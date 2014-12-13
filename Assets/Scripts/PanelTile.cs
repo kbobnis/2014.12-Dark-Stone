@@ -7,7 +7,7 @@ using System;
 
 public class PanelTile : MonoBehaviour {
 
-	public GameObject PanelSpell, PanelTiles, PanelAvatar;
+	public GameObject PanelSpell, PanelTiles, PanelAvatar, PanelInteraction;
 
 	public Card TemplateCard;
 
@@ -26,4 +26,21 @@ public class PanelTile : MonoBehaviour {
 	}
 
 
+
+	internal bool SetInteractionForMode(Mode mode, Card c, int distance, Side s, PanelTile whoIsCasting) {
+		bool anyPlaceToCast = false;
+		if (distance > 0) {
+			if (Neighbours.ContainsKey(s)) {
+				if (Neighbours[s].SetInteractionForMode(mode, c, distance - 1, s, whoIsCasting)) {
+					anyPlaceToCast = true;
+				}
+			}
+		} else {
+			if (!PanelAvatar.GetComponent<PanelAvatar>().HasSpell()) {
+				PanelInteraction.GetComponent<PanelInteraction>().Prepare(mode, c, whoIsCasting);
+				anyPlaceToCast = true;
+			}
+		}
+		return anyPlaceToCast;
+	}
 }

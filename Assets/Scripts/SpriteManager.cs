@@ -35,6 +35,7 @@ public class SpriteManager : MonoBehaviour{
 		IceBoltAnimations.Add(AnimationType.OnBoardExplode, Resources.Load<Sprite>("Images/iceAnimationExplode"));
 
 		MudAnimations.Add(AnimationType.Icon, Resources.Load<Sprite>("Images/mudIcon"));
+		MudAnimations.Add(AnimationType.OnBoard, Resources.Load<Sprite>("Images/mudEffect"));
 
 
 		Debug.Log("lasia animation: " + LasiaAnimations[AnimationType.OnBoard]);
