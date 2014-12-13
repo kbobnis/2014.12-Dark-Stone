@@ -5,9 +5,9 @@ using System;
 
 public class PanelAvatar : MonoBehaviour {
 
-	public GameObject PanelHealth, PanelMana, PanelSpell, PanelAttack;
+	public GameObject PanelHealth, PanelMana, PanelSpell, PanelAttack, PanelDirection;
 
-	private Card Card;
+	public Card Card;
 
 	public void Prepare(Card card) {
 

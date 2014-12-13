@@ -27,19 +27,17 @@ public class PanelTile : MonoBehaviour {
 
 
 
-	internal bool SetInteractionForMode(Mode mode, Card c, int distance, Side s, PanelTile whoIsCasting) {
+	internal bool SetInteractionForMode(Mode mode, Card c, int distance, Side s, PanelTile whoIsCasting, PanelTile castingFrom) {
 		bool anyPlaceToCast = false;
 		if (distance > 0) {
 			if (Neighbours.ContainsKey(s)) {
-				if (Neighbours[s].SetInteractionForMode(mode, c, distance - 1, s, whoIsCasting)) {
+				if (Neighbours[s].SetInteractionForMode(mode, c, distance - 1, s, whoIsCasting, castingFrom)) {
 					anyPlaceToCast = true;
 				}
 			}
-		} else {
-			if (!PanelAvatar.GetComponent<PanelAvatar>().HasSpell()) {
-				PanelInteraction.GetComponent<PanelInteraction>().Prepare(mode, c, whoIsCasting);
-				anyPlaceToCast = true;
-			}
+		} else if (!PanelAvatar.GetComponent<PanelAvatar>().HasSpell()) {
+			PanelInteraction.GetComponent<PanelInteraction>().Prepare(mode, c, whoIsCasting, castingFrom, s.Opposite());
+			anyPlaceToCast = true;
 		}
 		return anyPlaceToCast;
 	}

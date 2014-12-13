@@ -7,5 +7,6 @@ public enum ParamType {
 	Speed,
 	//this is this monsters mana
 	HisMana,
-	IncreaseManaEachTurn
+	IncreaseManaEachTurn,
+	Distance
 }
