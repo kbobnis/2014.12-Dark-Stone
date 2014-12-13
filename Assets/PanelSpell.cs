@@ -65,7 +65,7 @@ public class PanelSpell : MonoBehaviour {
 		if (c == null) {
 			throw new Exception("Why you cast when there is no card");
 		}
-		CardFeeders.Add(panelTile.GetComponent<PanelTile>().PanelSpell.GetComponent<PanelSpell>());
+		CardFeeders.Add(panelTile.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().PanelSpell.GetComponent<PanelSpell>());
 		panelTile.Prepare(c);
 	}
 }

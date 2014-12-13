@@ -7,7 +7,7 @@ using System;
 
 public class PanelTile : MonoBehaviour {
 
-	public GameObject PanelSpell, PanelTiles, PanelAvatar, PanelInteraction;
+	public GameObject PanelTiles, PanelAvatar, PanelInteraction;
 
 	public Card TemplateCard;
 

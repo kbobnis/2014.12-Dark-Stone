@@ -24,7 +24,7 @@ public class PanelMinigame : MonoBehaviour {
 
 		PanelTiles.GetComponent<ScrollableList>().Build(templates);
 
-		PanelSpell lasiaPanel = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[7 * 9 + 3].GetComponent<PanelTile>().PanelSpell.GetComponent<PanelSpell>();
+		PanelSpell lasiaPanel = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[7 * 9 + 3].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().PanelSpell.GetComponent<PanelSpell>();
 		PanelTile leftOrbTile = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[7 * 9 + 1].GetComponent<PanelTile>();
 		lasiaPanel.AddCard(Card.Orb);
 		lasiaPanel.CastOn(leftOrbTile);
@@ -33,12 +33,12 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaPanel.AddCard(Card.Orb);
 		lasiaPanel.CastOn(rightOrbTile);
 
-		PanelSpell leftOrb = leftOrbTile.PanelSpell.GetComponent<PanelSpell>();
+		PanelSpell leftOrb = leftOrbTile.PanelAvatar.GetComponent<PanelAvatar>().PanelSpell.GetComponent<PanelSpell>();
 		leftOrb.AddCard(Card.Mud);
 		leftOrb.AddCard(Card.IceBolt);
 		leftOrb.AddCard(Card.IceBolt);
 
-		PanelSpell rightOrb = rightOrbTile.PanelSpell.GetComponent<PanelSpell>();
+		PanelSpell rightOrb = rightOrbTile.PanelAvatar.GetComponent<PanelAvatar>().PanelSpell.GetComponent<PanelSpell>();
 		rightOrb.AddCard(Card.IceBolt);
 		rightOrb.AddCard(Card.Mud);
 		rightOrb.AddCard(Card.Mud);

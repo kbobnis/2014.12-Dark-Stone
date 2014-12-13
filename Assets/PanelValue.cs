@@ -13,6 +13,7 @@ public class PanelValue : MonoBehaviour {
 			_Value = value;
 			TextValue.GetComponent<Text>().text = "" + value;
 		}
+		get { return _Value; }
 	}
 
 	// Use this for initialization

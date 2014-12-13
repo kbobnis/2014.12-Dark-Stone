@@ -16,6 +16,11 @@ public class Game : MonoBehaviour {
 	void Awake () {
 		Me = this;
 
+		StartCoroutine(Prepare());
+	}
+
+	private IEnumerator Prepare() {
+		yield return new WaitForSeconds(0.5f);
 		PanelMinigame.GetComponent<PanelMinigame>().Prepare();
 	}
 

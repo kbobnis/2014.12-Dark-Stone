@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public enum ParamType  {
+public enum ParamType {
 	Health,
 	Damage,
-	Speed
+	Speed,
+	//this is this monsters mana
+	HisMana
 }
