@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System;
 
 public class PanelSpell : MonoBehaviour {
 
@@ -52,7 +53,19 @@ public class PanelSpell : MonoBehaviour {
 		if (CardStack.Count > 0) {
 			GetComponent<Image>().enabled = true;
 			ImageSpell.SetActive(true);
+			if (!CardStack[0].Animations.ContainsKey(AnimationType.Icon)) {
+				throw new Exception("Card: " + CardStack[0].Name + ", has no icon animation.");
+			}
 			ImageSpell.GetComponent<Image>().sprite = CardStack[0].Animations[AnimationType.Icon];
 		}
+	}
+
+	internal void CastOn(PanelTile panelTile) {
+		Card c = TryToPullCard();
+		if (c == null) {
+			throw new Exception("Why you cast when there is no card");
+		}
+		CardFeeders.Add(panelTile.GetComponent<PanelTile>().PanelSpell.GetComponent<PanelSpell>());
+		panelTile.Prepare(c);
 	}
 }

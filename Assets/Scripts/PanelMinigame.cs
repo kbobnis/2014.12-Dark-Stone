@@ -1,20 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
 public class PanelMinigame : MonoBehaviour {
 
 	public GameObject PanelTiles;
-
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 
 	internal void Prepare() {
 
@@ -28,25 +19,28 @@ public class PanelMinigame : MonoBehaviour {
 			templates.Add(col);
 		}
 
-		Card orb = new Card("Orb", 10, SpriteManager.OrbAnimations, new Dictionary<ParamType, int>(){ { ParamType.Health, 30} });
-
 		templates[9][3].AddTemplate(Card.Lasia);
 		templates[0][3].AddTemplate(Card.Dementor);
 
 		PanelTiles.GetComponent<ScrollableList>().Build(templates);
 
-		GameObject lasia = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[7 * 9 + 3];
-		PanelCardOnBoard lasiaPanel = lasia.GetComponent<PanelTile>().PanelCardOnBoard.GetComponent<PanelCardOnBoard>();
-		
-		lasiaPanel.Cast(orb, PanelTiles.GetComponent<ScrollableList>().ElementsToPut[7 * 9 + 1].GetComponent<PanelTile>().PanelCardOnBoard.GetComponent<PanelCardOnBoard>());
+		PanelSpell lasiaPanel = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[7 * 9 + 3].GetComponent<PanelTile>().PanelSpell.GetComponent<PanelSpell>();
+		PanelTile leftOrbTile = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[7 * 9 + 1].GetComponent<PanelTile>();
+		lasiaPanel.AddCard(Card.Orb);
+		lasiaPanel.CastOn(leftOrbTile);
 
-		PanelCardOnBoard leftOrb = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[7 * 9 + 1].GetComponent<PanelTile>().PanelCardOnBoard.GetComponent<PanelCardOnBoard>();
-		leftOrb.AddCardTemplate(Card.Mud);
-		leftOrb.AddCardTemplate(Card.IceBolt);
-		leftOrb.AddCardTemplate(Card.IceBolt);
-		
-		PanelCardOnBoard rightOrb = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[7 * 9 + 5].GetComponent<PanelTile>().PanelCardOnBoard.GetComponent<PanelCardOnBoard>();
-		lasiaPanel.Cast(orb, rightOrb);
-		rightOrb.AddCardTemplate(Card.IceBolt);
+		PanelTile rightOrbTile = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[7 * 9 + 5].GetComponent<PanelTile>();
+		lasiaPanel.AddCard(Card.Orb);
+		lasiaPanel.CastOn(rightOrbTile);
+
+		PanelSpell leftOrb = leftOrbTile.PanelSpell.GetComponent<PanelSpell>();
+		leftOrb.AddCard(Card.Mud);
+		leftOrb.AddCard(Card.IceBolt);
+		leftOrb.AddCard(Card.IceBolt);
+
+		PanelSpell rightOrb = rightOrbTile.PanelSpell.GetComponent<PanelSpell>();
+		rightOrb.AddCard(Card.IceBolt);
+		rightOrb.AddCard(Card.Mud);
+		rightOrb.AddCard(Card.Mud);
 	}
 }

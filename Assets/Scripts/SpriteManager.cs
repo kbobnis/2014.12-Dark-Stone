@@ -27,6 +27,7 @@ public class SpriteManager : MonoBehaviour{
 
 		DementorAnimations.Add(AnimationType.OnBoard, Resources.Load<Sprite>("Images/zlyDementor"));
 
+		OrbAnimations.Add(AnimationType.Icon, Resources.Load<Sprite>("Images/orb"));
 		OrbAnimations.Add(AnimationType.OnBoard, Resources.Load<Sprite>("Images/orb"));
 
 		IceBoltAnimations.Add(AnimationType.Icon, Resources.Load<Sprite>("Images/iceIcon"));
