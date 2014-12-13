@@ -5,7 +5,7 @@ using System;
 
 public class PanelAvatar : MonoBehaviour {
 
-	public GameObject PanelHealth, PanelMana, PanelSpell;
+	public GameObject PanelHealth, PanelMana, PanelSpell, PanelAttack;
 
 	private Card Card;
 
@@ -14,6 +14,7 @@ public class PanelAvatar : MonoBehaviour {
 		GetComponent<Image>().enabled = card != null;
 		PanelHealth.SetActive(false);
 		PanelMana.SetActive(false);
+		PanelAttack.SetActive(false);
 		if (card != null) {
 			if (!card.Animations.ContainsKey(AnimationType.OnBoard)) {
 				throw new Exception("There is no onBoard animation for card: " + card.Name);
@@ -28,6 +29,11 @@ public class PanelAvatar : MonoBehaviour {
 			if (card.Params.ContainsKey(ParamType.HisMana)) {
 				PanelMana.SetActive(true);
 				PanelMana.GetComponent<PanelValue>().Value = card.Params[ParamType.HisMana];
+			}
+
+			if (card.Params.ContainsKey(ParamType.Damage)) {
+				PanelAttack.SetActive(true);
+				PanelAttack.GetComponent<PanelValue>().Value = card.Params[ParamType.Damage];
 			}
 		}
 	}
