@@ -121,19 +121,19 @@ public class ScrollableList : MonoBehaviour
 				PanelTile bu = bi.GetComponent<PanelTile>();
 
 				if (tiles.Count > x + 1) {
-					bu.Neighbours.Add(Side.Right, tiles[x + 1][y]);
+					bu.Neighbours.Add(Side.Down, tiles[x + 1][y]);
 				}
 
 				if (tiles[x].Count > y + 1) {
-					bu.Neighbours.Add(Side.Down, tiles[x][y + 1]);
+					bu.Neighbours.Add(Side.Right, tiles[x][y + 1]);
 				}
 
 				if (x - 1 >= 0) {
-					bu.Neighbours.Add(Side.Left, tiles[x - 1][y]);
+					bu.Neighbours.Add(Side.Up, tiles[x - 1][y]);
 				}
 
 				if (y - 1 >= 0) {
-					bu.Neighbours.Add(Side.Up, tiles[x][y - 1]);
+					bu.Neighbours.Add(Side.Left, tiles[x][y-1]);
 				}
 				y++;
 			}

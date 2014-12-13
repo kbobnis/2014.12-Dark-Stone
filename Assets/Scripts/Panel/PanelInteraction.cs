@@ -7,7 +7,7 @@ public class PanelInteraction : MonoBehaviour {
 
 	public GameObject Text;
 
-	private Mode Mode;
+	public Mode Mode;
 	public Card Card;
 	public PanelTile WhoIsCasting;
 	public PanelTile CastingFrom;

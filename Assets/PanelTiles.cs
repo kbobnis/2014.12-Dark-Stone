@@ -114,7 +114,7 @@ public class PanelTiles : MonoBehaviour {
 		Card c = castingWhere.PanelAvatar.GetComponent<PanelAvatar>().Card;
 		Debug.Log("Setting direction for card: " + c.Name);
 
-		bool anyPlaceForDirection = castingWhere.SetInteractionForMode(Mode.SpellPositioning, c, c.Params[ParamType.Speed], Side.Up, castersTile, castingWhere);
+		bool anyPlaceForDirection = castingWhere.SetInteractionForMode(Mode.SpellDirectioning, c, c.Params[ParamType.Speed], Side.Up, castersTile, castingWhere);
 
 		if (castingWhere.SetInteractionForMode(Mode.SpellDirectioning, c, c.Params[ParamType.Speed], Side.Down, castersTile, castingWhere)) {
 			anyPlaceForDirection = true;
