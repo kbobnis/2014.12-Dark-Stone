@@ -64,20 +64,10 @@ public class PanelTiles : MonoBehaviour {
 
 		bool foundAPlace = false;
 
-		if (panelTile.SetInteractionForMode(Mode.SpellPositioning, c, c.Params[ParamType.Distance], Side.Left, panelTile, panelTile)) {
-			foundAPlace = true;
-		}
-
-		if (panelTile.SetInteractionForMode(Mode.SpellPositioning, c, c.Params[ParamType.Distance], Side.Right, panelTile, panelTile)) {
-			foundAPlace = true;
-		}
-
-		if (panelTile.SetInteractionForMode(Mode.SpellPositioning, c, c.Params[ParamType.Distance], Side.Up, panelTile, panelTile)) {
-			foundAPlace = true;
-		}
-
-		if (panelTile.SetInteractionForMode(Mode.SpellPositioning, c, c.Params[ParamType.Distance], Side.Down, panelTile, panelTile)) {
-			foundAPlace = true;
+		foreach (Side s in SideMethods.AllSides()) {
+			if (panelTile.SetInteractionForMode(Mode.SpellPositioning, c, c.Params[ParamType.Distance], s, panelTile, panelTile)) {
+				foundAPlace = true;
+			}
 		}
 
 		if (foundAPlace) {
@@ -114,19 +104,15 @@ public class PanelTiles : MonoBehaviour {
 		Card c = castingWhere.PanelAvatar.GetComponent<PanelAvatar>().Card;
 		Debug.Log("Setting direction for card: " + c.Name);
 
-		bool anyPlaceForDirection = castingWhere.SetInteractionForMode(Mode.SpellDirectioning, c, c.Params[ParamType.Speed], Side.Up, castersTile, castingWhere);
+		bool foundAPlace = false;
 
-		if (castingWhere.SetInteractionForMode(Mode.SpellDirectioning, c, c.Params[ParamType.Speed], Side.Down, castersTile, castingWhere)) {
-			anyPlaceForDirection = true;
-		}
-		if (castingWhere.SetInteractionForMode(Mode.SpellDirectioning, c, c.Params[ParamType.Speed], Side.Left, castersTile, castingWhere)) {
-			anyPlaceForDirection = true;
-		}
-		if (castingWhere.SetInteractionForMode(Mode.SpellDirectioning, c, c.Params[ParamType.Speed], Side.Right, castersTile, castingWhere)) {
-			anyPlaceForDirection = true;
+		foreach (Side s in SideMethods.AllSides()) {
+			if (castingWhere.SetInteractionForMode(Mode.SpellDirectioning, c, c.Params[ParamType.Speed], s, castersTile, castingWhere)) {
+				foundAPlace = true;
+			}
 		}
 
-		if (!anyPlaceForDirection) {
+		if (!foundAPlace) {
 			Debug.Log("There is no place where it can be cast.");
 			Mode = Mode.Ready;
 		}

@@ -135,6 +135,20 @@ public class ScrollableList : MonoBehaviour
 				if (y - 1 >= 0) {
 					bu.Neighbours.Add(Side.Left, tiles[x][y-1]);
 				}
+
+				if (x - 1 >= 0 && y - 1 >= 0) {
+					bu.Neighbours.Add(Side.UpLeft, tiles[x - 1][y - 1]);
+				}
+				if (x - 1 >= 0 && tiles[x - 1].Count > y + 1) {
+					bu.Neighbours.Add(Side.UpRight, tiles[x - 1][y + 1]);
+				}
+				if (tiles.Count > x + 1 && y - 1 >= 0) {
+					bu.Neighbours.Add(Side.DownLeft, tiles[x + 1][y - 1]);
+				}
+				if (tiles.Count > x + 1 && tiles[x+1].Count  > y+1){
+					bu.Neighbours.Add(Side.DownRight, tiles[x + 1][y + 1]);
+				}
+
 				y++;
 			}
 			x++;
