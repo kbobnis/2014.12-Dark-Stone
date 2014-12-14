@@ -35,7 +35,7 @@ public class PanelTile : MonoBehaviour {
 					anyPlaceToCast = true;
 				}
 			}
-		} else if (!PanelAvatar.GetComponent<PanelAvatar>().HasSpell()) {
+		} else if (!PanelAvatar.GetComponent<PanelAvatar>().HasSpell() || (mode == Mode.SpellDirectioning)) {
 			PanelInteraction.GetComponent<PanelInteraction>().Prepare(mode, c, whoIsCasting, castingFrom, s);
 			anyPlaceToCast = true;
 		}
