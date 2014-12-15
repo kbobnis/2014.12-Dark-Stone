@@ -41,4 +41,5 @@ public class PanelTile : MonoBehaviour {
 		}
 		return anyPlaceToCast;
 	}
+
 }

@@ -21,7 +21,7 @@ public class PanelTiles : MonoBehaviour {
 					if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Card.Params.ContainsKey(ParamType.HisMana) && panelTile.PanelAvatar.GetComponent<PanelAvatar>().PanelSpell.GetComponent<PanelSpell>().TopCard() == null) {
 						PanelInformation.GetComponent<PanelInformation>().SetText("No more spells available.");
 					} else  if (c != null) {
-						if (c.Cost > panelTile.PanelAvatar.GetComponent<PanelAvatar>().PanelMana.GetComponent<PanelValue>().Value) {
+						if (c.Cost > panelTile.PanelAvatar.GetComponent<PanelAvatar>().PanelMana.GetComponent<PanelValue>().ActualValue) {
 							PanelInformation.GetComponent<PanelInformation>().SetText("You have not enough mana to cast this spell");
 						} else if (c.Params.ContainsKey(ParamType.Distance)) {
 							SetPlace(panelTile);
@@ -34,7 +34,7 @@ public class PanelTiles : MonoBehaviour {
 					break;
 				case Mode.SpellDirectioning:
 					if (panelTile.PanelInteraction.GetComponent<PanelInteraction>().IsInMode(Mode.SpellDirectioning)) {
-						panelTile.PanelInteraction.GetComponent<PanelInteraction>().CastingFrom.PanelAvatar.GetComponent<PanelAvatar>().PanelDirection.GetComponent<PanelDirection>().Prepare(panelTile.PanelInteraction.GetComponent<PanelInteraction>().CastingSide);
+						panelTile.PanelInteraction.GetComponent<PanelInteraction>().CastingFrom.PanelAvatar.GetComponent<PanelAvatar>().PanelDirection.GetComponent<PanelDirection>().Prepare(panelTile.PanelInteraction.GetComponent<PanelInteraction>().CastingSide, panelTile.PanelInteraction.GetComponent<PanelInteraction>().Card.Params[ParamType.Speed]);
 						DisableCastingOnAll(Mode.All);
 						Mode = Mode.Ready;
 					} else {

@@ -4,9 +4,16 @@ using UnityEngine.UI;
 
 public class PanelDirection : MonoBehaviour {
 
-	public GameObject ImageDirection;
+	public GameObject ImageDirection, ImageMovesLeft;
 
-	private Side Side = Side.None;
+	public Side Side = Side.None;
+	public int Speed;
+	private int _MovesLeft;
+
+	public int MovesLeft {
+		get { return _MovesLeft; }
+		set { _MovesLeft = value; UpdateImage();  }
+	}
 
 	void Awake() {
 		UpdateImage();
@@ -15,16 +22,28 @@ public class PanelDirection : MonoBehaviour {
 	private void UpdateImage() {
 		GetComponent<Image>().enabled = false;
 		ImageDirection.SetActive(false);
+		ImageMovesLeft.SetActive(false);
 		if (Side != global::Side.None) {
 			GetComponent<Image>().enabled = true;
 			ImageDirection.SetActive(true);
 			Quaternion old = ImageDirection.GetComponent<RectTransform>().rotation;
 			ImageDirection.GetComponent<RectTransform>().Rotate(0, 0, Side.ToRotation());
+
+			if (_MovesLeft > 0) {
+				ImageMovesLeft.SetActive(true);
+				ImageMovesLeft.GetComponent<Text>().text = "" + _MovesLeft;
+			}
 		}
 	}
 
-	internal void Prepare(Side side) {
+	internal void Prepare(Side side, int speed) {
 		Side = side;
+		Speed = speed;
+		UpdateImage();
+	}
+
+	internal void RefillMoves() {
+		_MovesLeft = Speed;
 		UpdateImage();
 	}
 }

@@ -17,7 +17,7 @@ public class PanelInformation : MonoBehaviour {
 		Text.GetComponent<Text>().text = text;
 	}
 
-	private void DisableMe() {
+	public void DisableMe() {
 		GetComponent<Image>().enabled = false;
 		Text.SetActive(false);
 	}

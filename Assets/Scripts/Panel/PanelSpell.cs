@@ -8,8 +8,8 @@ public class PanelSpell : MonoBehaviour {
 
 	public GameObject ImageSpell;
 
-	public List<Card> CardStack = new List<Card>();
-	public List<PanelSpell> CardFeeders = new List<PanelSpell>();
+	private List<Card> CardStack = new List<Card>();
+	private List<PanelAvatar> CardFeeders = new List<PanelAvatar>();
 
 	void Awake() {
 		UpdateImage();
@@ -17,8 +17,8 @@ public class PanelSpell : MonoBehaviour {
 
 	void Update() {
 		if (CardStack.Count == 0 && CardFeeders.Count > 0) {
-			foreach (PanelSpell ps in CardFeeders) {
-				Card c = ps.TryToPullCard();
+			foreach (PanelAvatar ps in CardFeeders) {
+				Card c = ps.PanelSpell.GetComponent<PanelSpell>().TryToPullCard();
 				if (c != null) {
 					AddCard(c);
 					break;
@@ -65,7 +65,7 @@ public class PanelSpell : MonoBehaviour {
 		if (c == null) {
 			throw new Exception("Why you cast when there is no card");
 		}
-		CardFeeders.Add(panelTile.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().PanelSpell.GetComponent<PanelSpell>());
+		CardFeeders.Add(panelTile.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>());
 		panelTile.Prepare(c);
 	}
 }

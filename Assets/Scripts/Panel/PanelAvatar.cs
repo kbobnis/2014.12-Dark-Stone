@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using System;
+using System.Collections.Generic;
 
 public class PanelAvatar : MonoBehaviour {
 
@@ -9,43 +10,48 @@ public class PanelAvatar : MonoBehaviour {
 
 	public Card Card;
 
+	public bool IsEmpty() {
+		return Card == null;
+	}
+
 	public void Prepare(Card card) {
-
-		GetComponent<Image>().enabled = card != null;
-		PanelHealth.SetActive(false);
-		PanelMana.SetActive(false);
-		PanelAttack.SetActive(false);
+		Card = card;
 		if (card != null) {
-			if (!card.Animations.ContainsKey(AnimationType.OnBoard)) {
-				throw new Exception("There is no onBoard animation for card: " + card.Name);
+			if (Card.Params.ContainsKey(ParamType.Health)) {
+				PanelHealth.GetComponent<PanelValue>().Prepare(card.Params[ParamType.Health]);
 			}
-			Card = card;
-			GetComponent<Image>().sprite = card.Animations[AnimationType.OnBoard];
-			if (card.Params.ContainsKey(ParamType.Health)) {
-				PanelHealth.SetActive(true);
-				PanelHealth.GetComponent<PanelValue>().Value = (int)card.Params[ParamType.Health];
+			if (Card.Params.ContainsKey(ParamType.HisMana)) {
+				PanelMana.GetComponent<PanelValue>().Prepare(card.Params[ParamType.HisMana]);
 			}
-			
-			if (card.Params.ContainsKey(ParamType.HisMana)) {
-				PanelMana.SetActive(true);
-				PanelMana.GetComponent<PanelValue>().Value = card.Params[ParamType.HisMana];
-			}
-
-			if (card.Params.ContainsKey(ParamType.Damage)) {
-				PanelAttack.SetActive(true);
-				PanelAttack.GetComponent<PanelValue>().Value = card.Params[ParamType.Damage];
+			if (Card.Params.ContainsKey(ParamType.Damage)) {
+				PanelAttack.GetComponent<PanelValue>().Prepare(Card.Params[ParamType.Damage]);
 			}
 		}
+		UpdateImage();
+	}
+
+	public void UpdateImage() {
+		GetComponent<Image>().enabled = Card != null;
+		if (Card != null) {
+			if (!Card.Animations.ContainsKey(AnimationType.OnBoard)) {
+				throw new Exception("There is no onBoard animation for card: " + Card.Name);
+			}
+			GetComponent<Image>().sprite = Card.Animations[AnimationType.OnBoard];
+		}
+	}
+
+	internal void Clear() {
+		Prepare(null);
+		PanelDirection.GetComponent<PanelDirection>().Prepare(Side.None, 0);
 	}
 
 	public bool HasSpell() {
 		return Card != null;
 	}
 
-
 	internal void CastOn(PanelTile panelTile) {
-
-		PanelMana.GetComponent<PanelValue>().Value -= panelTile.PanelInteraction.GetComponent<PanelInteraction>().Card.Cost;
+		PanelMana.GetComponent<PanelValue>().ActualValue -= panelTile.PanelInteraction.GetComponent<PanelInteraction>().Card.Cost;
 		PanelSpell.GetComponent<PanelSpell>().CastOn(panelTile);
 	}
+
 }
