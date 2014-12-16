@@ -22,23 +22,56 @@ public class PanelAvatar : MonoBehaviour {
 	}
 
 	public void Prepare(Card card) {
-		if ( _Model.Card != null) {
-			throw new NotImplementedException("There is already a card here. What to do now");
-		}
-		_Model.Card = card;
 
-		_Model.ActualHealth = card != null && card.Params.ContainsKey(ParamType.Health) ? card.Params[ParamType.Health] : 0;
-		_Model.ActualMana = card != null && card.Params.ContainsKey(ParamType.HisMana) ? card.Params[ParamType.HisMana] : 0;
-		_Model.ActualDamage = card != null && card.Params.ContainsKey(ParamType.Damage) ? card.Params[ParamType.Damage] : 0;
-		if (card != null && !card.Animations.ContainsKey(AnimationType.OnBoard)) {
-			throw new Exception("There is no onBoard animation for card: " + card.Name);
+		if (card != null) {
+			foreach (KeyValuePair<ParamType, int> kvp in card.Params) {
+				switch (kvp.Key) {
+					case ParamType.Health: _Model.ActualHealth += kvp.Value; break;
+					case ParamType.HisMana: _Model.ActualMana += kvp.Value; break;
+					case ParamType.Damage: _Model.ActualDamage += kvp.Value; break;
+					case ParamType.Speed: _Model.Speed += kvp.Value; break;
+					case ParamType.IncreaseManaEachTurn: _Model.IncreaseManaEachTurn += kvp.Value; break;
+					//this is used when the spell is casted, no need for it now
+					case ParamType.Distance: break;
+					default: throw new NotImplementedException("Implement case for: " + kvp.Key);
+				}
+			}
 		}
+		if (card != null) {
+			Debug.Log("Preparing panelAvatar with card: " + card.Name + " and the speed in model is: " + _Model.Speed);
+		}
+
+		if (_Model.Card == null){
+			_Model.Card = card;
+			if (card != null && !card.Animations.ContainsKey(AnimationType.OnBoard)) {
+				throw new Exception("There is no onBoard animation for card: " + card.Name);
+			}
+		}
+
+		if (card != null && card.Spells.Count > 0) {
+			foreach(Card c in card.Spells){
+				_Model.CardStack.Add(c);
+			}
+		}
+
 		UpdateFromModel();
 	}
 
-	internal void SetDirection(Side side, int p) {
+	void Update() {
+		if (Model.CardStack.Count == 0 && Model.CardFeeders.Count > 0) {
+			foreach (PanelAvatar ps in Model.CardFeeders) {
+				Card c = TryToPullCard();
+				if (c != null) {
+					Model.CardStack.Add(c);
+					break;
+				}
+			}
+			UpdateFromModel();
+		}
+	}
+
+	internal void SetDirection(Side side) {
 		_Model.Direction = side;
-		_Model.Speed = p;
 		UpdateFromModel();
 	}
 
@@ -53,12 +86,23 @@ public class PanelAvatar : MonoBehaviour {
 			PanelHealth.GetComponent<PanelValue>().Prepare(0);
 			PanelMana.GetComponent<PanelValue>().Prepare(0);
 			PanelAttack.GetComponent<PanelValue>().Prepare(0);
-			PanelDirection.GetComponent<PanelDirection>().Prepare(Side.None, 0);
+			PanelDirection.GetComponent<PanelDirection>().Prepare(Side.None);
 		} else {
 			PanelHealth.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualHealth : 0);
 			PanelMana.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualMana : 0);
 			PanelAttack.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualDamage : 0);
-			PanelDirection.GetComponent<PanelDirection>().Prepare(_Model != null ? _Model.Direction : Side.None, _Model != null ? _Model.Speed : 0);
+			PanelDirection.GetComponent<PanelDirection>().Prepare(_Model != null ? _Model.Direction : Side.None);
+		}
+
+		PanelSpell.GetComponent<Image>().enabled = false;
+		PanelSpell.GetComponent<PanelSpell>().ImageSpell.SetActive(false);
+		if (Model.CardStack.Count > 0) {
+			PanelSpell.GetComponent<Image>().enabled = true;
+			PanelSpell.GetComponent<PanelSpell>().ImageSpell.SetActive(true);
+			if (!Model.CardStack[0].Animations.ContainsKey(AnimationType.Icon)) {
+				throw new Exception("Card: " + Model.CardStack[0].Name + ", has no icon animation.");
+			}
+			PanelSpell.GetComponent<PanelSpell>().ImageSpell.GetComponent<Image>().sprite = Model.CardStack[0].Animations[AnimationType.Icon];
 		}
 	}
 
@@ -67,8 +111,14 @@ public class PanelAvatar : MonoBehaviour {
 	}
 
 	internal void CastOn(PanelTile panelTile) {
-		Model.ActualMana -= panelTile.PanelInteraction.GetComponent<PanelInteraction>().Card.Cost;
-		PanelSpell.GetComponent<PanelSpell>().CastOn(panelTile);
+
+		Card c = TryToPullCard();
+		if (c == null) {
+			throw new Exception("Why you cast when there is no card");
+		}
+		Model.ActualMana -= c.Cost;
+		Model.CardFeeders.Add(panelTile.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>());
+		panelTile.PanelAvatar.GetComponent<PanelAvatar>().Prepare(c);
 	}
 
 	internal void AddModel(PanelAvatarModel model) {
@@ -103,7 +153,6 @@ public class PanelAvatar : MonoBehaviour {
 			foreach (PanelAvatarModel pam2 in _AdditionalModels) {
 				if (pam != pam2) {
 					pam2.ActualHealth -= pam.ActualDamage;
-					Debug.Log(pam2.Card.Name + "("+pam2.ActualHealth+" health), receives damage from : " + pam.Card.Name + " dmg: " + pam.ActualDamage);
 				}
 			}
 		}
@@ -125,6 +174,7 @@ public class PanelAvatar : MonoBehaviour {
 				if (pam.ActualHealth > mostHealth) {
 					pam3 = pam;
 					inAequo = 1;
+					mostHealth = pam.ActualHealth;
 				}
 				
 			}
@@ -137,6 +187,8 @@ public class PanelAvatar : MonoBehaviour {
 		if (inAequo > 1) {
 			Model = new PanelAvatarModel();
 		}
+		//in case all died and there will be fight sprite left.
+		UpdateFromModel();
 	}
 
 	internal void FlattenModelWhenNoBattles() {
@@ -149,14 +201,32 @@ public class PanelAvatar : MonoBehaviour {
 	internal void ShowBattleSignIfBattle() {
 		UpdateFromModel();
 	}
+
+	public Card TryToPullCard() {
+		Card c = null;
+		if (Model.CardStack.Count > 0) {
+			c = Model.CardStack[0];
+			Model.CardStack.Remove(c);
+			UpdateFromModel();
+		}
+		return c;
+	}
 }
 
 public class PanelAvatarModel {
 
 	public Card Card;
-	public int ActualHealth, ActualMana, ActualDamage, Speed, MovesLeft;
+	public int ActualHealth, ActualMana, ActualDamage, Speed, MovesLeft, IncreaseManaEachTurn;
 	public Side Direction = Side.None;
 
+	public List<Card> CardStack = new List<Card>();
+	public List<PanelAvatar> CardFeeders = new List<PanelAvatar>();
+
+	public Card TopCard() {
+		return CardStack.Count > 0 ? CardStack[0] : null;
+	}
+
+	
 }
 
 

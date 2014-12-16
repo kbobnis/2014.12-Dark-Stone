@@ -15,7 +15,9 @@ public class SpriteManager : MonoBehaviour{
 	public static Dictionary<AnimationType, Sprite> OrbAnimations = new Dictionary<AnimationType, Sprite>();
 	public static Dictionary<AnimationType, Sprite> IceBoltAnimations = new Dictionary<AnimationType, Sprite>();
 	public static Dictionary<AnimationType, Sprite> MudAnimations = new Dictionary<AnimationType, Sprite>();
-	
+	public static Dictionary<AnimationType, Sprite> ZombieAnimations = new Dictionary<AnimationType, Sprite>();
+	public static Dictionary<AnimationType, Sprite> ShoeAnimations = new Dictionary<AnimationType, Sprite>();
+	public static Dictionary<AnimationType, Sprite> FireballAnimations = new Dictionary<AnimationType, Sprite>();
 
 
 	void Awake(){
@@ -36,8 +38,13 @@ public class SpriteManager : MonoBehaviour{
 		MudAnimations.Add(AnimationType.Icon, Resources.Load<Sprite>("Images/mudIcon"));
 		MudAnimations.Add(AnimationType.OnBoard, Resources.Load<Sprite>("Images/mudEffect"));
 
-		Debug.Log("lasia animation: " + LasiaAnimations[AnimationType.OnBoard]);
+		ZombieAnimations.Add(AnimationType.OnBoard, Resources.Load<Sprite>("Images/zombieAnimation"));
+		ZombieAnimations.Add(AnimationType.Icon, Resources.Load<Sprite>("Images/zombie"));
 
+		ShoeAnimations.Add(AnimationType.Icon, Resources.Load<Sprite>("Images/shoeIcon"));
+		ShoeAnimations.Add(AnimationType.OnBoard, Resources.Load<Sprite>("Images/shoeAnimation"));
+
+		FireballAnimations.Add(AnimationType.Icon, Resources.Load<Sprite>("Images/fireballIcon"));
+		FireballAnimations.Add(AnimationType.OnBoard, Resources.Load<Sprite>("Images/fireball"));
 	}
-
 }

@@ -7,7 +7,6 @@ public class PanelDirection : MonoBehaviour {
 	public GameObject ImageDirection, ImageMovesLeft;
 
 	public Side Side = Side.None;
-	public int Speed;
 	private int _MovesLeft;
 
 	public int MovesLeft {
@@ -37,9 +36,8 @@ public class PanelDirection : MonoBehaviour {
 		}
 	}
 
-	internal void Prepare(Side side, int speed) {
+	internal void Prepare(Side side) {
 		Side = side;
-		Speed = speed;
 		UpdateImage();
 	}
 

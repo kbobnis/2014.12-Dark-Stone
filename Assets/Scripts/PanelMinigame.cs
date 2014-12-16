@@ -26,19 +26,30 @@ public class PanelMinigame : MonoBehaviour {
 
 		PanelTiles.GetComponent<ScrollableList>().Build(templates);
 		
-		PanelSpell lasiaPanel = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[5 * 6 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().PanelSpell.GetComponent<PanelSpell>();
-		lasiaPanel.AddCard(Card.IceBolt);
-		lasiaPanel.AddCard(Card.Mud);
-		lasiaPanel.AddCard(Card.IceBolt);
-		lasiaPanel.AddCard(Card.Mud);
+		PanelAvatar lasiaAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[5 * 6 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
+		PanelAvatarModel lasiaModel = lasiaAvatar.Model;
+		lasiaModel.CardStack.Add(Card.Zombie);
+		lasiaModel.CardStack.Add(Card.Fireball);
+		lasiaModel.CardStack.Add(Card.IceBolt);
+		lasiaModel.CardStack.Add(Card.Mud);
+		lasiaModel.CardStack.Add(Card.IceBolt);
+		lasiaModel.CardStack.Add(Card.Mud);
+		lasiaAvatar.UpdateFromModel();
 
-		PanelSpell dementorPanel = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().PanelSpell.GetComponent<PanelSpell>();
-		dementorPanel.AddCard(Card.IceBolt);
-		dementorPanel.AddCard(Card.Mud);
+		PanelAvatar dementorAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
+		PanelAvatarModel dementorModel = dementorAvatar.Model;
+		dementorModel.CardStack.Add(Card.IceBolt);
+		dementorModel.CardStack.Add(Card.Mud);
+		dementorAvatar.UpdateFromModel();
+
 	}
 
 	public void EndTurn() {
-		StartCoroutine(EndTurnCoroutine());
+		if (PanelTiles.GetComponent<PanelTiles>().Mode != Mode.Ready) {
+			PanelInformation.GetComponent<PanelInformation>().SetText("Finish " + PanelTiles.GetComponent<PanelTiles>().Mode + " first.");
+		} else {
+			StartCoroutine(EndTurnCoroutine());
+		}
 	}
 
 	private IEnumerator EndTurnCoroutine() {
@@ -48,6 +59,10 @@ public class PanelMinigame : MonoBehaviour {
 		foreach (GameObject go in elements) {
 			PanelAvatar pa = go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 			pa.Model.MovesLeft = pa.Model.Speed;
+			if (pa.Model.Card != null) {
+				int speed = pa.Model.Card.Params.ContainsKey(ParamType.Speed)? pa.Model.Card.Params[ParamType.Speed] : 0;
+				Debug.Log(pa.Model.Card.Name + " has moves left: " + pa.Model.MovesLeft + " and moves: " + speed + ", moves in model : " + pa.Model.Speed);
+			}
 		}
 
 		bool stillSomethingToDo;
@@ -95,10 +110,9 @@ public class PanelMinigame : MonoBehaviour {
 		//mana update
 		foreach (GameObject go in elements) {
 			PanelAvatar pa = go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
-			if (pa.Model.Card != null && pa.Model.Card.Params.ContainsKey(ParamType.IncreaseManaEachTurn)){
-				pa.Model.ActualMana += pa.Model.Card.Params[ParamType.IncreaseManaEachTurn];
+			if (pa.Model.IncreaseManaEachTurn > 0){
+				pa.Model.ActualMana += pa.Model.IncreaseManaEachTurn;
 				pa.UpdateFromModel();
-
 			}
 		}
 
