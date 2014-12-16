@@ -27,6 +27,7 @@ public class PanelDirection : MonoBehaviour {
 			GetComponent<Image>().enabled = true;
 			ImageDirection.SetActive(true);
 			Quaternion old = ImageDirection.GetComponent<RectTransform>().rotation;
+			ImageDirection.GetComponent<RectTransform>().rotation = new Quaternion();
 			ImageDirection.GetComponent<RectTransform>().Rotate(0, 0, Side.ToRotation());
 
 			if (_MovesLeft > 0) {
@@ -42,8 +43,4 @@ public class PanelDirection : MonoBehaviour {
 		UpdateImage();
 	}
 
-	internal void RefillMoves() {
-		_MovesLeft = Speed;
-		UpdateImage();
-	}
 }

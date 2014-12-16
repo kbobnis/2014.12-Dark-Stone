@@ -18,7 +18,7 @@ public class PanelTiles : MonoBehaviour {
 			switch (Mode) {
 				case Mode.Ready:
 
-					if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Card.Params.ContainsKey(ParamType.HisMana) && panelTile.PanelAvatar.GetComponent<PanelAvatar>().PanelSpell.GetComponent<PanelSpell>().TopCard() == null) {
+					if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Params.ContainsKey(ParamType.HisMana) && panelTile.PanelAvatar.GetComponent<PanelAvatar>().PanelSpell.GetComponent<PanelSpell>().TopCard() == null) {
 						PanelInformation.GetComponent<PanelInformation>().SetText("No more spells available.");
 					} else  if (c != null) {
 						if (c.Cost > panelTile.PanelAvatar.GetComponent<PanelAvatar>().PanelMana.GetComponent<PanelValue>().ActualValue) {
@@ -34,7 +34,7 @@ public class PanelTiles : MonoBehaviour {
 					break;
 				case Mode.SpellDirectioning:
 					if (panelTile.PanelInteraction.GetComponent<PanelInteraction>().IsInMode(Mode.SpellDirectioning)) {
-						panelTile.PanelInteraction.GetComponent<PanelInteraction>().CastingFrom.PanelAvatar.GetComponent<PanelAvatar>().PanelDirection.GetComponent<PanelDirection>().Prepare(panelTile.PanelInteraction.GetComponent<PanelInteraction>().CastingSide, panelTile.PanelInteraction.GetComponent<PanelInteraction>().Card.Params[ParamType.Speed]);
+						panelTile.PanelInteraction.GetComponent<PanelInteraction>().CastingFrom.PanelAvatar.GetComponent<PanelAvatar>().SetDirection(panelTile.PanelInteraction.GetComponent<PanelInteraction>().CastingSide, panelTile.PanelInteraction.GetComponent<PanelInteraction>().Card.Params[ParamType.Speed]);
 						DisableCastingOnAll(Mode.All);
 						Mode = Mode.Ready;
 					} else {
@@ -104,7 +104,7 @@ public class PanelTiles : MonoBehaviour {
 	}
 
 	private void SetDirection(PanelTile castingWhere, PanelTile castersTile) {
-		Card c = castingWhere.PanelAvatar.GetComponent<PanelAvatar>().Card;
+		Card c = castingWhere.PanelAvatar.GetComponent<PanelAvatar>().Model.Card;
 		Debug.Log("Setting direction for card: " + c.Name);
 
 		bool foundAPlace = false;

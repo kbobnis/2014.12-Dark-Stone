@@ -102,7 +102,7 @@ public class ScrollableList : MonoBehaviour
 
 				PanelTile b = newItem.GetComponent<PanelTile>();
 				float pan = (actualRow - ((columnCount-1)/2f))/((columnCount-1)/2f);
-				b.Prepare(bt.Card);
+				b.PanelAvatar.GetComponent<PanelAvatar>().Prepare(bt.Card);
 
 				ElementsToPut.Add(newItem);
 				buildingsRow.Add(b);

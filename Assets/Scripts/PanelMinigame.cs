@@ -44,74 +44,76 @@ public class PanelMinigame : MonoBehaviour {
 	private IEnumerator EndTurnCoroutine() {
 
 		//refill moves
-		PanelInformation.GetComponent<PanelInformation>().SetText("Refilling moves");
 		List<GameObject> elements = PanelTiles.GetComponent<ScrollableList>().ElementsToPut;
 		foreach (GameObject go in elements) {
-			PanelTile pt = go.GetComponent<PanelTile>();
-			PanelAvatar pa = pt.PanelAvatar.GetComponent<PanelAvatar>();
-			Side direction = pa.PanelDirection.GetComponent<PanelDirection>().Side;
-			pa.PanelDirection.GetComponent<PanelDirection>().RefillMoves();
+			PanelAvatar pa = go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
+			pa.Model.MovesLeft = pa.Model.Speed;
 		}
-		yield return new WaitForSeconds(1f);
 
 		bool stillSomethingToDo;
-		int iteration = 1;
 		do {
-			//moving
+			PanelInformation.GetComponent<PanelInformation>().SetText("Moving");
+			//checking what is moving
 			stillSomethingToDo = false;
+			List<KeyValuePair<PanelTile, Side>> toMove = new List<KeyValuePair<PanelTile, Side>>();
 			foreach (GameObject go in elements) {
 				PanelTile pt = go.GetComponent<PanelTile>();
 				PanelAvatar pa = pt.PanelAvatar.GetComponent<PanelAvatar>();
-				Side direction = pa.PanelDirection.GetComponent<PanelDirection>().Side;
-				if (pa.PanelDirection.GetComponent<PanelDirection>().MovesLeft > 0) {
-					pa.PanelDirection.GetComponent<PanelDirection>().MovesLeft--;
-					MovePanelAvatar(pt, direction, 1);
-					if (pa.PanelDirection.GetComponent<PanelDirection>().MovesLeft > 0) {
+				Side direction = pa.Model.Direction;
+				if (pa.Model.MovesLeft > 0) {
+					pa.Model.MovesLeft--;
+					toMove.Add(new KeyValuePair<PanelTile, Side>(pt, direction));
+					if (pa.Model.MovesLeft > 0) {
 						stillSomethingToDo = true;
 					}
 				}
 			}
-			PanelInformation.GetComponent<PanelInformation>().SetText("Moving " + iteration++);
-			yield return new WaitForSeconds(1f);
 
+			//moving
+			foreach (KeyValuePair<PanelTile, Side> oneMove in toMove) {
+				ShiftPanelAvatar(oneMove.Key, oneMove.Value);
+			}
+			toMove.Clear();
+
+			//updating when no collisions
+			foreach (GameObject go in elements) {
+				go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().FlattenModelWhenNoBattles();
+				go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().ShowBattleSignIfBattle();
+			}
+
+			yield return new WaitForSeconds(0.5f);
+
+			PanelInformation.GetComponent<PanelInformation>().SetText("Batlles");
+			//battling
+			foreach (GameObject go in elements) {
+				go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().BattleOut();
+			}
+			yield return new WaitForSeconds(0.5f);
 		} while (stillSomethingToDo);
 
-		//interact spells
-
-		//end
 		PanelInformation.GetComponent<PanelInformation>().SetText("New turn");
-		yield return new WaitForSeconds(0.5f);
+		//mana update
+		foreach (GameObject go in elements) {
+			PanelAvatar pa = go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
+			if (pa.Model.Card != null && pa.Model.Card.Params.ContainsKey(ParamType.IncreaseManaEachTurn)){
+				pa.Model.ActualMana += pa.Model.Card.Params[ParamType.IncreaseManaEachTurn];
+				pa.UpdateFromModel();
+
+			}
+		}
+
+		yield return new WaitForSeconds(0.25f);
 		PanelInformation.GetComponent<PanelInformation>().DisableMe();
 		yield return null;
 	}
 
-	private void MovePanelAvatar(PanelTile pt, Side direction, int distance) {
-
-		if (distance > 1){
-			throw new Exception("Programmer, what to do if distance is " + distance + " we want to move tiles by one");
+	private void ShiftPanelAvatar(PanelTile pt, Side direction) {
+		//moves outside screen
+		if (!pt.Neighbours.ContainsKey(direction)) {
+			pt.PanelAvatar.GetComponent<PanelAvatar>().Model = new PanelAvatarModel();
 		} else {
-			//moves outside screen
-			if (!pt.Neighbours.ContainsKey(direction)) {
-				pt.PanelAvatar.GetComponent<PanelAvatar>().Clear();
-			} else {
-				if (!pt.Neighbours[direction].PanelAvatar.GetComponent<PanelAvatar>().IsEmpty()) {
-					throw new Exception("we want to move on another panel avatar. collision collision. implement collisions");
-				} else { //no collision, can move
-					Debug.Log("Switching pa " + pt.gameObject.name + " with: " + pt.Neighbours[direction].gameObject.name);
-					GameObject pa = pt.Neighbours[direction].PanelAvatar;
-					pt.Neighbours[direction].PanelAvatar = pt.PanelAvatar;
-					pt.PanelAvatar.gameObject.transform.parent = pt.Neighbours[direction].gameObject.transform;
-					pt.PanelAvatar.gameObject.GetComponent<RectTransform>().offsetMin = new Vector2(0, 0);
-					pt.PanelAvatar.gameObject.GetComponent<RectTransform>().offsetMax = new Vector2(0, 0);
-
-					pt.PanelAvatar = pa;
-					pa.gameObject.transform.parent = pt.gameObject.transform;
-					pa.gameObject.GetComponent<RectTransform>().offsetMin = new Vector2(0, 0);
-					pa.gameObject.GetComponent<RectTransform>().offsetMax = new Vector2(0, 0);
-					
-				}
-				
-			}
+			pt.Neighbours[direction].PanelAvatar.GetComponent<PanelAvatar>().AddModel(pt.PanelAvatar.GetComponent<PanelAvatar>().GetAndRemoveModel());
 		}
 	}
+
 }

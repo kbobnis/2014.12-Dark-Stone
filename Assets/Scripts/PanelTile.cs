@@ -9,23 +9,11 @@ public class PanelTile : MonoBehaviour {
 
 	public GameObject PanelTiles, PanelAvatar, PanelInteraction;
 
-	public Card TemplateCard;
-
 	public Dictionary<Side, PanelTile> Neighbours = new Dictionary<Side, PanelTile>();
 
 	public void Touched(BaseEventData bed) {
 		PanelTiles.GetComponent<PanelTiles>().PointerDownOn(this);
 	}
-
-	public void Prepare(Card card) {
-		if (TemplateCard != null) {
-			throw new System.Exception("Card already on this tile. What to do now");
-		}
-		TemplateCard = card;
-		PanelAvatar.GetComponent<PanelAvatar>().Prepare(card);
-	}
-
-
 
 	internal bool SetInteractionForMode(Mode mode, Card c, int distance, Side s, PanelTile whoIsCasting, PanelTile castingFrom) {
 		bool anyPlaceToCast = false;
@@ -41,5 +29,6 @@ public class PanelTile : MonoBehaviour {
 		}
 		return anyPlaceToCast;
 	}
+
 
 }
