@@ -7,19 +7,22 @@ public class Mover : MonoBehaviour {
 	private Side Side = Side.None;
 	private float AnimationTime, StartTime;
 	private float FullDeltaX, FullDeltaY;
-	private float ToPercentF;
+	private float ToPercentF, FromPercentF;
+
+	private float IdleTime;
 
 	private Vector2 BaseOffsetMin, BaseOffsetMax;
 
 	void Update () {
 		if (Side != Side.None) {
-			float percentAnimation = (Time.time - StartTime) / AnimationTime;
+			float percentAnimation = FromPercentF + (Time.time - StartTime - IdleTime) / AnimationTime;
 			if (percentAnimation < ToPercentF) {
 				GetComponent<RectTransform>().offsetMin = new Vector2(FullDeltaX * percentAnimation, FullDeltaY * percentAnimation);
 				GetComponent<RectTransform>().offsetMax = new Vector2(FullDeltaX * percentAnimation,  FullDeltaY * percentAnimation);
+			} else {
+				IdleTime += Time.deltaTime;
 			}
 		}
-	
 	}
 
 	public void ResetToBase() {
@@ -73,5 +76,9 @@ public class Mover : MonoBehaviour {
 
 	internal void ToPercent(float p) {
 		ToPercentF = p;
+	}
+
+	internal void FromPercent(float p) {
+		FromPercentF = p;
 	}
 }

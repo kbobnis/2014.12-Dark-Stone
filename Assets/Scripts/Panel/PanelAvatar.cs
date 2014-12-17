@@ -76,6 +76,12 @@ public class PanelAvatar : MonoBehaviour {
 	}
 
 	public void UpdateFromModel() {
+
+		//if model has health under zero, then it dies
+		if (Model.ActualHealth <= 0 && Model.Card != null) {
+			Model = new PanelAvatarModel();
+		}
+
 		GetComponent<Image>().enabled = _Model!=null&&(_Model.Card != null);
 		if (_Model.Card != null) {
 			GetComponent<Image>().sprite = _Model.Card.Animations[AnimationType.OnBoard];
@@ -209,6 +215,16 @@ public class PanelAvatar : MonoBehaviour {
 		return c;
 	}
 
+
+	internal void BattleOutWith(PanelAvatar panelAvatar) {
+		PanelAvatarModel pam = panelAvatar.Model;
+
+		Model.ActualHealth -= pam.ActualDamage;
+		pam.ActualHealth -= Model.ActualDamage;
+		UpdateFromModel();
+		panelAvatar.UpdateFromModel();
+
+	}
 }
 
 public class PanelAvatarModel {
@@ -224,7 +240,8 @@ public class PanelAvatarModel {
 		return CardStack.Count > 0 ? CardStack[0] : null;
 	}
 
-	
+
+
 }
 
 
