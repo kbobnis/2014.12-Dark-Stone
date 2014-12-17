@@ -8,5 +8,6 @@ public enum ParamType {
 	//this is this monsters mana
 	HisMana,
 	IncreaseManaEachTurn,
-	Distance
+	Distance,
+	OneTimeSpeed,
 }

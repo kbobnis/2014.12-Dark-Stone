@@ -29,16 +29,14 @@ public class PanelAvatar : MonoBehaviour {
 					case ParamType.Health: _Model.ActualHealth += kvp.Value; break;
 					case ParamType.HisMana: _Model.ActualMana += kvp.Value; break;
 					case ParamType.Damage: _Model.ActualDamage += kvp.Value; break;
-					case ParamType.Speed: _Model.Speed += kvp.Value; break;
+					case ParamType.Speed: _Model.Speed += kvp.Value; _Model.MovesLeft += kvp.Value; break;
+					case ParamType.OneTimeSpeed: _Model.MovesLeft += kvp.Value; break;
 					case ParamType.IncreaseManaEachTurn: _Model.IncreaseManaEachTurn += kvp.Value; break;
 					//this is used when the spell is casted, no need for it now
 					case ParamType.Distance: break;
 					default: throw new NotImplementedException("Implement case for: " + kvp.Key);
 				}
 			}
-		}
-		if (card != null) {
-			Debug.Log("Preparing panelAvatar with card: " + card.Name + " and the speed in model is: " + _Model.Speed);
 		}
 
 		if (_Model.Card == null){
@@ -97,7 +95,7 @@ public class PanelAvatar : MonoBehaviour {
 			PanelHealth.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualHealth : 0);
 			PanelMana.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualMana : 0);
 			PanelAttack.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualDamage : 0);
-			PanelDirection.GetComponent<PanelDirection>().Prepare(_Model != null ? _Model.Direction : Side.None);
+			PanelDirection.GetComponent<PanelDirection>().Prepare(_Model != null&&_Model.MovesLeft>0 ? _Model.Direction : Side.None);
 		}
 
 		PanelSpell.GetComponent<Image>().enabled = false;

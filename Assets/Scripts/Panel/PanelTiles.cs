@@ -14,7 +14,7 @@ public class PanelTiles : MonoBehaviour {
 			PanelAvatarModel pam = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
 			Card c = pam.TopCard();
 
-			Debug.Log("mode: " + Mode);
+			Debug.Log("Before mode: " + Mode);
 			switch (Mode) {
 				case Mode.Ready:
 
@@ -26,11 +26,10 @@ public class PanelTiles : MonoBehaviour {
 						} else if (c.Params.ContainsKey(ParamType.Distance)) {
 							SetPlace(panelTile);
 						} else if (!c.Params.ContainsKey(ParamType.Distance)) {
-
 							//adding card params to actual card, event the after turn ones
 							if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Card != null) {
-								Debug.Log("combining");
-								panelTile.PanelInteraction.GetComponent<PanelInteraction>().Prepare(global::Mode.SpellPositioning, c, panelTile, panelTile, Side.None);
+								Debug.Log("There is a card, preparing panelInteraction");
+								panelTile.PanelInteraction.GetComponent<PanelInteraction>().Prepare(Mode.SpellPositioning, c, panelTile, panelTile, Side.None);
 								CastSpell(panelTile);
 							} else {
 								throw new NotImplementedException("What is this case.");
@@ -63,10 +62,9 @@ public class PanelTiles : MonoBehaviour {
 					} 
 					break;
 				default:
-					Debug.Log("Default switch, what mode is it? " + Mode);
-					break;
+					throw new NotImplementedException("Default switch what mode is it?");
 			}
-			Debug.Log("after mode is: " + Mode);
+			Debug.Log("After mode: " + Mode);
 		} catch (Exception e) {
 			Debug.Log("exception: " + e);
 		}
@@ -103,7 +101,7 @@ public class PanelTiles : MonoBehaviour {
 		PanelAvatar pa = panelTile.PanelInteraction.GetComponent<PanelInteraction>().WhoIsCasting.PanelAvatar.GetComponent<PanelAvatar>();
 		pa.CastOn(panelTile);
 		
-		if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Speed > 0) {
+		if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Speed > 0 || panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft > 0) {
 			DisableCastingOnAll(Mode.SpellPositioning);
 			SetDirection(panelTile, panelTile.PanelInteraction.GetComponent<PanelInteraction>().WhoIsCasting);
 			Mode = Mode.SpellDirectioning;
@@ -120,13 +118,12 @@ public class PanelTiles : MonoBehaviour {
 		bool foundAPlace = false;
 
 		foreach (Side s in SideMethods.AllSides()) {
-			if (castingWhere.SetInteractionForMode(Mode.SpellDirectioning, c, pam.Speed, s, castersTile, castingWhere)) {
+			if (castingWhere.SetInteractionForMode(Mode.SpellDirectioning, c, 1, s, castersTile, castingWhere)) {
 				foundAPlace = true;
 			}
 		}
 
 		if (!foundAPlace) {
-			Debug.Log("There is no place where it can be cast.");
 			Mode = Mode.Ready;
 		}
 	}
