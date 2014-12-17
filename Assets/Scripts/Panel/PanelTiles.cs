@@ -10,70 +10,11 @@ public class PanelTiles : MonoBehaviour {
 	public Mode Mode = Mode.Ready;
 
 	internal void PointerDownOn(PanelTile panelTile) {
-		try {
-			PanelAvatarModel pam = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
-			Card c = pam.TopCard();
-
-			Debug.Log("Before mode: " + Mode);
-			switch (Mode) {
-				case Mode.Ready:
-
-					if (pam.Card.Params.ContainsKey(ParamType.HisMana) && c == null) {
-						PanelInformation.GetComponent<PanelInformation>().SetText("No more spells available.");
-					}
-					if (c != null) {
-						if (c.Cost > panelTile.PanelAvatar.GetComponent<PanelAvatar>().PanelMana.GetComponent<PanelValue>().ActualValue) {
-							PanelInformation.GetComponent<PanelInformation>().SetText("You have not enough mana to cast this spell");
-						} else if (c.Params.ContainsKey(ParamType.Distance)) {
-							SetPlace(panelTile);
-						} else if (!c.Params.ContainsKey(ParamType.Distance)) {
-							//adding card params to actual card, event the after turn ones
-							if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Card != null) {
-								Debug.Log("There is a card, preparing panelInteraction");
-								panelTile.PanelInteraction.GetComponent<PanelInteraction>().Prepare(Mode.SpellPositioning, c, panelTile, panelTile, Side.None);
-								CastSpell(panelTile);
-							} else {
-								throw new NotImplementedException("What is this case.");
-							}
-
-							
-						} else {
-							throw new Exception("What to do here. What is this case");
-						}
-					}
-					break;
-				case Mode.SpellDirectioning:
-					if (panelTile.PanelInteraction.GetComponent<PanelInteraction>().IsInMode(Mode.SpellDirectioning)) {
-
-						Side castingSide = panelTile.PanelInteraction.GetComponent<PanelInteraction>().CastingSide;
-						panelTile.PanelInteraction.GetComponent<PanelInteraction>().CastingFrom.PanelAvatar.GetComponent<PanelAvatar>().SetDirection(castingSide);
-						DisableCastingOnAll(Mode.All);
-						Mode = Mode.Ready;
-					} else {
-						PanelInformation.GetComponent<PanelInformation>().SetText("Select direction");
-					}
-						
-					break;
-				case Mode.SpellPositioning:
-					if (panelTile.PanelInteraction.GetComponent<PanelInteraction>().IsInMode(Mode.SpellPositioning)) {
-						CastSpell(panelTile);
-					} else {
-						DisableCastingOnAll(Mode.All);
-						Mode = Mode.Ready;
-					} 
-					break;
-				default:
-					throw new NotImplementedException("Default switch what mode is it?");
-			}
-			Debug.Log("After mode: " + Mode);
-		} catch (Exception e) {
-			Debug.Log("exception: " + e);
-		}
-
+		Debug.Log("pointer down");
 	}
 
 	private void SetPlace(PanelTile panelTile){
-		Card c = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.TopCard();
+		Card c = null; 
 
 		bool foundAPlace = false;
 
@@ -98,9 +39,9 @@ public class PanelTiles : MonoBehaviour {
 		}
 	}
 
-	private void CastSpell(PanelTile panelTile) {
+	private void CastSpell(Card c, PanelTile panelTile) {
 		PanelAvatar pa = panelTile.PanelInteraction.GetComponent<PanelInteraction>().WhoIsCasting.PanelAvatar.GetComponent<PanelAvatar>();
-		pa.CastOn(panelTile);
+		pa.CastOn(c, panelTile);
 		
 		if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Speed > 0 || panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft > 0) {
 			DisableCastingOnAll(Mode.SpellPositioning);
@@ -113,7 +54,7 @@ public class PanelTiles : MonoBehaviour {
 	}
 
 	private void SetDirection(PanelTile castingWhere, PanelTile castersTile) {
-		PanelAvatarModel pam = castingWhere.PanelAvatar.GetComponent<PanelAvatar>().Model;
+		AvatarModel pam = castingWhere.PanelAvatar.GetComponent<PanelAvatar>().Model;
 		Card c = pam.Card;
 
 		bool foundAPlace = false;
@@ -123,6 +64,8 @@ public class PanelTiles : MonoBehaviour {
 				foundAPlace = true;
 			}
 		}
+
+		castingWhere.SetInteractionForMode(Mode.SpellDirectioning, c, 0, Side.None, castingWhere, castingWhere);
 
 		if (!foundAPlace) {
 			Mode = Mode.Ready;

@@ -33,8 +33,15 @@ public class ScrollableList : MonoBehaviour
 			width = panelRect.rect.width;
 
 			float scale = prefabH / prefabW;
+			
 			prefabW = width / columnCount;
 			prefabH = prefabW * scale;
+			//will it fit?
+			if (prefabH * rowCount > panelRect.rect.size.y) {
+				prefabH = panelRect.rect.size.y / rowCount;
+				prefabW = prefabH / scale;
+				width = prefabW * columnCount;
+			}
 
 			height = prefabH * rowCount;
 

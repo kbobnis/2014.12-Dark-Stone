@@ -6,13 +6,13 @@ using System.Collections.Generic;
 
 public class PanelAvatar : MonoBehaviour {
 
-	public GameObject PanelHealth, PanelMana, PanelSpell, PanelAttack, PanelDirection;
+	public GameObject PanelHealth, PanelAttack, PanelMana;
 
-	private PanelAvatarModel _Model = new PanelAvatarModel();
+	private AvatarModel _Model = new AvatarModel();
 
-	private List<PanelAvatarModel> _AdditionalModels = new List<PanelAvatarModel>();
+	private bool OnBoard = false;
 
-	public PanelAvatarModel Model {
+	public AvatarModel Model {
 		set { _Model = value; UpdateFromModel(); }
 		get { return _Model; }
 	}
@@ -23,15 +23,23 @@ public class PanelAvatar : MonoBehaviour {
 
 	public void Prepare(Card card) {
 
+		if (card == null) {
+			Model = new AvatarModel();
+		}
+
 		if (card != null) {
 			foreach (KeyValuePair<ParamType, int> kvp in card.Params) {
 				switch (kvp.Key) {
-					case ParamType.Health: _Model.ActualHealth += kvp.Value; break;
-					case ParamType.HisMana: _Model.ActualMana += kvp.Value; break;
+					case ParamType.Health: _Model.MaxHealth += kvp.Value;  _Model.ActualHealth += kvp.Value; break;
+					case ParamType.Heal: _Model.ActualHealth += kvp.Value; break;
 					case ParamType.Damage: _Model.ActualDamage += kvp.Value; break;
-					case ParamType.Speed: _Model.Speed += kvp.Value; _Model.MovesLeft += kvp.Value; break;
+					case ParamType.Speed:
+						if (_Model.Speed < kvp.Value) {
+							_Model.Speed = kvp.Value;
+							_Model.MovesLeft = kvp.Value;
+						} 
+						break;
 					case ParamType.OneTimeSpeed: _Model.MovesLeft += kvp.Value; break;
-					case ParamType.IncreaseManaEachTurn: _Model.IncreaseManaEachTurn += kvp.Value; break;
 					//this is used when the spell is casted, no need for it now
 					case ParamType.Distance: break;
 					default: throw new NotImplementedException("Implement case for: " + kvp.Key);
@@ -41,14 +49,8 @@ public class PanelAvatar : MonoBehaviour {
 
 		if (_Model.Card == null){
 			_Model.Card = card;
-			if (card != null && !card.Animations.ContainsKey(AnimationType.OnBoard)) {
-				throw new Exception("There is no onBoard animation for card: " + card.Name);
-			}
-		}
-
-		if (card != null && card.Spells.Count > 0) {
-			foreach(Card c in card.Spells){
-				_Model.CardStack.Add(c);
+			if (card != null && !card.Animations.ContainsKey(AnimationType.Icon)) {
+				throw new Exception("There is no icon animation for card: " + card.Name);
 			}
 		}
 
@@ -56,16 +58,7 @@ public class PanelAvatar : MonoBehaviour {
 	}
 
 	void Update() {
-		if (Model.CardStack.Count == 0 && Model.CardFeeders.Count > 0) {
-			foreach (PanelAvatar ps in Model.CardFeeders) {
-				Card c = TryToPullCard();
-				if (c != null) {
-					Model.CardStack.Add(c);
-					break;
-				}
-			}
-			UpdateFromModel();
-		}
+		UpdateFromModel();
 	}
 
 	internal void SetDirection(Side side) {
@@ -74,172 +67,112 @@ public class PanelAvatar : MonoBehaviour {
 	}
 
 	public void UpdateFromModel() {
+		if (OnBoard) {
+			if (Model.ActualHealth <= 0) {
+				_Model = new AvatarModel();
+			}
+		} 
 
-		//if model has health under zero, then it dies
-		if (Model.ActualHealth <= 0 && Model.Card != null) {
-			Model = new PanelAvatarModel();
+		PanelMana.SetActive(!OnBoard);
+		if (PanelMana != null && Model.Card != null && !OnBoard) {
+			PanelMana.GetComponent<PanelValue>().Prepare(Model.Card.Cost);
 		}
 
 		GetComponent<Image>().enabled = _Model!=null&&(_Model.Card != null);
 		if (_Model.Card != null) {
-			GetComponent<Image>().sprite = _Model.Card.Animations[AnimationType.OnBoard];
+			GetComponent<Image>().sprite = _Model.Card.Animations[AnimationType.Icon];
 		}
-		if ((_Model.Card != null && _AdditionalModels.Count > 0) || (_AdditionalModels.Count > 1)) {
-			GetComponent<Image>().enabled = true;
-			GetComponent<Image>().sprite = SpriteManager.Fight;
-			PanelHealth.GetComponent<PanelValue>().Prepare(0);
-			PanelMana.GetComponent<PanelValue>().Prepare(0);
-			PanelAttack.GetComponent<PanelValue>().Prepare(0);
-			PanelDirection.GetComponent<PanelDirection>().Prepare(Side.None);
-		} else {
-			PanelHealth.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualHealth : 0);
-			PanelMana.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualMana : 0);
-			PanelAttack.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualDamage : 0);
-			PanelDirection.GetComponent<PanelDirection>().Prepare(_Model != null&&_Model.MovesLeft>0 ? _Model.Direction : Side.None);
-		}
+		PanelHealth.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualHealth : 0);
+		PanelAttack.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualDamage : 0);
 
-		PanelSpell.GetComponent<Image>().enabled = false;
-		PanelSpell.GetComponent<PanelSpell>().ImageSpell.SetActive(false);
-		if (Model.CardStack.Count > 0) {
-			PanelSpell.GetComponent<Image>().enabled = true;
-			PanelSpell.GetComponent<PanelSpell>().ImageSpell.SetActive(true);
-			if (!Model.CardStack[0].Animations.ContainsKey(AnimationType.Icon)) {
-				throw new Exception("Card: " + Model.CardStack[0].Name + ", has no icon animation.");
-			}
-			PanelSpell.GetComponent<PanelSpell>().ImageSpell.GetComponent<Image>().sprite = Model.CardStack[0].Animations[AnimationType.Icon];
-		}
 	}
 
 	public bool HasSpell() {
 		return _Model.Card != null;
 	}
 
-	internal void CastOn(PanelTile panelTile) {
+	internal void CastOn(Card c, PanelTile panelTile) {
 
-		Card c = TryToPullCard();
 		if (c == null) {
 			throw new Exception("Why you cast when there is no card");
 		}
 		Model.ActualMana -= c.Cost;
-		Model.CardFeeders.Add(panelTile.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>());
 		panelTile.PanelAvatar.GetComponent<PanelAvatar>().Prepare(c);
-	}
-
-	internal void AddModel(PanelAvatarModel model) {
-		if (Model.Card == null) {
-			Model = model;
-		} else {
-			_AdditionalModels.Add(model);
+		//if is a monster, then adding as minion
+		if (c.Params.ContainsKey(ParamType.Health)) {
+			Model.Minions.Add(panelTile.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().Model);
 		}
-
 	}
 
-	internal PanelAvatarModel GetAndRemoveModel() {
-		PanelAvatarModel pam = Model;
-		Model = new PanelAvatarModel(); 
+	internal AvatarModel GetAndRemoveModel() {
+		AvatarModel pam = Model;
+		Model = new AvatarModel(); 
 		return pam;
 	}
 
-	internal void BattleOut() {
-
-		if (_AdditionalModels.Count == 0) {
-			return;
-		}
-		if (Model.Card == null && _AdditionalModels.Count == 1) {
-			Model = _AdditionalModels[0];
-			_AdditionalModels.Clear();
-			return;
-		}
-		_AdditionalModels.Add(Model);
-		Model = new PanelAvatarModel();
-
-		foreach (PanelAvatarModel pam in _AdditionalModels) {
-			foreach (PanelAvatarModel pam2 in _AdditionalModels) {
-				if (pam != pam2) {
-					pam2.ActualHealth -= pam.ActualDamage;
-				}
-			}
-		}
-
-		foreach(PanelAvatarModel pam in _AdditionalModels.ToArray()){
-			if (pam.ActualHealth <= 0) {
-				_AdditionalModels.Remove(pam);
-			}
-		}
-		int mostHealth = 0;
-		int inAequo = 1;
-		PanelAvatarModel pam3 = null;
-		if (_AdditionalModels.Count > 0) {
-			//leave the one with the most health
-			foreach (PanelAvatarModel pam in _AdditionalModels) {
-				if (pam.ActualHealth == mostHealth) {
-					inAequo++;
-				}
-				if (pam.ActualHealth > mostHealth) {
-					pam3 = pam;
-					inAequo = 1;
-					mostHealth = pam.ActualHealth;
-				}
-				
-			}
-		}
-		if (pam3 != null) {
-			_AdditionalModels.Clear();
-			Model = pam3;
-		}
-
-		if (inAequo > 1) {
-			Model = new PanelAvatarModel();
-		}
-		//in case all died and there will be fight sprite left.
-		UpdateFromModel();
-	}
-
-	internal void FlattenModelWhenNoBattles() {
-		if (Model.Card == null && _AdditionalModels.Count == 1) {
-			Model = _AdditionalModels[0];
-			_AdditionalModels.Clear();
-			UpdateFromModel();
-		}
-	}
-
-	public Card TryToPullCard() {
-		Card c = null;
-		if (Model.CardStack.Count > 0) {
-			c = Model.CardStack[0];
-			Model.CardStack.Remove(c);
-			UpdateFromModel();
-		}
-		return c;
-	}
-
-
 	internal void BattleOutWith(PanelAvatar panelAvatar) {
-		PanelAvatarModel pam = panelAvatar.Model;
+		AvatarModel pam = panelAvatar.Model;
 
 		Model.ActualHealth -= pam.ActualDamage;
 		pam.ActualHealth -= Model.ActualDamage;
 		UpdateFromModel();
 		panelAvatar.UpdateFromModel();
+	}
 
+	internal void IsOnBoard(bool p) {
+		OnBoard = p;
 	}
 }
 
-public class PanelAvatarModel {
+public class AvatarModel {
 
 	public Card Card;
-	public int ActualHealth, ActualMana, ActualDamage, Speed, MovesLeft, IncreaseManaEachTurn;
+	private int _ActualHealth;
+	public int ActualMana, ActualDamage, Speed, MovesLeft, MaxHealth, MaxMana;
 	public Side Direction = Side.None;
 
-	public List<Card> CardStack = new List<Card>();
-	public List<PanelAvatar> CardFeeders = new List<PanelAvatar>();
+	public List<Card> Deck = new List<Card>();
+	public List<Card> Hand = new List<Card>();
+	public List<AvatarModel> Minions = new List<AvatarModel>();
+	public int Draught;
 
-	public Card TopCard() {
-		return CardStack.Count > 0 ? CardStack[0] : null;
+	public int ActualHealth {
+		get { return _ActualHealth; }
+		set { _ActualHealth = value;
+			if (_ActualHealth > MaxHealth) {
+				_ActualHealth = MaxHealth;
+			}
+		}
 	}
 
+	internal void AddCrystal() {
+		MaxMana++;
+		if (MaxMana > 10){
+			MaxMana = 10;
+		}
+	}
 
+	internal void RefillCrystals() {
+		ActualMana = MaxMana;
+	}
 
+	internal void RefillMovements() {
+		MovesLeft = Speed;
+		foreach (AvatarModel am in Minions) {
+			am.RefillMovements();
+		}
+	}
+
+	internal void PullCardFromDeck() {
+		Card c = Deck.Count>0?Deck[0]:null;
+		if (c == null) {
+			Draught++;
+			ActualHealth -= Draught;
+		} else {
+			Deck.Remove(c);
+			Hand.Add(c);
+		}
+	}
 }
 
 
