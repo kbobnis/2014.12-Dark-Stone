@@ -10,7 +10,7 @@ public class PanelAvatar : MonoBehaviour {
 
 	private AvatarModel _Model = new AvatarModel();
 
-	private bool OnBoard = false;
+	
 
 	public AvatarModel Model {
 		set { _Model = value; UpdateFromModel(); }
@@ -67,14 +67,12 @@ public class PanelAvatar : MonoBehaviour {
 	}
 
 	public void UpdateFromModel() {
-		if (OnBoard) {
-			if (Model.ActualHealth <= 0) {
-				_Model = new AvatarModel();
-			}
-		} 
+		if (Model.OnBoard &&  Model.ActualHealth <= 0) {
+			_Model = new AvatarModel();
+		}
 
-		PanelMana.SetActive(!OnBoard);
-		if (PanelMana != null && Model.Card != null && !OnBoard) {
+		PanelMana.SetActive(!Model.OnBoard);
+		if (PanelMana != null && Model.Card != null && !Model.OnBoard) {
 			PanelMana.GetComponent<PanelValue>().Prepare(Model.Card.Cost);
 		}
 
@@ -119,12 +117,11 @@ public class PanelAvatar : MonoBehaviour {
 		panelAvatar.UpdateFromModel();
 	}
 
-	internal void IsOnBoard(bool p) {
-		OnBoard = p;
-	}
 }
 
 public class AvatarModel {
+
+	public bool OnBoard = true;
 
 	public Card Card;
 	private int _ActualHealth;

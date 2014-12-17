@@ -15,19 +15,4 @@ public class PanelTile : MonoBehaviour {
 		PanelTiles.GetComponent<PanelTiles>().PointerDownOn(this);
 	}
 
-	internal bool SetInteractionForMode(Mode mode, Card c, int distance, Side s, PanelTile whoIsCasting, PanelTile castingFrom) {
-		bool anyPlaceToCast = false;
-		if (distance > 0) {
-			if (Neighbours.ContainsKey(s)) {
-				if (Neighbours[s].SetInteractionForMode(mode, c, distance - 1, s, whoIsCasting, castingFrom)) {
-					anyPlaceToCast = true;
-				}
-			}
-		} 
-		PanelInteraction.GetComponent<PanelInteraction>().Prepare(mode, c, whoIsCasting, castingFrom, s);
-		anyPlaceToCast = true;
-		return anyPlaceToCast;
-	}
-
-
 }
