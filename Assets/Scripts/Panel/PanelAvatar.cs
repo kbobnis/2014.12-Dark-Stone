@@ -195,11 +195,8 @@ public class PanelAvatar : MonoBehaviour {
 		if (Model.Card == null && _AdditionalModels.Count == 1) {
 			Model = _AdditionalModels[0];
 			_AdditionalModels.Clear();
+			UpdateFromModel();
 		}
-	}
-
-	internal void ShowBattleSignIfBattle() {
-		UpdateFromModel();
 	}
 
 	public Card TryToPullCard() {
@@ -211,6 +208,7 @@ public class PanelAvatar : MonoBehaviour {
 		}
 		return c;
 	}
+
 }
 
 public class PanelAvatarModel {

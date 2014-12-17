@@ -37,6 +37,10 @@ public static class SideMethods {
 			case Side.Down: return Side.Up;
 			case Side.Left: return Side.Right;
 			case Side.Right: return Side.Left;
+			case Side.UpLeft: return Side.DownRight;
+			case Side.UpRight: return Side.DownLeft;
+			case Side.DownLeft: return Side.UpRight;
+			case Side.DownRight: return Side.UpLeft;
 		}
 		throw new Exception("Opposite for " + s + "?");
 	}

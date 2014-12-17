@@ -101,8 +101,11 @@ public class ScrollableList : MonoBehaviour
 				GameObject newItem = Instantiate(itemPrefab) as GameObject;
 
 				PanelTile b = newItem.GetComponent<PanelTile>();
-				float pan = (actualRow - ((columnCount-1)/2f))/((columnCount-1)/2f);
-				b.PanelAvatar.GetComponent<PanelAvatar>().Prepare(bt.Card);
+				//panel tiles bg doesn't have panelTile
+				if (b != null) {
+					float pan = (actualRow - ((columnCount-1)/2f))/((columnCount-1)/2f);
+					b.PanelAvatar.GetComponent<PanelAvatar>().Prepare(bt.Card);
+				}
 
 				ElementsToPut.Add(newItem);
 				buildingsRow.Add(b);
@@ -118,6 +121,10 @@ public class ScrollableList : MonoBehaviour
 		foreach (List<PanelTile> cols in tiles) {
 			int y = 0;
 			foreach (PanelTile bi in cols) {
+				//panel tiles bg doesn't have panelTile
+				if (bi == null) {
+					continue;
+				}
 				PanelTile bu = bi.GetComponent<PanelTile>();
 
 				if (tiles.Count > x + 1) {

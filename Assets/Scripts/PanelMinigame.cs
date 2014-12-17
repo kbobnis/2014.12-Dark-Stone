@@ -6,7 +6,7 @@ using System;
 
 public class PanelMinigame : MonoBehaviour {
 
-	public GameObject PanelTiles, PanelInformation;
+	public GameObject PanelTiles, PanelTilesBg, PanelInformation;
 
 	internal void Prepare() {
 		PanelInformation.SetActive(true);
@@ -20,6 +20,8 @@ public class PanelMinigame : MonoBehaviour {
 			}
 			templates.Add(col);
 		}
+
+		PanelTilesBg.GetComponent<ScrollableList>().Build(templates);
 
 		templates[6][2].AddTemplate(Card.Lasia);
 		templates[0][2].AddTemplate(Card.Dementor);
@@ -61,13 +63,12 @@ public class PanelMinigame : MonoBehaviour {
 			pa.Model.MovesLeft = pa.Model.Speed;
 			if (pa.Model.Card != null) {
 				int speed = pa.Model.Card.Params.ContainsKey(ParamType.Speed)? pa.Model.Card.Params[ParamType.Speed] : 0;
-				Debug.Log(pa.Model.Card.Name + " has moves left: " + pa.Model.MovesLeft + " and moves: " + speed + ", moves in model : " + pa.Model.Speed);
 			}
 		}
 
 		bool stillSomethingToDo;
 		do {
-			PanelInformation.GetComponent<PanelInformation>().SetText("Moving");
+			PanelInformation.GetComponent<PanelInformation>().SetText("Calculating");
 			//checking what is moving
 			stillSomethingToDo = false;
 			List<KeyValuePair<PanelTile, Side>> toMove = new List<KeyValuePair<PanelTile, Side>>();
@@ -84,26 +85,65 @@ public class PanelMinigame : MonoBehaviour {
 				}
 			}
 
+			PanelInformation.GetComponent<PanelInformation>().SetText("Moving");
 			//moving
 			foreach (KeyValuePair<PanelTile, Side> oneMove in toMove) {
-				ShiftPanelAvatar(oneMove.Key, oneMove.Value);
+				oneMove.Key.PanelAvatar.AddComponent<Mover>().Prepare(oneMove.Value, 0.5f);
+				oneMove.Key.PanelAvatar.GetComponent<Mover>().ToPercent(0.5f);
+
+			}
+
+			//check mid air collisions
+			Dictionary<PanelTile, bool> midAirCollisions = new Dictionary<PanelTile, bool>();
+			foreach (KeyValuePair<PanelTile, Side> move in toMove.ToArray()) {
+				//if is not outside the board
+				if (move.Key.Neighbours.ContainsKey(move.Value)) {
+					PanelTile oppositeTile = move.Key.Neighbours[move.Value];
+					Side oppositeSide = move.Value.Opposite();
+					if (oppositeTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Direction == oppositeSide && oppositeTile.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft > 0 ) {
+						//mid air collision!
+						if (!midAirCollisions.ContainsKey(move.Key) || !midAirCollisions.ContainsKey(oppositeTile)) {
+							Debug.Log("Mid air collision: " + move.Key.gameObject.name + " with: " + oppositeTile.gameObject.name);
+							midAirCollisions.Add(move.Key, true);
+						}
+					}
+				}
+			}
+
+			//battle out mid air collisions
+			foreach (PanelTile pt in midAirCollisions.Keys) {
+				Side s = pt.PanelAvatar.GetComponent<PanelAvatar>().Model.Direction;
+
+				PanelTile oppositePt = pt.Neighbours[s];
+
+				//pt.PanelAvatar.GetComponent<PanelAvatar>().BattleOutWith(oppositePt.PanelAvatar.GetComponent<PanelAvatar>());
+
+			}
+
+			
+			yield return new WaitForSeconds(0.5f);
+
+			//replacing
+			foreach (KeyValuePair<PanelTile, Side> oneMove in toMove) {
+				Mover m = oneMove.Key.PanelAvatar.GetComponent<Mover>();
+				m.ResetToBase();
+				Destroy(m);
+				SwitchPanelAvatar(oneMove.Key, oneMove.Value);
 			}
 			toMove.Clear();
 
 			//updating when no collisions
 			foreach (GameObject go in elements) {
 				go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().FlattenModelWhenNoBattles();
-				go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().ShowBattleSignIfBattle();
 			}
 
-			yield return new WaitForSeconds(0.5f);
 
 			PanelInformation.GetComponent<PanelInformation>().SetText("Batlles");
 			//battling
 			foreach (GameObject go in elements) {
 				go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().BattleOut();
 			}
-			yield return new WaitForSeconds(0.5f);
+			yield return new WaitForSeconds(0.25f);
 		} while (stillSomethingToDo);
 
 		PanelInformation.GetComponent<PanelInformation>().SetText("New turn");
@@ -116,12 +156,12 @@ public class PanelMinigame : MonoBehaviour {
 			}
 		}
 
-		yield return new WaitForSeconds(0.25f);
+		yield return new WaitForSeconds(0.1f);
 		PanelInformation.GetComponent<PanelInformation>().DisableMe();
 		yield return null;
 	}
 
-	private void ShiftPanelAvatar(PanelTile pt, Side direction) {
+	private void SwitchPanelAvatar(PanelTile pt, Side direction) {
 		//moves outside screen
 		if (!pt.Neighbours.ContainsKey(direction)) {
 			pt.PanelAvatar.GetComponent<PanelAvatar>().Model = new PanelAvatarModel();
