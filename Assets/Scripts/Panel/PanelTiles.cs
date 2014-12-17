@@ -20,7 +20,8 @@ public class PanelTiles : MonoBehaviour {
 
 					if (pam.Card.Params.ContainsKey(ParamType.HisMana) && c == null) {
 						PanelInformation.GetComponent<PanelInformation>().SetText("No more spells available.");
-					} else  if (c != null) {
+					}
+					if (c != null) {
 						if (c.Cost > panelTile.PanelAvatar.GetComponent<PanelAvatar>().PanelMana.GetComponent<PanelValue>().ActualValue) {
 							PanelInformation.GetComponent<PanelInformation>().SetText("You have not enough mana to cast this spell");
 						} else if (c.Params.ContainsKey(ParamType.Distance)) {

@@ -23,10 +23,9 @@ public class PanelTile : MonoBehaviour {
 					anyPlaceToCast = true;
 				}
 			}
-		} else if (!PanelAvatar.GetComponent<PanelAvatar>().HasSpell() || (mode == Mode.SpellDirectioning)) {
-			PanelInteraction.GetComponent<PanelInteraction>().Prepare(mode, c, whoIsCasting, castingFrom, s);
-			anyPlaceToCast = true;
-		}
+		} 
+		PanelInteraction.GetComponent<PanelInteraction>().Prepare(mode, c, whoIsCasting, castingFrom, s);
+		anyPlaceToCast = true;
 		return anyPlaceToCast;
 	}
 
