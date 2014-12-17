@@ -6,30 +6,25 @@ using UnityEngine.UI;
 public class PanelCardInHand : MonoBehaviour {
 
 	public GameObject PanelCardPreview, PanelAvatar;
-	private Card _Card;
-
-	public Card Card {
-		set { _Card = value; UpdateImage(); }
-	}
+	public Card Card;
 
 
-	void Awake() {
-		UpdateImage();
-	}
-
-	private void UpdateImage() {
+	void Update() {
 		PanelAvatar.SetActive(false);
 
-		if (_Card != null) {
+		if (Card != null) {
 			PanelAvatar.SetActive(true);
-			PanelAvatar.GetComponent<PanelAvatar>().Prepare(null);
-			PanelAvatar.GetComponent<PanelAvatar>().Prepare(_Card);
+			PanelAvatar.GetComponent<PanelAvatarCard>().Prepare(Card);
 		}
 	}
 
 	public void ShowPreview() {
-		Debug.Log("Showing preview for card: " + _Card.Name);
-		PanelCardPreview.GetComponent<PanelCardPreview>().Preview(_Card);
+		Debug.Log("Showing preview for card: " + Card.Name);
+		try {
+			PanelCardPreview.GetComponent<PanelCardPreview>().Preview(Card);
+		} catch (Exception e) {
+			Debug.Log("Exception: " + e);
+		}
 	}
 
 }

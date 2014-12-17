@@ -41,14 +41,12 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.Mud);
 		lasiaModel.Deck.Add(Card.IceBolt);
 		lasiaModel.Deck.Add(Card.Mud);
-		lasiaModel.OnBoard = true;
 		lasiaAvatar.UpdateFromModel();
 
 		PanelAvatar dementorAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel dementorModel = dementorAvatar.Model;
 		dementorModel.Deck.Add(Card.IceBolt);
 		dementorModel.Deck.Add(Card.Mud);
-		dementorModel.OnBoard = true;
 		dementorAvatar.UpdateFromModel();
 
 		MyModel = lasiaModel;

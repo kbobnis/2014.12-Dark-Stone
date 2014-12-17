@@ -111,7 +111,11 @@ public class ScrollableList : MonoBehaviour
 				//panel tiles bg doesn't have panelTile
 				if (b != null) {
 					float pan = (actualRow - ((columnCount-1)/2f))/((columnCount-1)/2f);
-					b.PanelAvatar.GetComponent<PanelAvatar>().Prepare(bt.Card);
+					AvatarModel am = null;
+					if (bt.Card != null) {
+						am = new AvatarModel(bt.Card, true);
+					}
+					b.PanelAvatar.GetComponent<PanelAvatar>().Model = am;
 				}
 
 				ElementsToPut.Add(newItem);

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class PanelValue : MonoBehaviour {
 
 	public GameObject TextValue;
-	public int ActualValue;
+	private int ActualValue;
 
 	void Awake() {
 		UpdateImage();

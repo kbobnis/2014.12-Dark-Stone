@@ -12,7 +12,6 @@ public class PanelTiles : MonoBehaviour {
 	internal void PointerDownOn(PanelTile panelTile) {
 		Debug.Log("Clicked");
 
-
 		switch (Mode) {
 			case global::Mode.Ready: {
 				if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft > 0) {
@@ -31,7 +30,7 @@ public class PanelTiles : MonoBehaviour {
 				if (whatWantsToMoveHere != null) {
 					whatWantsToMoveHere.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft--;
 					panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model = whatWantsToMoveHere.PanelAvatar.GetComponent<PanelAvatar>().Model;
-					whatWantsToMoveHere.PanelAvatar.GetComponent<PanelAvatar>().Model = new AvatarModel();
+					whatWantsToMoveHere.PanelAvatar.GetComponent<PanelAvatar>().Model = null;
 				} 
 				DisableAllPanelsInteraction();
 				Mode = global::Mode.Ready;
