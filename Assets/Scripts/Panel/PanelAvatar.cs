@@ -27,7 +27,11 @@ public class PanelAvatar : MonoBehaviour {
 
 		GetComponent<Image>().enabled = _Model != null;
 		if (_Model != null) {
+			GetComponent<Image>().color = Color.white;
 			GetComponent<Image>().sprite = _Model.Card.Animation;
+			if (Model != null && Model.MovesLeft == 0) {
+				GetComponent<Image>().color = Color.black;
+			}
 		}
 		
 		PanelHealth.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualHealth : 0);
@@ -198,7 +202,8 @@ public class AvatarModel {
 		AvatarModel am = actualModel;
 		_ActualMana -= c.Cost;
 		if (_ActualMana < 0) {
-			throw new Exception("What is this situation. Mana can not go under zero. Casting: " + c.Name + " for " + c.Cost);
+			//it can go under zero. if a minion is summoning it with battlecry
+			//throw new Exception("What is this situation. Mana can not go under zero. Casting: " + c.Name + " for " + c.Cost);
 		}
 		Hand.Remove(c);
 
@@ -232,6 +237,7 @@ public class AvatarModel {
 			}
 			if (c.Params.ContainsKey(ParamType.AdditionalHealth)) {
 				actualModel._ActualHealth += c.Params[ParamType.AdditionalHealth];
+				actualModel.MaxHealth += c.Params[ParamType.AdditionalHealth];
 			}
 		}
 		return am;

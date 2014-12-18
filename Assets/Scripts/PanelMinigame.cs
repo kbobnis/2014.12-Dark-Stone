@@ -38,6 +38,7 @@ public class PanelMinigame : MonoBehaviour {
 		AvatarModel lasiaModel = lasiaAvatar.Model;
 		lasiaModel.Deck.Add(Card.RockbiterWeapon);
 		lasiaModel.Deck.Add(Card.FlametongueTotem);
+		lasiaModel.Deck.Add(Card.RazorfenHunter);
 		lasiaModel.Deck.Add(Card.MurlocTidehunter);
 		lasiaModel.Deck.Add(Card.Hex);
 		lasiaModel.Deck.Add(Card.ShatteredSunCleric);
