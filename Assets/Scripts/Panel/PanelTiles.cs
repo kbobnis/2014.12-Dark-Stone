@@ -13,6 +13,22 @@ public class PanelTiles : MonoBehaviour {
 		}
 		return null;
 	}
+
+	internal void UpdateAdjacentModels() {
+		foreach (GameObject go in GetComponent<ScrollableList>().ElementsToPut) {
+			
+			PanelTile pt = go.GetComponent<PanelTile>();
+			AvatarModel am = go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().Model;
+			if (am != null) {
+
+				foreach (Side s in SideMethods.AdjacentSides()) {
+					if (pt.Neighbours.ContainsKey(s)) {
+						am.AdjacentModels[s] = pt.Neighbours[s].PanelAvatar.GetComponent<PanelAvatar>().Model;
+					}
+				}
+			}
+		}
+	}
 }
 
 

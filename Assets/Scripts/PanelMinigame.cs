@@ -37,6 +37,7 @@ public class PanelMinigame : MonoBehaviour {
 		PanelAvatar lasiaAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[3 * 5 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel lasiaModel = lasiaAvatar.Model;
 		lasiaModel.Deck.Add(Card.RockbiterWeapon);
+		lasiaModel.Deck.Add(Card.FlametongueTotem);
 		lasiaModel.Deck.Add(Card.Thrallmar);
 		lasiaModel.Deck.Add(Card.Wisp);
 		lasiaModel.Deck.Add(Card.Fireball);
@@ -246,8 +247,10 @@ public class PanelMinigame : MonoBehaviour {
 			}
 			default: throw new NotImplementedException("Implement working with mode: " + Mode);
 		}
-	}
 
+		//after action revalidate adjacent models
+		PanelTiles.GetComponent<PanelTiles>().UpdateAdjacentModels();
+	}
 
 
 	private void DisableAllPanelsInteraction() {

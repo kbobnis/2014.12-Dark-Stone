@@ -6,13 +6,13 @@ using System.Collections.Generic;
 
 public class PanelAvatar : MonoBehaviour {
 
-	public GameObject PanelHealth, PanelAttack;
+	public GameObject PanelHealth, PanelAttack, PanelTile;
 
 	private AvatarModel _Model = null;
 
 	public AvatarModel Model {
 		get { return _Model; }
-		set { _Model = value; UpdateFromModel(); } //because we modify contents of AvatarModel }
+		set { _Model = value; } //because we modify contents of AvatarModel }
 	}
 
 	void Update() {
@@ -69,6 +69,7 @@ public class AvatarModel {
 	private int _ActualHealth;
 	private int _ActualMana, _ActualDamage, Speed, _MovesLeft, MaxHealth, _MaxMana;
 
+	public Dictionary<Side, AvatarModel> AdjacentModels = new Dictionary<Side,AvatarModel>();
 	public List<Card> Deck = new List<Card>();
 	private List<Card> _Hand = new List<Card>();
 	private List<AvatarModel> Minions = new List<AvatarModel>();
@@ -76,6 +77,7 @@ public class AvatarModel {
 	private int Draught;
 	private bool OnBoard;
 	private int AttackBonusThisTurn;
+	private int AttackForAdjacent;
 
 	public List<Card> Hand {
 		get { return _Hand; }
@@ -109,11 +111,19 @@ public class AvatarModel {
 		_Card = card;
 		OnBoard = onBoard;
 
+		foreach (Side s in SideMethods.AdjacentSides()) {
+			AdjacentModels.Add(s, null);
+		}
+
 		foreach (KeyValuePair<ParamType, int> kvp in card.Params) {
 			switch (kvp.Key) {
 				case ParamType.Health: MaxHealth = kvp.Value; ActualHealth = kvp.Value; break;
 				case ParamType.Attack: _ActualDamage = kvp.Value; break;
 				case ParamType.Speed: Speed = kvp.Value; break;
+				//this doesnt show on board, but works nevertheless
+				case ParamType.AttackForAdjacent:
+					AttackForAdjacent = kvp.Value;
+					break;
 				//this is used when the spell is casted, no need for it now
 				case ParamType.Distance:
 					break;
@@ -172,7 +182,15 @@ public class AvatarModel {
 	}
 
 	public int ActualDamage {
-		get { return _ActualDamage + AttackBonusThisTurn; }
+		get {
+			int adjacentBonus = 0;
+			foreach (AvatarModel am in AdjacentModels.Values) {
+				if (am != null) {
+					adjacentBonus += am.AttackForAdjacent;
+				}
+			}
+			return _ActualDamage + AttackBonusThisTurn + adjacentBonus; 
+		}
 	}
 
 	internal AvatarModel Cast(AvatarModel actualModel, Card c) {
@@ -220,6 +238,9 @@ public class AvatarModel {
 
 	internal void EndOfATurn() {
 		AttackBonusThisTurn = 0;
+		foreach (AvatarModel am in Minions) {
+			am.AttackBonusThisTurn = 0;
+		}
 	}
 }
 

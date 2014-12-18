@@ -9,5 +9,6 @@ public enum ParamType {
 	Distance,
 	OneTimeSpeed,
 	Heal,
-	AttackThisTurn
+	AttackThisTurn,
+	AttackForAdjacent
 }

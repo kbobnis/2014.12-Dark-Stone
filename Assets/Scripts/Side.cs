@@ -9,8 +9,13 @@ public enum Side {
 
 public static class SideMethods {
 
-	public static Side[] AllSides() {
-		return new Side[]{Side.Up, Side.Down, Side.Left, Side.Right, Side.UpLeft, Side.UpRight, Side.DownLeft, Side.DownRight};
+	public static List<Side> AllSides() {
+		List<Side> l = new List<Side>() { Side.UpLeft, Side.UpRight, Side.DownLeft, Side.DownRight };
+		l.AddRange(AdjacentSides());
+		return l;
+	}
+	public static List<Side> AdjacentSides() {
+		return new List<Side>() { Side.Up, Side.Down, Side.Left, Side.Right };
 	}
 
 	public static int DeltaX(this Side s) {
