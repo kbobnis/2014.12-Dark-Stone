@@ -75,6 +75,7 @@ public class AvatarModel {
 	private AvatarModel _Creator;
 	private int Draught;
 	private bool OnBoard;
+	private int AttackBonusThisTurn;
 
 	public List<Card> Hand {
 		get { return _Hand; }
@@ -133,25 +134,25 @@ public class AvatarModel {
 	}
 
 
-	internal void AddCrystal() {
+	private void AddCrystal() {
 		_MaxMana++;
 		if (_MaxMana > MaxCrystals){
 			_MaxMana = MaxCrystals;
 		}
 	}
 
-	internal void RefillCrystals() {
+	private void RefillCrystals() {
 		_ActualMana = _MaxMana;
 	}
 
-	internal void RefillMovements() {
+	private void RefillMovements() {
 		_MovesLeft = Speed;
 		foreach (AvatarModel am in Minions) {
 			am.RefillMovements();
 		}
 	}
 
-	internal void PullCardFromDeck() {
+	private void PullCardFromDeck() {
 		Card c = Deck.Count>0?Deck[0]:null;
 		if (c == null) {
 			Draught++;
@@ -171,7 +172,7 @@ public class AvatarModel {
 	}
 
 	public int ActualDamage {
-		get { return _ActualDamage; }
+		get { return _ActualDamage + AttackBonusThisTurn; }
 	}
 
 	internal AvatarModel Cast(AvatarModel actualModel, Card c) {
@@ -203,8 +204,22 @@ public class AvatarModel {
 			if (c.Params.ContainsKey(ParamType.Heal)) {
 				actualModel.ActualHealth += c.Params[ParamType.Heal];
 			}
+			if (c.Params.ContainsKey(ParamType.AttackThisTurn)) {
+				actualModel.AttackBonusThisTurn += c.Params[ParamType.AttackThisTurn];
+			}
 		}
 		return am;
+	}
+
+	internal void StartOfATurn() {
+		AddCrystal();
+		RefillCrystals();
+		RefillMovements();
+		PullCardFromDeck();
+	}
+
+	internal void EndOfATurn() {
+		AttackBonusThisTurn = 0;
 	}
 }
 

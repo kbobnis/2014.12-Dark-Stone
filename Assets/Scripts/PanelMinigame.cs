@@ -36,8 +36,9 @@ public class PanelMinigame : MonoBehaviour {
 		
 		PanelAvatar lasiaAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[3 * 5 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel lasiaModel = lasiaAvatar.Model;
-		lasiaModel.Deck.Add(Card.Zombie);
-		lasiaModel.Deck.Add(Card.HealingTouch);
+		lasiaModel.Deck.Add(Card.RockbiterWeapon);
+		lasiaModel.Deck.Add(Card.Thrallmar);
+		lasiaModel.Deck.Add(Card.Wisp);
 		lasiaModel.Deck.Add(Card.Fireball);
 		lasiaModel.Deck.Add(Card.IceBolt);
 		lasiaModel.Deck.Add(Card.Mud);
@@ -75,12 +76,11 @@ public class PanelMinigame : MonoBehaviour {
 
 	private IEnumerator EndTurnCoroutine() {
 
+		ActualTurnModel.EndOfATurn();
+
 		ActualTurnModel = ActualTurnModel == MyModel?EnemysModel:MyModel;
 
-		ActualTurnModel.AddCrystal();
-		ActualTurnModel.RefillCrystals();
-		ActualTurnModel.RefillMovements();
-		ActualTurnModel.PullCardFromDeck();
+		ActualTurnModel.StartOfATurn();
 
 		ButtonEndTurn.GetComponentInChildren<Text>().text = ActualTurnModel == MyModel?"End turn":"Enemys turn";
 
@@ -133,6 +133,10 @@ public class PanelMinigame : MonoBehaviour {
 			if (card.Params.ContainsKey(ParamType.Damage)) {
 				return atLeastOneTile;
 			}
+
+			if (card.Params.ContainsKey(ParamType.AttackThisTurn)) {
+				return atLeastOneTile;
+			}
 		}
 
 		panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanCastHere(caster, card);
@@ -164,9 +168,10 @@ public class PanelMinigame : MonoBehaviour {
 	}
 
 	internal void PointerDownOn(PanelTile panelTile) {
+		PanelInteraction pi = panelTile.PanelInteraction.GetComponent<PanelInteraction>();
 		AvatarModel am = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
 		bool isYourMinion = IsYourMinionHere(am);
-		Debug.Log("This minion is " + (isYourMinion ? "yours" : "not yours"));
+		Debug.Log("This tile has " + (isYourMinion ? "yours" : "not yours") +" " + (am!=null?am.Card.Name:"no minion"));
 
 		switch (Mode) {
 			case global::Mode.Ready: {
@@ -181,6 +186,7 @@ public class PanelMinigame : MonoBehaviour {
 							PanelInformation.GetComponent<PanelInformation>().SetText("No moves left");
 						} else {
 							//preparing interaction panels for moves
+							Debug.Log(am.MovesLeft + " moves left, ready to move");
 							foreach (Side s in SideMethods.AllSides()) {
 								if (SetInteractionToMoveAround(panelTile, panelTile, s, 1)){
 									Mode = Mode.MovingOrAttacking;
@@ -191,32 +197,46 @@ public class PanelMinigame : MonoBehaviour {
 					break;
 				}
 			case global::Mode.MovingOrAttacking: {
-					PanelTile whatWantsToMoveOrAttackHere = panelTile.PanelInteraction.GetComponent<PanelInteraction>().WhatMoveOrAttack;
-					if (whatWantsToMoveOrAttackHere != null) {
-						whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft--;
-						//is here something?
-						if (am != null) {
-							if (IsYourMinionHere(am)) {
-								//can not move on your mininion
-								PanelInformation.GetComponent<PanelInformation>().SetText("Can not attack your own minion");
-							} else {
-								//battle
-								whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().BattleOutWith(panelTile.PanelAvatar.GetComponent<PanelAvatar>());
-							}
+
+				int movesLeft = 0;
+				PanelTile whatWantsToMoveOrAttackHere = pi.WhatMoveOrAttack;
+				PanelInteractionMode mode = pi.Mode;
+				if (pi.Mode == PanelInteractionMode.Moving || pi.Mode == PanelInteractionMode.Attacking) {
+					whatWantsToMoveOrAttackHere = pi.WhatMoveOrAttack;
+					whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft--;
+					movesLeft = whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft;
+					//is here something?
+					if (am != null) {
+						if (IsYourMinionHere(am)) {
+							//can not move on your mininion
+							PanelInformation.GetComponent<PanelInformation>().SetText("Can not attack your own minion");
 						} else {
-							//move
-							panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model = whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model;
-							whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model = null;
+							//battle
+							whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().BattleOutWith(panelTile.PanelAvatar.GetComponent<PanelAvatar>());
 						}
-
+					} else {
+						//move
+						panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model = whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model;
+						whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model = null;
 					}
-					DisableAllPanelsInteraction();
-					Mode = global::Mode.Ready;
-
-					break;
+					
 				}
+				DisableAllPanelsInteraction();
+				Mode = global::Mode.Ready;
+				//automatically enter next move interaction if moves are left
+				if (movesLeft > 0) {
+					Debug.Log("Moves left: " + movesLeft);
+
+					if (mode == PanelInteractionMode.Moving) {
+						PointerDownOn(panelTile);
+					} else {
+						PointerDownOn(whatWantsToMoveOrAttackHere);
+					}
+				}			
+
+				break;
+			}
 			case global::Mode.CastingSpell: {
-				PanelInteraction pi = panelTile.PanelInteraction.GetComponent<PanelInteraction>();
 				if (pi.Mode == PanelInteractionMode.Casting) {
 					panelTile.PanelAvatar.GetComponent<PanelAvatar>().CastOn(pi.CastersCard, pi.Caster);
 				}
@@ -231,22 +251,24 @@ public class PanelMinigame : MonoBehaviour {
 
 
 	private void DisableAllPanelsInteraction() {
+		Debug.Log("clearing all tiles");
 		foreach (GameObject tile in PanelTiles.GetComponent<ScrollableList>().ElementsToPut) {
 			tile.GetComponent<PanelTile>().PanelInteraction.GetComponent<PanelInteraction>().Clear();
 		}
 	}
 
 	private bool IsYourMinionHere(AvatarModel am) {
-
 		bool isYourMinion = false;
-		AvatarModel parent = am;
+		if (am != null) {
+			Debug.Log("Is your minion here? checking " + am.Card.Name);
+		}
 		for (int i = 0; true; i++) {
-			if (parent == null) {
+			if (am == null) {
 				//not your minion
 				break;
 			}
-			if (parent != null) {
-				isYourMinion = parent == ActualTurnModel;
+			if (am != null) {
+				isYourMinion = am == ActualTurnModel;
 				if (isYourMinion) {
 					break;
 				}
@@ -254,7 +276,10 @@ public class PanelMinigame : MonoBehaviour {
 			if (i > 50) {
 				throw new Exception("Fuck this shit");
 			}
-			parent = am.Creator;
+			am = am.Creator;
+			if (am != null ) {
+				Debug.Log("creator is " + am.Card.Name);
+			}
 		}
 		return isYourMinion;
 	}

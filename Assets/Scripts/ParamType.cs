@@ -8,5 +8,6 @@ public enum ParamType {
 	Speed,
 	Distance,
 	OneTimeSpeed,
-	Heal
+	Heal,
+	AttackThisTurn
 }

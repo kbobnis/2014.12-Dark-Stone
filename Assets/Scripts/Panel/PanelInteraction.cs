@@ -5,7 +5,12 @@ using UnityEngine.EventSystems;
 
 public class PanelInteraction : MonoBehaviour {
 
-	public PanelInteractionMode Mode = PanelInteractionMode.Idle;
+	private PanelInteractionMode _Mode = PanelInteractionMode.Idle;
+
+	public PanelInteractionMode Mode {
+		set { _Mode = value; UpdateImage(); }
+		get { return _Mode; }
+	}
 
 	//moving
 	public PanelTile WhatMoveOrAttack;
@@ -19,9 +24,6 @@ public class PanelInteraction : MonoBehaviour {
 		UpdateImage();
 	}
 
-	void Update() {
-		UpdateImage();
-	}
 
 	private void UpdateImage() {
 		GetComponent<Image>().enabled = false;
@@ -50,8 +52,8 @@ public class PanelInteraction : MonoBehaviour {
 	}
 
 	internal void CanMoveHere(PanelTile panelTile) {
-		Mode = PanelInteractionMode.Moving;
 		WhatMoveOrAttack = panelTile;
+		Mode = PanelInteractionMode.Moving;
 	}
 
 	internal void CanAttackHere(PanelTile panelTile) {
