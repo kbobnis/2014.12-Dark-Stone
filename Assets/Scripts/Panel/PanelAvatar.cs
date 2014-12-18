@@ -27,7 +27,7 @@ public class PanelAvatar : MonoBehaviour {
 
 		GetComponent<Image>().enabled = _Model != null;
 		if (_Model != null) {
-			GetComponent<Image>().sprite = _Model.Card.Animations[AnimationType.Icon];
+			GetComponent<Image>().sprite = _Model.Card.Animation;
 		}
 		
 		PanelHealth.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualHealth : 0);
@@ -105,9 +105,6 @@ public class AvatarModel {
 		if (card == null) {
 			throw new Exception("Card can not be null");
 		}
-		if (!card.Animations.ContainsKey(AnimationType.Icon)) {
-			throw new Exception("There is no icon animation for card: " + card.Name);
-		}
 		_Card = card;
 		OnBoard = onBoard;
 
@@ -118,9 +115,9 @@ public class AvatarModel {
 				case ParamType.Speed: Speed = kvp.Value; break;
 				//this is used when the spell is casted, no need for it now
 				case ParamType.Distance:
+					break;
 				case ParamType.OneTimeSpeed:
 				case ParamType.Heal:
-					break;
 				default: throw new NotImplementedException("Implement case for: " + kvp.Key);
 			}
 		}
@@ -181,24 +178,17 @@ public class AvatarModel {
 		AvatarModel am = actualModel;
 		_ActualMana -= c.Cost;
 		if (_ActualMana < 0) {
-			throw new Exception("What is this situation. Mana can not go under zero");
+			throw new Exception("What is this situation. Mana can not go under zero.");
 		}
-		bool removed = false;
-		foreach (Card handC in Hand.ToArray()) {
-			if (handC == c) {
-				Hand.Remove(c);
-				removed = true;
-			}
-		}
-		if (!removed) {
-			throw new Exception("You are casting a card not from your hand. Implement this possibility. Or think it throught.");
+		if (!Hand.Remove(c)) {
+			throw new Exception("You can not cast spell which is not in your hand.");
 		}
 
 		//if is a monster, then adding as minion
 		if (c.Params.ContainsKey(ParamType.Health)) {
 			if (actualModel != null) {
 				//can not cast minion on other minion
-				throw new Exception("Can not cast minion on top of other");
+				throw new Exception("Can not cast minion on top of other.");
 			}
 			am = new AvatarModel(c, true, this);
 			Minions.Add(am);
@@ -206,9 +196,12 @@ public class AvatarModel {
 			//if is a spell, then doing the magic
 			if (c.Params.ContainsKey(ParamType.Damage)) {
 				if (actualModel == null) {
-					throw new Exception("Can not cast damage spell on nothing");
+					throw new Exception("Can not cast damage spell on nothing.");
 				}
 				actualModel.ActualHealth -= c.Params[ParamType.Damage];
+			}
+			if (c.Params.ContainsKey(ParamType.Heal)) {
+				actualModel.ActualHealth += c.Params[ParamType.Heal];
 			}
 		}
 		return am;

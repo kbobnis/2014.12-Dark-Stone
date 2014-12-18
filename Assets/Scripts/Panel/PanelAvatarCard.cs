@@ -13,7 +13,7 @@ public class PanelAvatarCard : MonoBehaviour {
 			throw new Exception("Not nice to prepare with empty card");
 		}
 		PanelCost.GetComponent<PanelValue>().Prepare(Card.Cost);
-		GetComponent<Image>().sprite = Card.Animations[AnimationType.Icon];
+		GetComponent<Image>().sprite = Card.Animation;
 		PanelAttack.GetComponent<PanelValue>().Prepare(Card.Params.ContainsKey(ParamType.Attack) ? Card.Params[ParamType.Attack] : 0);
 		PanelHealth.GetComponent<PanelValue>().Prepare(Card.Params.ContainsKey(ParamType.Health) ? Card.Params[ParamType.Health] : 0);
 	}

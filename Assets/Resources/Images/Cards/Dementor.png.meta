@@ -1,8 +1,10 @@
 fileFormatVersion: 2
-guid: d37194df306293b479f568665da274d7
+guid: b6870cca6da00c847bb3d0331d167ce5
 TextureImporter:
   fileIDToRecycleName:
-    21300000: mudEffect
+    21300000: zlydementor
+    21300002: zlyDementor
+    21300004: Dementor
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0

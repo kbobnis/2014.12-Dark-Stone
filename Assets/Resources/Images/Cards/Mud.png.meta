@@ -1,8 +1,10 @@
 fileFormatVersion: 2
-guid: ffdcb498387a1b147a03250a6dd1ca79
+guid: 784d181051301d54eae13a3023ea6d85
 TextureImporter:
   fileIDToRecycleName:
-    21300000: zombie
+    21300000: mudIcon
+    21300002: Mu
+    21300004: Mud
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0

@@ -1,8 +1,9 @@
 fileFormatVersion: 2
-guid: ab0cd90e8ef767d45803bcd9070abd62
+guid: 422a9eb6e7e07384e9af0b666df4f639
 TextureImporter:
   fileIDToRecycleName:
-    21300000: shoeAnimation
+    21300000: fireballIcon
+    21300002: Fireball
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -25,10 +26,10 @@ TextureImporter:
   textureFormat: -1
   maxTextureSize: 1024
   textureSettings:
-    filterMode: -1
-    aniso: -1
+    filterMode: 0
+    aniso: 1
     mipBias: -1
-    wrapMode: -1
+    wrapMode: 1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50

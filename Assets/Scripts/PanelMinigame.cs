@@ -123,14 +123,16 @@ public class PanelMinigame : MonoBehaviour {
 			return atLeastOneTile;
 		}
 
-		//you can not cast healing touch on empty area
-		if (card.Params.ContainsKey(ParamType.Heal) && am == null){
-			return atLeastOneTile;
-		}
+		if (am == null) {
+			//you can not cast healing touch on empty area
+			if (card.Params.ContainsKey(ParamType.Heal)) {
+				return atLeastOneTile;
+			}
 
-		//damage spell on empty area can not be cast
-		if (card.Params.ContainsKey(ParamType.Damage) && am == null) {
-			return atLeastOneTile;
+			//damage spell can not be cast on empty area 
+			if (card.Params.ContainsKey(ParamType.Damage)) {
+				return atLeastOneTile;
+			}
 		}
 
 		panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanCastHere(caster, card);

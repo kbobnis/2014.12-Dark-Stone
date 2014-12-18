@@ -1,8 +1,9 @@
 fileFormatVersion: 2
-guid: 92718c631860fdb4b9d9211ed8455df1
+guid: 44d5d6af99bbab64fb63958d4d781d4e
 TextureImporter:
   fileIDToRecycleName:
-    21300000: iceAnimation
+    21300000: iceIcon
+    21300002: Ice bolt
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0

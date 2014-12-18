@@ -1,8 +1,9 @@
 fileFormatVersion: 2
-guid: 67adf13dc2cb0354384a9132a54f6c5d
+guid: c288ceda670509441a9ba2d948851367
 TextureImporter:
   fileIDToRecycleName:
-    21300000: arrow_up
+    21300000: wisp
+    21300002: Wisp
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0

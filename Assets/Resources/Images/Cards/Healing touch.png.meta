@@ -1,8 +1,9 @@
 fileFormatVersion: 2
-guid: 686a8029ac68fc34f918741d049833ab
+guid: ffdcb498387a1b147a03250a6dd1ca79
 TextureImporter:
   fileIDToRecycleName:
-    21300000: iceExplode
+    21300000: zombie
+    21300002: Healing touch
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0

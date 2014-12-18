@@ -1,8 +1,9 @@
 fileFormatVersion: 2
-guid: 44d5d6af99bbab64fb63958d4d781d4e
+guid: e61f39a30a332de4a934d4c51f214371
 TextureImporter:
   fileIDToRecycleName:
-    21300000: iceIcon
+    21300000: lasia
+    21300002: Lasia
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
