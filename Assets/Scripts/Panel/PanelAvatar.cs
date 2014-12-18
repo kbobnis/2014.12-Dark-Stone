@@ -125,6 +125,7 @@ public class AvatarModel {
 					AttackForAdjacent = kvp.Value;
 					break;
 				//this is used when the spell is casted, no need for it now
+				case ParamType.ReplaceExisting:
 				case ParamType.Distance:
 					break;
 				case ParamType.OneTimeSpeed:
@@ -203,9 +204,12 @@ public class AvatarModel {
 
 		//if is a monster, then adding as minion
 		if (c.Params.ContainsKey(ParamType.Health)) {
-			if (actualModel != null) {
+			if (actualModel != null && !c.Params.ContainsKey(ParamType.ReplaceExisting)) {
 				//can not cast minion on other minion
 				throw new Exception("Can not cast minion on top of other.");
+			}
+			if (c.Params.ContainsKey(ParamType.ReplaceExisting)) {
+				Minions.Remove(am);
 			}
 			am = new AvatarModel(c, true, this);
 			Minions.Add(am);

@@ -12,5 +12,6 @@ public enum ParamType {
 	AttackThisTurn,
 	AttackForAdjacent,
 	AdditionalAttack,
-	AdditionalHealth
+	AdditionalHealth,
+	ReplaceExisting
 }

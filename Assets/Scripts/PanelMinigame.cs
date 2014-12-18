@@ -39,6 +39,7 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.RockbiterWeapon);
 		lasiaModel.Deck.Add(Card.FlametongueTotem);
 		lasiaModel.Deck.Add(Card.MurlocTidehunter);
+		lasiaModel.Deck.Add(Card.Hex);
 		lasiaModel.Deck.Add(Card.ShatteredSunCleric);
 		lasiaModel.Deck.Add(Card.BloodfenRaptor);
 		lasiaModel.Deck.Add(Card.Thrallmar);
@@ -122,7 +123,7 @@ public class PanelMinigame : MonoBehaviour {
 		}
 		//you can not cast one minion on top of the other
 		AvatarModel am = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
-		if (card.Params.ContainsKey(ParamType.Health) && am != null) {
+		if (card.Params.ContainsKey(ParamType.Health) && am != null && !card.Params.ContainsKey(ParamType.ReplaceExisting)) {
 			return atLeastOneTile;
 		}
 
