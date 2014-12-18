@@ -223,6 +223,12 @@ public class AvatarModel {
 			if (c.Params.ContainsKey(ParamType.AttackThisTurn)) {
 				actualModel.AttackBonusThisTurn += c.Params[ParamType.AttackThisTurn];
 			}
+			if (c.Params.ContainsKey(ParamType.AdditionalAttack)) {
+				actualModel._ActualDamage += c.Params[ParamType.AdditionalAttack];
+			}
+			if (c.Params.ContainsKey(ParamType.AdditionalHealth)) {
+				actualModel._ActualHealth += c.Params[ParamType.AdditionalHealth];
+			}
 		}
 		return am;
 	}

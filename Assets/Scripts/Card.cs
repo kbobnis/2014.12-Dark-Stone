@@ -17,7 +17,7 @@ public class Card  {
 		Cost = cost;
 		Animation = Resources.Load<Sprite>("Images/Cards/" + name);
 		Params = param;
-		Effects = effects;
+		Effects = effects!=null?effects:new Dictionary<Effect, Card>();
 	}
 
 	public static readonly Card Wisp = new Card("Wisp", 0, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, { ParamType.Distance, 1 }, {ParamType.Speed, 1}});
@@ -29,7 +29,11 @@ public class Card  {
 	public static readonly Card MurlocScout = new Card("Murloc Scout", 0, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, { ParamType.Distance, 1 }, { ParamType.Speed, 1 } });	
 	public static readonly Card MurlocTidehunter = new Card("Murloc Tidehunter", 2, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 2 }, { ParamType.Distance, 1 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>(){ {Effect.Battlecry, MurlocScout}} );
+	public static readonly Card ShatteredSunClericBlessing = new Card("Shattered Sun Cleric Blessing", 0, new Dictionary<ParamType, int>() { { ParamType.AdditionalHealth, 1 }, { ParamType.AdditionalAttack, 1 }, { ParamType.Distance, 5 } });	
+	public static readonly Card ShatteredSunCleric = new Card("Shattered Sun Cleric", 3, new Dictionary<ParamType, int>() { { ParamType.Health, 2 }, { ParamType.Attack, 3 }, { ParamType.Distance, 1 }, { ParamType.Speed, 1 } },
+		new Dictionary<Effect, Card>() { { Effect.Battlecry, ShatteredSunClericBlessing } });
 	
+
 	public static readonly Card IceBolt = new Card("Ice bolt", 2, new Dictionary<ParamType, int>() { { ParamType.Damage, 10 }, { ParamType.Speed, 2 }, { ParamType.Distance, 2 } });
 	public static readonly Card Mud = new Card("Mud", 4, new Dictionary<ParamType, int>() { { ParamType.Damage, 1 }, { ParamType.Distance, 1 } });
 	public static readonly Card HealingTouch = new Card("Healing touch", 4, new Dictionary<ParamType, int>() { { ParamType.Distance, 3 }, {ParamType.Heal, 10} });

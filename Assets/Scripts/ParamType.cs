@@ -10,5 +10,7 @@ public enum ParamType {
 	OneTimeSpeed,
 	Heal,
 	AttackThisTurn,
-	AttackForAdjacent
+	AttackForAdjacent,
+	AdditionalAttack,
+	AdditionalHealth
 }

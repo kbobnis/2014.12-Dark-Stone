@@ -39,6 +39,7 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.RockbiterWeapon);
 		lasiaModel.Deck.Add(Card.FlametongueTotem);
 		lasiaModel.Deck.Add(Card.MurlocTidehunter);
+		lasiaModel.Deck.Add(Card.ShatteredSunCleric);
 		lasiaModel.Deck.Add(Card.BloodfenRaptor);
 		lasiaModel.Deck.Add(Card.Thrallmar);
 		lasiaModel.Deck.Add(Card.Wisp);
@@ -260,6 +261,8 @@ public class PanelMinigame : MonoBehaviour {
 								Mode = global::Mode.CastingSpell;
 							}
 						}
+						//battlecry can not be casted on itself
+						panelTile.PanelInteraction.GetComponent<PanelInteraction>().Clear();
 					}
 				}
 
