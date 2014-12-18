@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class PanelCardInHand : MonoBehaviour {
 
-	public GameObject PanelCardPreview, PanelAvatar;
+	public GameObject PanelCardPreview, PanelAvatar, PanelMinigame;
 	public Card Card;
 
 
@@ -22,6 +22,7 @@ public class PanelCardInHand : MonoBehaviour {
 		Debug.Log("Showing preview for card: " + Card.Name);
 		try {
 			PanelCardPreview.GetComponent<PanelCardPreview>().Preview(Card);
+			PanelMinigame.GetComponent<PanelMinigame>().CardInHandSelected(Card);
 		} catch (Exception e) {
 			Debug.Log("Exception: " + e);
 		}

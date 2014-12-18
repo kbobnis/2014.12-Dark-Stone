@@ -113,7 +113,7 @@ public class ScrollableList : MonoBehaviour
 					float pan = (actualRow - ((columnCount-1)/2f))/((columnCount-1)/2f);
 					AvatarModel am = null;
 					if (bt.Card != null) {
-						am = new AvatarModel(bt.Card, true);
+						am = new AvatarModel(bt.Card, true, null);
 					}
 					b.PanelAvatar.GetComponent<PanelAvatar>().Model = am;
 				}

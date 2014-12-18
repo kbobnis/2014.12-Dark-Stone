@@ -3,6 +3,7 @@ using System.Collections;
 
 public enum ParamType {
 	Health,
+	Attack,
 	Damage,
 	Speed,
 	Distance,

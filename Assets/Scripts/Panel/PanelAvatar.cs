@@ -35,13 +35,12 @@ public class PanelAvatar : MonoBehaviour {
 
 	}
 
-	internal void CastOn(Card c, PanelTile panelTile) {
+	internal void CastOn(Card c, AvatarModel am) {
 
 		if (c == null) {
 			throw new Exception("Why you cast when there is no card");
 		}
-		panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model = Model.Cast(c);
-
+		Model = am.Cast(Model, c);
 	}
 
 	internal AvatarModel GetAndRemoveModel() {
@@ -63,6 +62,9 @@ public class PanelAvatar : MonoBehaviour {
 
 public class AvatarModel {
 
+	public static readonly int HandSize = 4;
+	public static readonly int MaxCrystals = 10;
+	
 	private Card _Card;
 	private int _ActualHealth;
 	private int _ActualMana, _ActualDamage, Speed, _MovesLeft, MaxHealth, _MaxMana;
@@ -70,6 +72,7 @@ public class AvatarModel {
 	public List<Card> Deck = new List<Card>();
 	private List<Card> _Hand = new List<Card>();
 	private List<AvatarModel> Minions = new List<AvatarModel>();
+	private AvatarModel _Creator;
 	private int Draught;
 	private bool OnBoard;
 
@@ -93,8 +96,12 @@ public class AvatarModel {
 	public int ActualMana {
 		get { return _ActualMana; }
 	}
-	public AvatarModel(Card card, bool onBoard) {
 
+	public AvatarModel Creator {
+		get { return _Creator; }
+	}
+	public AvatarModel(Card card, bool onBoard, AvatarModel creator) {
+		_Creator = creator;
 		if (card == null) {
 			throw new Exception("Card can not be null");
 		}
@@ -107,7 +114,7 @@ public class AvatarModel {
 		foreach (KeyValuePair<ParamType, int> kvp in card.Params) {
 			switch (kvp.Key) {
 				case ParamType.Health: MaxHealth = kvp.Value; ActualHealth = kvp.Value; break;
-				case ParamType.Damage: _ActualDamage = kvp.Value; break;
+				case ParamType.Attack: _ActualDamage = kvp.Value; break;
 				case ParamType.Speed: Speed = kvp.Value; break;
 				//this is used when the spell is casted, no need for it now
 				case ParamType.Distance:
@@ -131,8 +138,8 @@ public class AvatarModel {
 
 	internal void AddCrystal() {
 		_MaxMana++;
-		if (_MaxMana > 10){
-			_MaxMana = 10;
+		if (_MaxMana > MaxCrystals){
+			_MaxMana = MaxCrystals;
 		}
 	}
 
@@ -154,8 +161,11 @@ public class AvatarModel {
 			ActualHealth -= Draught;
 		} else {
 			Deck.Remove(c);
-			_Hand.Add(c);
-			Debug.Log("hand now has " + _Hand.Count + " cards");
+			if (_Hand.Count < AvatarModel.HandSize) {
+				_Hand.Add(c);
+			} else {
+				Debug.Log("Burning card " + c.Name + " from deck");
+			}
 		}
 	}
 
@@ -167,12 +177,26 @@ public class AvatarModel {
 		get { return _ActualDamage; }
 	}
 
-	internal AvatarModel Cast(Card c) {
-		AvatarModel am = new AvatarModel(c, true);
+	internal AvatarModel Cast(AvatarModel actualModel, Card c) {
+		AvatarModel am = actualModel;
 		_ActualMana -= c.Cost;
+
 		//if is a monster, then adding as minion
 		if (c.Params.ContainsKey(ParamType.Health)) {
+			if (actualModel != null) {
+				//can not cast minion on other minion
+				throw new Exception("Can not cast minion on top of other");
+			}
+			am = new AvatarModel(c, true, this);
 			Minions.Add(am);
+		} else {
+			//if is a spell, then doing the magic
+			if (c.Params.ContainsKey(ParamType.Damage)) {
+				if (actualModel == null) {
+					throw new Exception("Can not cast damage spell on nothing");
+				}
+				actualModel.ActualHealth -= c.Params[ParamType.Damage];
+			}
 		}
 		return am;
 	}
