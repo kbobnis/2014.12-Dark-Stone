@@ -5,8 +5,10 @@ using UnityEngine.EventSystems;
 
 public class PanelInteraction : MonoBehaviour {
 
+	public PanelInteractionMode Mode = PanelInteractionMode.Idle;
+
 	//moving
-	public PanelTile WhatWantsToMoveHere;
+	public PanelTile WhatMoveOrAttack;
 
 	//casting spell
 	public AvatarModel Caster;
@@ -17,34 +19,51 @@ public class PanelInteraction : MonoBehaviour {
 		UpdateImage();
 	}
 
+	void Update() {
+		UpdateImage();
+	}
+
 	private void UpdateImage() {
 		GetComponent<Image>().enabled = false;
-		GetComponentInChildren<Text>().enabled = false;
+		Text text = GetComponentInChildren<Text>();
+		text.enabled = false;
 
-		if (WhatWantsToMoveHere != null || Caster != null) {
+		if ( Mode != PanelInteractionMode.Idle) {
 			GetComponent<Image>().enabled = true;
-			GetComponentInChildren<Text>().enabled = true;
+			text.enabled = true;
+			switch (Mode) {
+				case PanelInteractionMode.Casting: text.text = "Cast " + CastersCard.Name + " here"; break;
+				case PanelInteractionMode.Moving: text.text = "Move " + WhatMoveOrAttack.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name + " here"; break;
+				case PanelInteractionMode.Attacking: text.text = "Attack with " + WhatMoveOrAttack.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name; break;
+			}
 		}
 	}
 
-	internal void CanMoveHere(PanelTile panelTile) {
-		WhatWantsToMoveHere = panelTile;
-
-		GetComponentInChildren<Text>().text = "Move here";
-		UpdateImage();
-	}
-
 	internal void Clear() {
-		WhatWantsToMoveHere = null;
-		Caster = null;
-		CastersCard = null;
-		UpdateImage();
+		Mode = PanelInteractionMode.Idle;
 	}
 
 	internal void CanCastHere(AvatarModel caster, Card card) {
 		Caster = caster;
 		CastersCard = card;
-		GetComponentInChildren<Text>().text = "Cast " + card.Name + " here";
-		UpdateImage();
+		Mode = PanelInteractionMode.Casting;
 	}
+
+	internal void CanMoveHere(PanelTile panelTile) {
+		Mode = PanelInteractionMode.Moving;
+		WhatMoveOrAttack = panelTile;
+	}
+
+	internal void CanAttackHere(PanelTile panelTile) {
+		WhatMoveOrAttack = panelTile;
+		Mode = PanelInteractionMode.Attacking;
+	}
+}
+
+public enum PanelInteractionMode {
+	Idle,
+	Casting,
+	Moving,
+	Attacking
+
 }

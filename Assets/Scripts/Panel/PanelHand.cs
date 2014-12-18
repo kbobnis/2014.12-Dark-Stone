@@ -9,7 +9,8 @@ public class PanelHand : MonoBehaviour {
 	public AvatarModel AvatarModel;
 
 	void Update() {
-		if (AvatarModel != null && AvatarModel.Hand.Count > 0) {
+
+		if (AvatarModel != null ) {
 			for (int i = 0; i < Cards.Length; i++) {
 				Cards[i].SetActive(AvatarModel.Hand.Count > i);
 				if (AvatarModel.Hand.Count > i) {

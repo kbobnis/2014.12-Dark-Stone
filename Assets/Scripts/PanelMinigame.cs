@@ -11,7 +11,8 @@ public class PanelMinigame : MonoBehaviour {
 
 	private AvatarModel MyModel, EnemysModel;
 	private AvatarModel ActualTurnModel;
-	private Mode Mode = Mode.Ready;
+	//to be visible in inspector
+	public Mode Mode = Mode.Ready;
 
 	internal void Prepare() {
 		PanelInformation.SetActive(true);
@@ -99,21 +100,65 @@ public class PanelMinigame : MonoBehaviour {
 				PanelTile panelTile = PanelTiles.GetComponent<PanelTiles>().FindTileForModel(ActualTurnModel);
 				int distance = card.Params.ContainsKey(ParamType.Distance) ? card.Params[ParamType.Distance] : 0;
 				foreach (Side s in SideMethods.AllSides()) {
-					SetInteractionToCastAround(ActualTurnModel, panelTile, card, s, distance);
+					if (SetInteractionToCastAround(ActualTurnModel, panelTile, card, s, distance)) {
+						Mode = global::Mode.CastingSpell;
+					}
 				}
 			}
 		}
 	}
 
-	private void SetInteractionToCastAround(AvatarModel caster, PanelTile panelTile, Card card, Side s, int distance) {
-
+	private bool SetInteractionToCastAround(AvatarModel caster, PanelTile panelTile, Card card, Side s, int distance) {
+		bool atLeastOneTile = false;
 		if (distance > 0){
 			if (panelTile.Neighbours.ContainsKey(s)) {
-				SetInteractionToCastAround(caster, panelTile.Neighbours[s], card, s, distance - 1);
+				if (SetInteractionToCastAround(caster, panelTile.Neighbours[s], card, s, distance - 1)) {
+					atLeastOneTile = true;
+				}
 			}
-		} 
+		}
+		//you can not cast one minion on top of the other
+		AvatarModel am = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
+		if (card.Params.ContainsKey(ParamType.Health) && am != null) {
+			return atLeastOneTile;
+		}
+
+		//you can not cast healing touch on empty area
+		if (card.Params.ContainsKey(ParamType.Heal) && am == null){
+			return atLeastOneTile;
+		}
+
+		//damage spell on empty area can not be cast
+		if (card.Params.ContainsKey(ParamType.Damage) && am == null) {
+			return atLeastOneTile;
+		}
+
 		panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanCastHere(caster, card);
-		Mode = global::Mode.CastingSpell;
+		atLeastOneTile = true;
+		return atLeastOneTile;
+	}
+
+	private bool SetInteractionToMoveAround(PanelTile mover, PanelTile panelTile, Side s, int distance) {
+		bool atLeastOneTile = false;
+		if (distance > 0) {
+			if (panelTile.Neighbours.ContainsKey(s)) {
+				if (SetInteractionToMoveAround(mover, panelTile.Neighbours[s], s, distance - 1)) {
+					atLeastOneTile = true;
+				}
+			}
+		} else {
+			//if there is another minion, then this will be attack move
+			if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model != null) {
+				//can not attack your own minions
+				if (!IsYourMinionHere(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model)) {
+					panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanAttackHere(mover);
+				}
+			} else {
+				panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanMoveHere(mover);
+				atLeastOneTile = true;
+			}
+		}
+		return atLeastOneTile;
 	}
 
 	internal void PointerDownOn(PanelTile panelTile) {
@@ -135,19 +180,18 @@ public class PanelMinigame : MonoBehaviour {
 						} else {
 							//preparing interaction panels for moves
 							foreach (Side s in SideMethods.AllSides()) {
-								if (panelTile.Neighbours.ContainsKey(s)) {
-									panelTile.Neighbours[s].PanelInteraction.GetComponent<PanelInteraction>().CanMoveHere(panelTile);
+								if (SetInteractionToMoveAround(panelTile, panelTile, s, 1)){
+									Mode = Mode.MovingOrAttacking;
 								}
 							}
-							Mode = Mode.MovingElement;
 						}
 					}
 					break;
 				}
-			case global::Mode.MovingElement: {
-					PanelTile whatWantsToMoveHere = panelTile.PanelInteraction.GetComponent<PanelInteraction>().WhatWantsToMoveHere;
-					if (whatWantsToMoveHere != null) {
-						whatWantsToMoveHere.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft--;
+			case global::Mode.MovingOrAttacking: {
+					PanelTile whatWantsToMoveOrAttackHere = panelTile.PanelInteraction.GetComponent<PanelInteraction>().WhatMoveOrAttack;
+					if (whatWantsToMoveOrAttackHere != null) {
+						whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft--;
 						//is here something?
 						if (am != null) {
 							if (IsYourMinionHere(am)) {
@@ -155,12 +199,12 @@ public class PanelMinigame : MonoBehaviour {
 								PanelInformation.GetComponent<PanelInformation>().SetText("Can not attack your own minion");
 							} else {
 								//battle
-
+								whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().BattleOutWith(panelTile.PanelAvatar.GetComponent<PanelAvatar>());
 							}
 						} else {
 							//move
-							panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model = whatWantsToMoveHere.PanelAvatar.GetComponent<PanelAvatar>().Model;
-							whatWantsToMoveHere.PanelAvatar.GetComponent<PanelAvatar>().Model = null;
+							panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model = whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model;
+							whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model = null;
 						}
 
 					}
@@ -171,7 +215,7 @@ public class PanelMinigame : MonoBehaviour {
 				}
 			case global::Mode.CastingSpell: {
 				PanelInteraction pi = panelTile.PanelInteraction.GetComponent<PanelInteraction>();
-				if (pi.Caster != null) {
+				if (pi.Mode == PanelInteractionMode.Casting) {
 					panelTile.PanelAvatar.GetComponent<PanelAvatar>().CastOn(pi.CastersCard, pi.Caster);
 				}
 				DisableAllPanelsInteraction();
@@ -181,6 +225,8 @@ public class PanelMinigame : MonoBehaviour {
 			default: throw new NotImplementedException("Implement working with mode: " + Mode);
 		}
 	}
+
+
 
 	private void DisableAllPanelsInteraction() {
 		foreach (GameObject tile in PanelTiles.GetComponent<ScrollableList>().ElementsToPut) {
@@ -199,6 +245,9 @@ public class PanelMinigame : MonoBehaviour {
 			}
 			if (parent != null) {
 				isYourMinion = parent == ActualTurnModel;
+				if (isYourMinion) {
+					break;
+				}
 			}
 			if (i > 50) {
 				throw new Exception("Fuck this shit");
@@ -211,6 +260,6 @@ public class PanelMinigame : MonoBehaviour {
 }
 
 public enum Mode {
-	Ready, MovingElement,
+	Ready, MovingOrAttacking,
 	CastingSpell
 }

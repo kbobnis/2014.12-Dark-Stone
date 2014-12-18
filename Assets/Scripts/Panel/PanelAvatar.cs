@@ -180,6 +180,19 @@ public class AvatarModel {
 	internal AvatarModel Cast(AvatarModel actualModel, Card c) {
 		AvatarModel am = actualModel;
 		_ActualMana -= c.Cost;
+		if (_ActualMana < 0) {
+			throw new Exception("What is this situation. Mana can not go under zero");
+		}
+		bool removed = false;
+		foreach (Card handC in Hand.ToArray()) {
+			if (handC == c) {
+				Hand.Remove(c);
+				removed = true;
+			}
+		}
+		if (!removed) {
+			throw new Exception("You are casting a card not from your hand. Implement this possibility. Or think it throught.");
+		}
 
 		//if is a monster, then adding as minion
 		if (c.Params.ContainsKey(ParamType.Health)) {
