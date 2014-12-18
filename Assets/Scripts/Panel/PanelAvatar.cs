@@ -197,11 +197,9 @@ public class AvatarModel {
 		AvatarModel am = actualModel;
 		_ActualMana -= c.Cost;
 		if (_ActualMana < 0) {
-			throw new Exception("What is this situation. Mana can not go under zero.");
+			throw new Exception("What is this situation. Mana can not go under zero. Casting: " + c.Name + " for " + c.Cost);
 		}
-		if (!Hand.Remove(c)) {
-			throw new Exception("You can not cast spell which is not in your hand.");
-		}
+		Hand.Remove(c);
 
 		//if is a monster, then adding as minion
 		if (c.Params.ContainsKey(ParamType.Health)) {

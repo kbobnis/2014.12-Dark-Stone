@@ -38,6 +38,8 @@ public class PanelMinigame : MonoBehaviour {
 		AvatarModel lasiaModel = lasiaAvatar.Model;
 		lasiaModel.Deck.Add(Card.RockbiterWeapon);
 		lasiaModel.Deck.Add(Card.FlametongueTotem);
+		lasiaModel.Deck.Add(Card.MurlocTidehunter);
+		lasiaModel.Deck.Add(Card.BloodfenRaptor);
 		lasiaModel.Deck.Add(Card.Thrallmar);
 		lasiaModel.Deck.Add(Card.Wisp);
 		lasiaModel.Deck.Add(Card.Fireball);
@@ -58,7 +60,6 @@ public class PanelMinigame : MonoBehaviour {
 
 		ActualTurnModel = EnemysModel;
 		EndTurn();
-
 	}
 
 	void Update() {
@@ -157,9 +158,11 @@ public class PanelMinigame : MonoBehaviour {
 			//if there is another minion, then this will be attack move
 			if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model != null) {
 				//can not attack your own minions
-				if (!IsYourMinionHere(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model)) {
+				if (!IsYourMinionHere(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model) && mover.PanelAvatar.GetComponent<PanelAvatar>().Model.ActualDamage > 0) {
+
 					panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanAttackHere(mover);
 				}
+				
 			} else {
 				panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanMoveHere(mover);
 				atLeastOneTile = true;
@@ -238,11 +241,28 @@ public class PanelMinigame : MonoBehaviour {
 				break;
 			}
 			case global::Mode.CastingSpell: {
+
+				PanelInteractionMode whatMode = pi.Mode;
+				Card whatCard = pi.CastersCard;
+
 				if (pi.Mode == PanelInteractionMode.Casting) {
 					panelTile.PanelAvatar.GetComponent<PanelAvatar>().CastOn(pi.CastersCard, pi.Caster);
 				}
 				DisableAllPanelsInteraction();
 				Mode = global::Mode.Ready;
+
+				if (whatMode == PanelInteractionMode.Casting && panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model != null) {
+					if (whatCard.Effects.ContainsKey(Effect.Battlecry)) {
+						whatCard = whatCard.Effects[Effect.Battlecry];
+						int distance = whatCard.Params.ContainsKey(ParamType.Distance) ? whatCard.Params[ParamType.Distance] : 0;
+						foreach (Side s in SideMethods.AllSides()) {
+							if (SetInteractionToCastAround(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model, panelTile, whatCard, s, distance)) {
+								Mode = global::Mode.CastingSpell;
+							}
+						}
+					}
+				}
+
 				break;
 			}
 			default: throw new NotImplementedException("Implement working with mode: " + Mode);
