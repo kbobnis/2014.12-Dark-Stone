@@ -168,18 +168,20 @@ public class PanelMinigame : MonoBehaviour {
 			}
 		} else {
 			
-			//it there is a taunter nearby, you can not attack nor move here
-			bool enemysTaunterFound = false;
-			foreach (Side sTmp in SideMethods.AdjacentSides()) {
-				if (panelTile.Neighbours.ContainsKey(sTmp) && panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model != null && panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model.HasTaunt && !ActualTurnModel.IsItYourMinion(panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model)) {
-					enemysTaunterFound = true;
-				}
-			}
+			AvatarModel am = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
+			if (am != null) {
 
-			//if there is another minion, then this will be attack instead of move
-			if (!enemysTaunterFound && panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model != null) {
-				//can not attack your own minions
-				if (!ActualTurnModel.IsItYourMinion(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model) && mover.PanelAvatar.GetComponent<PanelAvatar>().Model.ActualDamage > 0) {
+				bool hasPhysicalProtection = false;
+
+				foreach (CastedCard cc in am.Effects) {
+					if (cc.Params.ContainsKey(CastedCardParamType.PhysicalProtection)) {
+						hasPhysicalProtection = true;
+						break;
+					}
+				}
+
+				//can not attack your own minions nor with physical protection
+				if (!hasPhysicalProtection && !ActualTurnModel.IsItYourMinion(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model) && mover.PanelAvatar.GetComponent<PanelAvatar>().Model.ActualAttack > 0) {
 					panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanAttackHere(mover);
 				}
 
@@ -326,7 +328,16 @@ public class PanelMinigame : MonoBehaviour {
 								am.Cast(kvp.Value, e.Value);
 							}
 						}
-					}							
+					}
+					if (e.Value.Params.ContainsKey(ParamType.PhysicalProtectionForFriendyAdjacentCharactersracters)) {
+
+						AvatarModel myHero = am.GetMyHero();
+						foreach (KeyValuePair<Side, AvatarModel> kvp in am.AdjacentModels) {
+							if (kvp.Value != null && (myHero.IsItYourMinion(kvp.Value) || kvp.Value == myHero)) {
+								am.Cast(kvp.Value, e.Value);
+							}
+						}
+					}
 				}
 			}
 		}
@@ -352,7 +363,6 @@ public class PanelMinigame : MonoBehaviour {
 			}
 		}
 		return myMinionsCount;
-
 	}
 }
 

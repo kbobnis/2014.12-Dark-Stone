@@ -32,7 +32,7 @@ public class Card  {
 
 	public static readonly Card Wisp = new Card("Wisp", 0, CardPersistency.Minion, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, { ParamType.Distance, 1 }, {ParamType.Speed, 1}});
 
-	public static readonly Card RockbiterWeapon = new Card("Rockbiter Weapon", 1, CardPersistency.UntilEndTurn, new Dictionary<ParamType, int>() { { ParamType.Attack, 3 }, { ParamType.Distance, 5 } });
+	public static readonly Card RockbiterWeapon = new Card("Rockbiter Weapon", 1, CardPersistency.UntilEndTurn, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 3 }, { ParamType.Distance, 5 } });
 	public static readonly Card FlametongueTotemAura = new Card("Flametongue Totem Aura", 1, CardPersistency.EveryActionRevalidate, new Dictionary<ParamType, int>() { { ParamType.AttackAddForAdjacentFriendlyCharacters, 2 } });
 	public static readonly Card FlametongueTotem= new Card("Flametongue Totem", 2, CardPersistency.Minion, new Dictionary<ParamType, int>() { { ParamType.Distance, 1 }, {ParamType.Health, 3}, {ParamType.Speed, 1} },
 		new Dictionary<Effect,Card>() { {Effect.WhileAlive, FlametongueTotemAura} });
@@ -52,9 +52,9 @@ public class Card  {
 	public static readonly Card GnomishInventor = new Card("Gnomish Inventor", 4, CardPersistency.Minion, new Dictionary<ParamType, int>() { { ParamType.Health, 4 }, { ParamType.Attack, 2 }, { ParamType.Distance, 1 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, GnomishInvention } });
 	public static readonly Card ChillwindYeti = new Card("Chillwind Yeti", 4, CardPersistency.Minion, new Dictionary<ParamType, int>() { { ParamType.Health, 5 }, { ParamType.Attack, 4 }, { ParamType.Distance, 1 }, { ParamType.Speed, 1 } });
-	public static readonly Card Taunt = new Card("Taunt", 1, CardPersistency.WhileHolderAlive, new Dictionary<ParamType, int>() { { ParamType.Taunt, 1 } });
+	public static readonly Card PhysicalProtectionForAdjacent = new Card("Physical Protection for Adjacent", 1, CardPersistency.EveryActionRevalidate, new Dictionary<ParamType, int>() { { ParamType.PhysicalProtectionForFriendyAdjacentCharactersracters, 1 } });
 	public static readonly Card SenjinShieldmasta= new Card("Senjin Shieldmasta", 4, CardPersistency.Minion, new Dictionary<ParamType, int>() { { ParamType.Health, 5 }, { ParamType.Attack, 3 }, { ParamType.Distance, 1 }, { ParamType.Speed, 1 } },
-		new Dictionary<Effect,Card>() { {Effect.WhileAlive, Taunt} });
+		new Dictionary<Effect, Card>() { { Effect.WhileAlive, PhysicalProtectionForAdjacent } });
 	public static readonly Card FrostwolfCall = new Card("Frostwolf Call", 1, CardPersistency.WhileHolderAlive, new Dictionary<ParamType, int>() { { ParamType.AttackAddOfFriendlyMinionNumber, 1 }, { ParamType.HealthAddOfOtherFriendlyMinionNumber, 1 } });
 	public static readonly Card FrostwolfWarlord = new Card("Frostwolf Warlord", 5, CardPersistency.Minion, new Dictionary<ParamType, int>() { { ParamType.Health, 4 }, { ParamType.Attack, 4 }, { ParamType.Distance, 1 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, FrostwolfCall} } );
@@ -65,7 +65,7 @@ public class Card  {
 	public static readonly Card BoulderfishOgre = new Card("Boulderfist Ogre", 6, CardPersistency.Minion, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 7 }, { ParamType.Distance, 1 }, { ParamType.Speed, 1 } });
 	public static readonly Card StormwindChampionsAura = new Card("Stormwind Champions Aura", 2, CardPersistency.EveryActionRevalidate, new Dictionary<ParamType, int>() { { ParamType.AttackAddForOtherFriendlyMinions, 1 }, { ParamType.HealthAddForFriendlyMinions, 1 } });
 	public static readonly Card StormwindChampion = new Card("Stormwind Champion", 7, CardPersistency.Minion, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 6 }, { ParamType.Distance, 1 }, { ParamType.Speed, 1 }},
-		new Dictionary<Effect, Card>() {{Effect.Battlecry, StormwindChampionsAura} });
+		new Dictionary<Effect, Card>() {{Effect.WhileAlive, StormwindChampionsAura} });
 
 
 	//heroes
@@ -75,8 +75,9 @@ public class Card  {
 
 
 public enum CastedCardParamType {
-	AttackAdd, 
+	AttackAdd,
 	HealthAdd, //this includes max health
+	PhysicalProtection, //can not be targeted with physical attack
 }
 
 public class CastedCard {
@@ -116,7 +117,7 @@ public class CastedCard {
 		}
 		
 		if (c.Params.ContainsKey(ParamType.AttackAddForOtherFriendlyMinions)) {
-			Params.Add(CastedCardParamType.AttackAdd, PanelMinigame.Me.MyMinionNumber() - 1); //because itself doesn't count and its already casted
+			Params.Add(CastedCardParamType.AttackAdd, PanelMinigame.Me.MyMinionNumber()- 1); //because itself doesn't count and its already casted
 		}
 
 		if (c.Params.ContainsKey(ParamType.HealthAddOfOtherFriendlyMinionNumber)) {
@@ -125,6 +126,10 @@ public class CastedCard {
 
 		if (c.Params.ContainsKey(ParamType.AttackAddForAdjacentFriendlyCharacters)) {
 			Params.Add(CastedCardParamType.AttackAdd, c.Params[ParamType.AttackAddForAdjacentFriendlyCharacters]);
+		}
+
+		if (c.Params.ContainsKey(ParamType.PhysicalProtectionForFriendyAdjacentCharactersracters)) {
+			Params.Add(CastedCardParamType.PhysicalProtection, 1);
 		}
 
 	}

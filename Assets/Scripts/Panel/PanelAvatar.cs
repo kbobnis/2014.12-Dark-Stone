@@ -35,7 +35,7 @@ public class PanelAvatar : MonoBehaviour {
 		}
 		
 		PanelHealth.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualHealth : 0);
-		PanelAttack.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualDamage : 0);
+		PanelAttack.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualAttack : 0);
 
 	}
 
@@ -56,8 +56,8 @@ public class PanelAvatar : MonoBehaviour {
 	internal void BattleOutWith(PanelAvatar panelAvatar) {
 		AvatarModel pam = panelAvatar.Model;
 
-		Model.ActualHealth -= pam.ActualDamage;
-		pam.ActualHealth -= Model.ActualDamage;
+		Model.ActualHealth -= pam.ActualAttack;
+		pam.ActualHealth -= Model.ActualAttack;
 		UpdateFromModel();
 		panelAvatar.UpdateFromModel();
 	}
@@ -70,10 +70,7 @@ public class AvatarModel {
 	public static readonly int MaxCrystals = 10;
 	
 	private Card _Card;
-	private int _ActualHealth;
-	private int _ActualMana, Speed, _MovesLeft, MaxHealth, _MaxMana;
-
-	private readonly int _ActualDamage;
+	private int _ActualMana, _MovesLeft, _ActualHealth, _MaxMana;
 
 	public List<Card> Deck = new List<Card>();
 	private List<Card> _Hand = new List<Card>();
@@ -83,11 +80,6 @@ public class AvatarModel {
 	public Dictionary<Side, AvatarModel> AdjacentModels = new Dictionary<Side,AvatarModel>();
 	private int Draught;
 	private bool OnBoard;
-	private bool _HasTaunt;
-
-	public bool HasTaunt {
-		get { return _HasTaunt; }
-	}
 
 	public List<Card> Hand {
 		get { return _Hand; }
@@ -100,10 +92,6 @@ public class AvatarModel {
 
 	public Card Card {
 		get { return _Card;  }
-	}
-
-	public int MaxMana {
-		get { return _MaxMana; }
 	}
 
 	public int ActualMana {
@@ -121,21 +109,7 @@ public class AvatarModel {
 		_Card = card;
 		OnBoard = onBoard;
 
-		foreach (KeyValuePair<ParamType, int> kvp in card.Params) {
-			switch (kvp.Key) {
-				case ParamType.Health: MaxHealth = kvp.Value; ActualHealth = kvp.Value; break;
-				case ParamType.Attack: _ActualDamage = kvp.Value; break;
-				case ParamType.Speed: Speed = kvp.Value; break;
-				case ParamType.Taunt: _HasTaunt = true; break;
-				//this is used when the spell is casted, no need for it now
-				case ParamType.AttackAddForAdjacentFriendlyCharacters:
-				case ParamType.ReplaceExisting:
-				case ParamType.Distance:
-					break;
-				case ParamType.Heal:
-				default: throw new NotImplementedException("Implement case for: " + kvp.Key);
-			}
-		}
+		ActualHealth = card.Params[ParamType.Health];
 	}
 
 	public int ActualHealth {
@@ -147,6 +121,17 @@ public class AvatarModel {
 		}
 	}
 
+	public int MaxHealth {
+		get {
+			int max = Card.Params[ParamType.Health];
+			foreach (CastedCard c in Effects) {
+				if (c.Params.ContainsKey(CastedCardParamType.HealthAdd)) {
+					max += c.Params[CastedCardParamType.HealthAdd];
+				}
+			}
+			return max;
+		}
+	}
 
 	private void AddCrystal() {
 		_MaxMana++;
@@ -155,12 +140,18 @@ public class AvatarModel {
 		}
 	}
 
+	public int MaxMana {
+		get { return _MaxMana; }
+	}
+
 	private void RefillCrystals() {
 		_ActualMana = _MaxMana;
 	}
 
 	private void RefillMovements() {
-		_MovesLeft = Speed;
+		int speed = Card.Params[ParamType.Speed];
+
+		_MovesLeft = speed;
 		foreach (AvatarModel am in Minions) {
 			am.RefillMovements();
 		}
@@ -185,7 +176,7 @@ public class AvatarModel {
 		return OnBoard;
 	}
 
-	public int ActualDamage {
+	public int ActualAttack {
 		get {
 			int additionalDamage = 0;
 			foreach (CastedCard c in Effects) {
@@ -193,7 +184,8 @@ public class AvatarModel {
 					additionalDamage += c.Params[CastedCardParamType.AttackAdd];
 				}
 			}
-			return _ActualDamage + additionalDamage; 
+			int baseAttack = Card.Params.ContainsKey(ParamType.Attack) ? Card.Params[ParamType.Attack] : 0;
+			return baseAttack + additionalDamage; 
 		}
 	}
 

@@ -17,6 +17,6 @@ public enum ParamType {
 	Distance,
 	Heal,
 	HeroDrawsCard,
-	Taunt,
+	PhysicalProtectionForFriendyAdjacentCharactersracters,
 	ReplaceExisting,
 }
