@@ -235,8 +235,8 @@ public class AvatarModel {
 			if (c.Params.ContainsKey(ParamType.Heal)) {
 				actualModel.ActualHealth += c.Params[ParamType.Heal];
 			}
-			if (c.Params.ContainsKey(ParamType.AttackThisTurn)) {
-				actualModel.AttackBonusThisTurn += c.Params[ParamType.AttackThisTurn];
+			if (c.Params.ContainsKey(ParamType.AttackThisTurnForCharacter)) {
+				actualModel.AttackBonusThisTurn += c.Params[ParamType.AttackThisTurnForCharacter];
 			}
 			if (c.Params.ContainsKey(ParamType.AdditionalAttack)) {
 				actualModel._ActualDamage += c.Params[ParamType.AdditionalAttack];
@@ -256,6 +256,14 @@ public class AvatarModel {
 				actualModel.MaxHealth += PanelMinigame.Me.MyMinionNumber() -1 ; //because itself doesn't count
 				actualModel._ActualHealth += PanelMinigame.Me.MyMinionNumber() -1; //because itself doesn't count
 			}
+			if (c.Params.ContainsKey(ParamType.AddAttackThisTurnForAllYourMinions)) {
+				foreach (AvatarModel amTmp in PanelMinigame.Me.ActualTurnModel.Minions) {
+					amTmp.AttackBonusThisTurn += 3;
+					foreach (AvatarModel amTmp2 in amTmp.Minions) {
+						amTmp2.AttackBonusThisTurn += 3;
+					}
+				}
+			}
 		}
 		return am;
 	}
@@ -271,6 +279,9 @@ public class AvatarModel {
 		AttackBonusThisTurn = 0;
 		foreach (AvatarModel am in Minions) {
 			am.AttackBonusThisTurn = 0;
+			foreach (AvatarModel am2 in am.Minions) {
+				am2.AttackBonusThisTurn = 0;
+			}
 		}
 	}
 }

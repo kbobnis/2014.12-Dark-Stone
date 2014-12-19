@@ -9,7 +9,7 @@ public enum ParamType {
 	Distance,
 	OneTimeSpeed,
 	Heal,
-	AttackThisTurn,
+	AttackThisTurnForCharacter,
 	AttackForAdjacent,
 	AdditionalAttack,
 	AdditionalHealth,
@@ -17,5 +17,6 @@ public enum ParamType {
 	AvatarDrawCard,
 	Taunt,
 	AddAttackOfMinionNumber,
-	AddHealthOfMinionNumber
+	AddHealthOfMinionNumber,
+	AddAttackThisTurnForAllYourMinions
 }

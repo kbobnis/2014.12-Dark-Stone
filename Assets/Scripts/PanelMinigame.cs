@@ -42,6 +42,7 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.FlametongueTotem);
 		lasiaModel.Deck.Add(Card.RazorfenHunter);
 		lasiaModel.Deck.Add(Card.SenjinShieldmasta);
+		lasiaModel.Deck.Add(Card.Bloodlust);
 		lasiaModel.Deck.Add(Card.FrostwolfWarlord);
 		lasiaModel.Deck.Add(Card.GnomishInventor);
 		lasiaModel.Deck.Add(Card.ChillwindYeti);
@@ -158,7 +159,7 @@ public class PanelMinigame : MonoBehaviour {
 				return atLeastOneTile;
 			}
 
-			if (card.Params.ContainsKey(ParamType.AttackThisTurn)) {
+			if (card.Params.ContainsKey(ParamType.AttackThisTurnForCharacter)) {
 				return atLeastOneTile;
 			}
 		}

@@ -22,7 +22,7 @@ public class Card  {
 
 	public static readonly Card Wisp = new Card("Wisp", 0, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, { ParamType.Distance, 1 }, {ParamType.Speed, 1}});
 	
-	public static readonly Card RockbiterWeapon = new Card("Rockbiter Weapon", 1, new Dictionary<ParamType, int>() { { ParamType.AttackThisTurn, 3 }, { ParamType.Distance, 5 } });
+	public static readonly Card RockbiterWeapon = new Card("Rockbiter Weapon", 1, new Dictionary<ParamType, int>() { { ParamType.AttackThisTurnForCharacter, 3 }, { ParamType.Distance, 5 } });
 	public static readonly Card FlametongueTotem= new Card("Flametongue Totem", 2, new Dictionary<ParamType, int>() { { ParamType.AttackForAdjacent, 2 }, { ParamType.Distance, 1 }, {ParamType.Health, 3}, {ParamType.Speed, 1} });
 	public static readonly Card Thrallmar = new Card("Thrallmar", 2, new Dictionary<ParamType, int>() { { ParamType.Health, 3 }, { ParamType.Attack, 2 }, { ParamType.Distance, 1 }, { ParamType.Speed, 2 } });
 	public static readonly Card BloodfenRaptor = new Card("Bloodfen Raptor", 2, new Dictionary<ParamType, int>() { { ParamType.Health, 2 }, { ParamType.Attack, 3 }, { ParamType.Distance, 1 }, { ParamType.Speed, 1 } });
@@ -44,6 +44,7 @@ public class Card  {
 	public static readonly Card FrostwolfCall = new Card("Frostwolf Call", 1, new Dictionary<ParamType, int>() { { ParamType.AddAttackOfMinionNumber, 1 }, { ParamType.AddHealthOfMinionNumber, 1 } });
 	public static readonly Card FrostwolfWarlord = new Card("Frostwolf Warlord", 5, new Dictionary<ParamType, int>() { { ParamType.Health, 4 }, { ParamType.Attack, 4 }, { ParamType.Distance, 1 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, FrostwolfCall} } );
+	public static readonly Card Bloodlust = new Card("Bloodlust", 5, new Dictionary<ParamType, int>() { {ParamType.AddAttackThisTurnForAllYourMinions, 3} });
 
 	public static readonly Card IceBolt = new Card("Ice bolt", 2, new Dictionary<ParamType, int>() { { ParamType.Damage, 10 }, { ParamType.Speed, 2 }, { ParamType.Distance, 2 } });
 	public static readonly Card Mud = new Card("Mud", 4, new Dictionary<ParamType, int>() { { ParamType.Damage, 1 }, { ParamType.Distance, 1 } });
