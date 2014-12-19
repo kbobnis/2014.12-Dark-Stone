@@ -10,11 +10,13 @@ public class PanelMinigame : MonoBehaviour {
 	public GameObject PanelTiles, PanelTilesBg, PanelInformation, PanelCardPreview, PanelBottom, ButtonEndTurn;
 
 	private AvatarModel MyModel, EnemysModel;
-	private AvatarModel ActualTurnModel;
+	public AvatarModel ActualTurnModel;
 	//to be visible in inspector
 	public Mode Mode = Mode.Ready;
+	public static PanelMinigame Me;
 
 	internal void Prepare() {
+		Me = this;
 		PanelInformation.SetActive(true);
 
 		List<List<TileTemplate>> templates = new List<List<TileTemplate>>();
@@ -40,6 +42,7 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.FlametongueTotem);
 		lasiaModel.Deck.Add(Card.RazorfenHunter);
 		lasiaModel.Deck.Add(Card.MurlocTidehunter);
+		lasiaModel.Deck.Add(Card.GnomishInventor);
 		lasiaModel.Deck.Add(Card.Hex);
 		lasiaModel.Deck.Add(Card.ShatteredSunCleric);
 		lasiaModel.Deck.Add(Card.BloodfenRaptor);
@@ -53,6 +56,19 @@ public class PanelMinigame : MonoBehaviour {
 
 		PanelAvatar dementorAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel dementorModel = dementorAvatar.Model;
+		dementorModel.Deck.Add(Card.RockbiterWeapon);
+		dementorModel.Deck.Add(Card.FlametongueTotem);
+		dementorModel.Deck.Add(Card.RazorfenHunter);
+		dementorModel.Deck.Add(Card.MurlocTidehunter);
+		dementorModel.Deck.Add(Card.GnomishInventor);
+		dementorModel.Deck.Add(Card.Hex);
+		dementorModel.Deck.Add(Card.ShatteredSunCleric);
+		dementorModel.Deck.Add(Card.BloodfenRaptor);
+		dementorModel.Deck.Add(Card.Thrallmar);
+		dementorModel.Deck.Add(Card.Wisp);
+		dementorModel.Deck.Add(Card.Fireball);
+		dementorModel.Deck.Add(Card.IceBolt);
+		dementorModel.Deck.Add(Card.Mud);
 		dementorModel.Deck.Add(Card.IceBolt);
 		dementorModel.Deck.Add(Card.Mud);
 
@@ -255,16 +271,24 @@ public class PanelMinigame : MonoBehaviour {
 				Mode = global::Mode.Ready;
 
 				if (whatMode == PanelInteractionMode.Casting && panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model != null) {
+					Debug.Log("There is battlecry for " + whatCard.Name);
 					if (whatCard.Effects.ContainsKey(Effect.Battlecry)) {
 						whatCard = whatCard.Effects[Effect.Battlecry];
-						int distance = whatCard.Params.ContainsKey(ParamType.Distance) ? whatCard.Params[ParamType.Distance] : 0;
-						foreach (Side s in SideMethods.AllSides()) {
-							if (SetInteractionToCastAround(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model, panelTile, whatCard, s, distance)) {
-								Mode = global::Mode.CastingSpell;
+
+						//auto casting
+						if (!whatCard.Params.ContainsKey(ParamType.Distance)) {
+							panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Cast(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model, whatCard);
+						} else {
+							//manual casting 
+							int distance = whatCard.Params.ContainsKey(ParamType.Distance) ? whatCard.Params[ParamType.Distance] : 0;
+							foreach (Side s in SideMethods.AllSides()) {
+								if (SetInteractionToCastAround(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model, panelTile, whatCard, s, distance)) {
+									Mode = global::Mode.CastingSpell;
+								}
 							}
+							//battlecry can not be casted on itself
+							panelTile.PanelInteraction.GetComponent<PanelInteraction>().Clear();
 						}
-						//battlecry can not be casted on itself
-						panelTile.PanelInteraction.GetComponent<PanelInteraction>().Clear();
 					}
 				}
 
@@ -285,10 +309,10 @@ public class PanelMinigame : MonoBehaviour {
 		}
 	}
 
-	private bool IsYourMinionHere(AvatarModel am) {
+	public bool IsYourMinionHere(AvatarModel am) {
 		bool isYourMinion = false;
 		if (am != null) {
-			Debug.Log("Is your minion here? checking " + am.Card.Name);
+			//Debug.Log("Is your minion here? checking " + am.Card.Name);
 		}
 		for (int i = 0; true; i++) {
 			if (am == null) {
@@ -306,7 +330,7 @@ public class PanelMinigame : MonoBehaviour {
 			}
 			am = am.Creator;
 			if (am != null ) {
-				Debug.Log("creator is " + am.Card.Name);
+				//Debug.Log("creator is " + am.Card.Name);
 			}
 		}
 		return isYourMinion;

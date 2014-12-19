@@ -29,7 +29,7 @@ public class PanelAvatar : MonoBehaviour {
 		if (_Model != null) {
 			GetComponent<Image>().color = Color.white;
 			GetComponent<Image>().sprite = _Model.Card.Animation;
-			if (Model != null && Model.MovesLeft == 0) {
+			if (Model != null && (Model.MovesLeft == 0 || !PanelMinigame.Me.IsYourMinionHere(Model) )) {
 				GetComponent<Image>().color = Color.black;
 			}
 		}
@@ -238,6 +238,10 @@ public class AvatarModel {
 			if (c.Params.ContainsKey(ParamType.AdditionalHealth)) {
 				actualModel._ActualHealth += c.Params[ParamType.AdditionalHealth];
 				actualModel.MaxHealth += c.Params[ParamType.AdditionalHealth];
+			}
+			if (c.Params.ContainsKey(ParamType.AvatarDrawCard)) {
+				//this is an exception. the card draws our avatar
+				PanelMinigame.Me.ActualTurnModel.PullCardFromDeck();
 			}
 		}
 		return am;
