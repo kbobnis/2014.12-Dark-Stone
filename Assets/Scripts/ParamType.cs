@@ -15,5 +15,7 @@ public enum ParamType {
 	AdditionalHealth,
 	ReplaceExisting,
 	AvatarDrawCard,
-	Taunt
+	Taunt,
+	AddAttackOfMinionNumber,
+	AddHealthOfMinionNumber
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.EventSystems;
 using System;
+using System.Collections.Generic;
 
 public class PanelTiles : MonoBehaviour {
 
@@ -28,6 +29,18 @@ public class PanelTiles : MonoBehaviour {
 				}
 			}
 		}
+	}
+
+	internal List<AvatarModel> GetAllAvatarModels() {
+		List<AvatarModel> tmp = new List<AvatarModel>();
+		foreach (GameObject go in GetComponent<ScrollableList>().ElementsToPut) {
+			PanelTile pt = go.GetComponent<PanelTile>();
+			AvatarModel am = go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().Model;
+			if (am != null) {
+				tmp.Add(am);
+			}
+		}
+		return tmp;
 	}
 }
 

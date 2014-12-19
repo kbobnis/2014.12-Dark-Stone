@@ -42,6 +42,7 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.FlametongueTotem);
 		lasiaModel.Deck.Add(Card.RazorfenHunter);
 		lasiaModel.Deck.Add(Card.SenjinShieldmasta);
+		lasiaModel.Deck.Add(Card.FrostwolfWarlord);
 		lasiaModel.Deck.Add(Card.GnomishInventor);
 		lasiaModel.Deck.Add(Card.ChillwindYeti);
 		lasiaModel.Deck.Add(Card.Hex);
@@ -180,7 +181,7 @@ public class PanelMinigame : MonoBehaviour {
 			//it there is a taunter nearby, you can not attack nor move here
 			bool enemysTaunterFound = false;
 			foreach (Side sTmp in SideMethods.AdjacentSides()) {
-				if (panelTile.Neighbours.ContainsKey(sTmp) && panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model != null && panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model.HasTaunt && !IsYourMinionHere(panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model)) {
+				if (panelTile.Neighbours.ContainsKey(sTmp) && panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model != null && panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model.HasTaunt && !IsYourMinionOrHeroHere(panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model)) {
 					enemysTaunterFound = true;
 				}
 			}
@@ -188,7 +189,7 @@ public class PanelMinigame : MonoBehaviour {
 			//if there is another minion, then this will be attack instead of move
 			if (!enemysTaunterFound && panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model != null) {
 				//can not attack your own minions
-				if (!IsYourMinionHere(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model) && mover.PanelAvatar.GetComponent<PanelAvatar>().Model.ActualDamage > 0) {
+				if (!IsYourMinionOrHeroHere(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model) && mover.PanelAvatar.GetComponent<PanelAvatar>().Model.ActualDamage > 0) {
 					panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanAttackHere(mover);
 				}
 
@@ -203,7 +204,7 @@ public class PanelMinigame : MonoBehaviour {
 	internal void PointerDownOn(PanelTile panelTile) {
 		PanelInteraction pi = panelTile.PanelInteraction.GetComponent<PanelInteraction>();
 		AvatarModel am = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
-		bool isYourMinion = IsYourMinionHere(am);
+		bool isYourMinion = IsYourMinionOrHeroHere(am);
 		Debug.Log("This tile has " + (isYourMinion ? "yours" : "not yours") +" " + (am!=null?am.Card.Name:"no minion"));
 
 		switch (Mode) {
@@ -212,7 +213,6 @@ public class PanelMinigame : MonoBehaviour {
 					if (!isYourMinion && am != null) {
 						PanelInformation.GetComponent<PanelInformation>().SetText("This is your enemys minion");
 					}
-
 					if (isYourMinion) {
 						//has no moves
 						if (am.MovesLeft <= 0) {
@@ -240,7 +240,7 @@ public class PanelMinigame : MonoBehaviour {
 					movesLeft = whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft;
 					//is here something?
 					if (am != null) {
-						if (IsYourMinionHere(am)) {
+						if (IsYourMinionOrHeroHere(am)) {
 							//can not move on your mininion
 							PanelInformation.GetComponent<PanelInformation>().SetText("Can not attack your own minion");
 						} else {
@@ -285,7 +285,7 @@ public class PanelMinigame : MonoBehaviour {
 					if (whatCard.Effects.ContainsKey(Effect.Battlecry)) {
 						whatCard = whatCard.Effects[Effect.Battlecry];
 
-						//auto casting
+						//auto casting with self on self
 						if (!whatCard.Params.ContainsKey(ParamType.Distance)) {
 							panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Cast(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model, whatCard);
 						} else {
@@ -319,7 +319,7 @@ public class PanelMinigame : MonoBehaviour {
 		}
 	}
 
-	public bool IsYourMinionHere(AvatarModel am) {
+	public bool IsYourMinionOrHeroHere(AvatarModel am) {
 		bool isYourMinion = false;
 		if (am != null) {
 			//Debug.Log("Is your minion here? checking " + am.Card.Name);
@@ -346,6 +346,18 @@ public class PanelMinigame : MonoBehaviour {
 		return isYourMinion;
 	}
 
+
+	internal int MyMinionNumber() {
+		int myMinionsCount = 0;
+		List<AvatarModel> ams = PanelTiles.GetComponent<PanelTiles>().GetAllAvatarModels();
+		foreach (AvatarModel am in ams) {
+			if (IsYourMinionOrHeroHere(am) && am != ActualTurnModel) {
+				myMinionsCount++;
+			}
+		}
+		return myMinionsCount;
+
+	}
 }
 
 public enum Mode {
