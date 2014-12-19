@@ -29,7 +29,7 @@ public class PanelAvatar : MonoBehaviour {
 		if (_Model != null) {
 			GetComponent<Image>().color = Color.white;
 			GetComponent<Image>().sprite = _Model.Card.Animation;
-			if (Model != null && (Model.MovesLeft == 0 || !PanelMinigame.Me.IsYourMinionOrHeroHere(Model) )) {
+			if (Model != null && (Model.MovesLeft == 0 || (!PanelMinigame.Me.ActualTurnModel.IsItYourMinion(Model) && PanelMinigame.Me.ActualTurnModel != Model) )) {
 				GetComponent<Image>().color = Color.black;
 			}
 		}
@@ -71,17 +71,18 @@ public class AvatarModel {
 	
 	private Card _Card;
 	private int _ActualHealth;
-	private int _ActualMana, _ActualDamage, Speed, _MovesLeft, MaxHealth, _MaxMana;
+	private int _ActualMana, Speed, _MovesLeft, MaxHealth, _MaxMana;
 
-	public Dictionary<Side, AvatarModel> AdjacentModels = new Dictionary<Side,AvatarModel>();
+	private readonly int _ActualDamage;
+
 	public List<Card> Deck = new List<Card>();
 	private List<Card> _Hand = new List<Card>();
+	public List<CastedCard> Effects = new List<CastedCard>();
 	private List<AvatarModel> Minions = new List<AvatarModel>();
 	private AvatarModel _Creator;
+	public Dictionary<Side, AvatarModel> AdjacentModels = new Dictionary<Side,AvatarModel>();
 	private int Draught;
 	private bool OnBoard;
-	private int AttackBonusThisTurn;
-	private int AttackForAdjacent;
 	private bool _HasTaunt;
 
 	public bool HasTaunt {
@@ -120,25 +121,17 @@ public class AvatarModel {
 		_Card = card;
 		OnBoard = onBoard;
 
-		foreach (Side s in SideMethods.AdjacentSides()) {
-			AdjacentModels.Add(s, null);
-		}
-
 		foreach (KeyValuePair<ParamType, int> kvp in card.Params) {
 			switch (kvp.Key) {
 				case ParamType.Health: MaxHealth = kvp.Value; ActualHealth = kvp.Value; break;
 				case ParamType.Attack: _ActualDamage = kvp.Value; break;
 				case ParamType.Speed: Speed = kvp.Value; break;
 				case ParamType.Taunt: _HasTaunt = true; break;
-				//this doesnt show on board, but works nevertheless
-				case ParamType.AttackForAdjacent:
-					AttackForAdjacent = kvp.Value;
-					break;
 				//this is used when the spell is casted, no need for it now
+				case ParamType.AttackAddForAdjacentFriendlyCharacters:
 				case ParamType.ReplaceExisting:
 				case ParamType.Distance:
 					break;
-				case ParamType.OneTimeSpeed:
 				case ParamType.Heal:
 				default: throw new NotImplementedException("Implement case for: " + kvp.Key);
 			}
@@ -173,7 +166,7 @@ public class AvatarModel {
 		}
 	}
 
-	private void PullCardFromDeck() {
+	public void PullCardFromDeck() {
 		Card c = Deck.Count>0?Deck[0]:null;
 		if (c == null) {
 			Draught++;
@@ -194,18 +187,18 @@ public class AvatarModel {
 
 	public int ActualDamage {
 		get {
-			int adjacentBonus = 0;
-			foreach (AvatarModel am in AdjacentModels.Values) {
-				if (am != null) {
-					adjacentBonus += am.AttackForAdjacent;
+			int additionalDamage = 0;
+			foreach (CastedCard c in Effects) {
+				if (c.Params.ContainsKey(CastedCardParamType.AttackAdd)){
+					additionalDamage += c.Params[CastedCardParamType.AttackAdd];
 				}
 			}
-			return _ActualDamage + AttackBonusThisTurn + adjacentBonus; 
+			return _ActualDamage + additionalDamage; 
 		}
 	}
 
-	internal AvatarModel Cast(AvatarModel actualModel, Card c) {
-		AvatarModel am = actualModel;
+	internal AvatarModel Cast(AvatarModel castingOn, Card c) {
+		AvatarModel am = castingOn;
 		_ActualMana -= c.Cost;
 		if (_ActualMana < 0) {
 			//it can go under zero. if a minion is summoning it with battlecry
@@ -215,7 +208,7 @@ public class AvatarModel {
 
 		//if is a monster, then adding as minion
 		if (c.Params.ContainsKey(ParamType.Health)) {
-			if (actualModel != null && !c.Params.ContainsKey(ParamType.ReplaceExisting)) {
+			if (castingOn != null && !c.Params.ContainsKey(ParamType.ReplaceExisting)) {
 				//can not cast minion on other minion
 				throw new Exception("Can not cast minion on top of other.");
 			}
@@ -225,44 +218,11 @@ public class AvatarModel {
 			am = new AvatarModel(c, true, this);
 			Minions.Add(am);
 		} else {
-			//if is a spell, then doing the magic
-			if (c.Params.ContainsKey(ParamType.Damage)) {
-				if (actualModel == null) {
-					throw new Exception("Can not cast damage spell on nothing.");
-				}
-				actualModel.ActualHealth -= c.Params[ParamType.Damage];
-			}
-			if (c.Params.ContainsKey(ParamType.Heal)) {
-				actualModel.ActualHealth += c.Params[ParamType.Heal];
-			}
-			if (c.Params.ContainsKey(ParamType.AttackThisTurnForCharacter)) {
-				actualModel.AttackBonusThisTurn += c.Params[ParamType.AttackThisTurnForCharacter];
-			}
-			if (c.Params.ContainsKey(ParamType.AdditionalAttack)) {
-				actualModel._ActualDamage += c.Params[ParamType.AdditionalAttack];
-			}
-			if (c.Params.ContainsKey(ParamType.AdditionalHealth)) {
-				actualModel._ActualHealth += c.Params[ParamType.AdditionalHealth];
-				actualModel.MaxHealth += c.Params[ParamType.AdditionalHealth];
-			}
-			if (c.Params.ContainsKey(ParamType.AvatarDrawCard)) {
-				//this is an exception. the card draws our avatar
-				PanelMinigame.Me.ActualTurnModel.PullCardFromDeck();
-			}
-			if (c.Params.ContainsKey(ParamType.AddAttackOfMinionNumber)) {
-				actualModel._ActualDamage += PanelMinigame.Me.MyMinionNumber() -1 ; //because itself doesn't count
-			}
-			if (c.Params.ContainsKey(ParamType.AddHealthOfMinionNumber)) {
-				actualModel.MaxHealth += PanelMinigame.Me.MyMinionNumber() -1 ; //because itself doesn't count
-				actualModel._ActualHealth += PanelMinigame.Me.MyMinionNumber() -1; //because itself doesn't count
-			}
-			if (c.Params.ContainsKey(ParamType.AddAttackThisTurnForAllActualModelMinions)) {
-				foreach (AvatarModel amTmp in PanelMinigame.Me.ActualTurnModel.Minions) {
-					amTmp.AttackBonusThisTurn += 3;
-					foreach (AvatarModel amTmp2 in amTmp.Minions) {
-						amTmp2.AttackBonusThisTurn += 3;
-					}
-				}
+
+			CastedCard castedCard = new CastedCard(castingOn, c);
+			//for one milisecond cards the effects where applied in constructor
+			if (c.CardPersistency != CardPersistency.OneMilisecond) {
+				am.Effects.Add(castedCard);
 			}
 		}
 		return am;
@@ -276,13 +236,39 @@ public class AvatarModel {
 	}
 
 	internal void EndOfATurn() {
-		AttackBonusThisTurn = 0;
-		foreach (AvatarModel am in Minions) {
-			am.AttackBonusThisTurn = 0;
-			foreach (AvatarModel am2 in am.Minions) {
-				am2.AttackBonusThisTurn = 0;
+
+		foreach (CastedCard c in Effects.ToArray()) {
+			if (c.Card.CardPersistency == CardPersistency.UntilEndTurn) {
+				Effects.Remove(c);
 			}
 		}
+		foreach (AvatarModel am in Minions) {
+			am.EndOfATurn();
+			foreach (AvatarModel am2 in am.Minions) {
+				am2.EndOfATurn();
+			}
+		}
+	}
+
+	public bool IsItYourMinion(AvatarModel am) {
+
+		foreach(AvatarModel am2 in Minions){
+			if (am2 == am) {
+				return true;
+			}
+			if (am2.IsItYourMinion(am)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	internal AvatarModel GetMyHero() {
+
+		if (_Creator.Card.CardPersistency == CardPersistency.Hero) {
+			return _Creator;
+		}
+		return _Creator.GetMyHero();
 	}
 }
 

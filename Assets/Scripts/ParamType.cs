@@ -2,21 +2,21 @@
 using System.Collections;
 
 public enum ParamType {
-	Health,
 	Attack,
-	Damage,
+	AttackAdd,
+	AttackAddFriendlyMinions,
+	AttackAddOfFriendlyMinionNumber,
+	AttackAddForOtherFriendlyMinions,
+	AttackAddForAdjacentFriendlyCharacters,
+	Health,
+	HealthAdd,
+	HealthAddOfOtherFriendlyMinionNumber,
+	HealthAddForFriendlyMinions,
+	DealDamage,
 	Speed,
 	Distance,
-	OneTimeSpeed,
 	Heal,
-	AttackThisTurnForCharacter,
-	AttackForAdjacent,
-	AdditionalAttack,
-	AdditionalHealth,
-	ReplaceExisting,
-	AvatarDrawCard,
+	HeroDrawsCard,
 	Taunt,
-	AddAttackOfMinionNumber,
-	AddHealthOfMinionNumber,
-	AddAttackThisTurnForAllActualModelMinions
+	ReplaceExisting,
 }

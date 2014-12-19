@@ -43,6 +43,7 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.RazorfenHunter);
 		lasiaModel.Deck.Add(Card.SenjinShieldmasta);
 		lasiaModel.Deck.Add(Card.Bloodlust);
+		lasiaModel.Deck.Add(Card.BoulderfishOgre);
 		lasiaModel.Deck.Add(Card.FireElemental);
 		lasiaModel.Deck.Add(Card.FrostwolfWarlord);
 		lasiaModel.Deck.Add(Card.GnomishInventor);
@@ -53,11 +54,6 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.BloodfenRaptor);
 		lasiaModel.Deck.Add(Card.Thrallmar);
 		lasiaModel.Deck.Add(Card.Wisp);
-		lasiaModel.Deck.Add(Card.Fireball);
-		lasiaModel.Deck.Add(Card.IceBolt);
-		lasiaModel.Deck.Add(Card.Mud);
-		lasiaModel.Deck.Add(Card.IceBolt);
-		lasiaModel.Deck.Add(Card.Mud);
 
 		PanelAvatar dementorAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel dementorModel = dementorAvatar.Model;
@@ -71,11 +67,6 @@ public class PanelMinigame : MonoBehaviour {
 		dementorModel.Deck.Add(Card.BloodfenRaptor);
 		dementorModel.Deck.Add(Card.Thrallmar);
 		dementorModel.Deck.Add(Card.Wisp);
-		dementorModel.Deck.Add(Card.Fireball);
-		dementorModel.Deck.Add(Card.IceBolt);
-		dementorModel.Deck.Add(Card.Mud);
-		dementorModel.Deck.Add(Card.IceBolt);
-		dementorModel.Deck.Add(Card.Mud);
 
 		MyModel = lasiaModel;
 		EnemysModel = dementorModel;
@@ -156,13 +147,10 @@ public class PanelMinigame : MonoBehaviour {
 			}
 
 			//damage spell can not be cast on empty area 
-			if (card.Params.ContainsKey(ParamType.Damage)) {
+			if (card.Params.ContainsKey(ParamType.DealDamage)) {
 				return atLeastOneTile;
 			}
 
-			if (card.Params.ContainsKey(ParamType.AttackThisTurnForCharacter)) {
-				return atLeastOneTile;
-			}
 		}
 
 		panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanCastHere(caster, card);
@@ -183,7 +171,7 @@ public class PanelMinigame : MonoBehaviour {
 			//it there is a taunter nearby, you can not attack nor move here
 			bool enemysTaunterFound = false;
 			foreach (Side sTmp in SideMethods.AdjacentSides()) {
-				if (panelTile.Neighbours.ContainsKey(sTmp) && panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model != null && panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model.HasTaunt && !IsYourMinionOrHeroHere(panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model)) {
+				if (panelTile.Neighbours.ContainsKey(sTmp) && panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model != null && panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model.HasTaunt && !ActualTurnModel.IsItYourMinion(panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model)) {
 					enemysTaunterFound = true;
 				}
 			}
@@ -191,7 +179,7 @@ public class PanelMinigame : MonoBehaviour {
 			//if there is another minion, then this will be attack instead of move
 			if (!enemysTaunterFound && panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model != null) {
 				//can not attack your own minions
-				if (!IsYourMinionOrHeroHere(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model) && mover.PanelAvatar.GetComponent<PanelAvatar>().Model.ActualDamage > 0) {
+				if (!ActualTurnModel.IsItYourMinion(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model) && mover.PanelAvatar.GetComponent<PanelAvatar>().Model.ActualDamage > 0) {
 					panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanAttackHere(mover);
 				}
 
@@ -206,16 +194,16 @@ public class PanelMinigame : MonoBehaviour {
 	internal void PointerDownOn(PanelTile panelTile) {
 		PanelInteraction pi = panelTile.PanelInteraction.GetComponent<PanelInteraction>();
 		AvatarModel am = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
-		bool isYourMinion = IsYourMinionOrHeroHere(am);
-		Debug.Log("This tile has " + (isYourMinion ? "yours" : "not yours") +" " + (am!=null?am.Card.Name:"no minion"));
+		bool isYourCharacter = ActualTurnModel.IsItYourMinion(am) || ActualTurnModel == am;
+		Debug.Log("This tile has " + (isYourCharacter ? "yours" : "not yours") +" " + (am!=null?am.Card.Name:"no minion"));
 
 		switch (Mode) {
 			case global::Mode.Ready: {
 
-					if (!isYourMinion && am != null) {
+					if (!isYourCharacter && am != null) {
 						PanelInformation.GetComponent<PanelInformation>().SetText("This is your enemys minion");
 					}
-					if (isYourMinion) {
+					if (isYourCharacter) {
 						//has no moves
 						if (am.MovesLeft <= 0) {
 							PanelInformation.GetComponent<PanelInformation>().SetText("No moves left");
@@ -242,7 +230,7 @@ public class PanelMinigame : MonoBehaviour {
 					movesLeft = whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft;
 					//is here something?
 					if (am != null) {
-						if (IsYourMinionOrHeroHere(am)) {
+						if ( isYourCharacter) {
 							//can not move on your mininion
 							PanelInformation.GetComponent<PanelInformation>().SetText("Can not attack your own minion");
 						} else {
@@ -309,10 +297,41 @@ public class PanelMinigame : MonoBehaviour {
 			default: throw new NotImplementedException("Implement working with mode: " + Mode);
 		}
 
-		//after action revalidate adjacent models
-		PanelTiles.GetComponent<PanelTiles>().UpdateAdjacentModels();
+		//revalidate effects
+		RevalidateEffects();
 	}
 
+	private void RevalidateEffects() {
+		PanelTiles.GetComponent<PanelTiles>().UpdateAdjacentModels();
+
+		//remove all every action revalidate effects
+		List<AvatarModel> allModels = PanelTiles.GetComponent<PanelTiles>().GetAllAvatarModels();
+		foreach (AvatarModel am in allModels) {
+			foreach (CastedCard cc in am.Effects.ToArray()) {
+				if (cc.Card.CardPersistency == CardPersistency.EveryActionRevalidate) {
+					am.Effects.Remove(cc);
+				}
+			}
+		}
+
+		//add all every action revalidate effects
+		foreach (AvatarModel am in allModels) {
+			foreach (KeyValuePair<Effect, Card> e in am.Card.Effects) {
+				if (e.Key == Effect.WhileAlive && e.Value.CardPersistency == CardPersistency.EveryActionRevalidate){
+
+					if (e.Value.Params.ContainsKey(ParamType.AttackAddForAdjacentFriendlyCharacters)) {
+						AvatarModel myHero = am.GetMyHero();
+						foreach (KeyValuePair<Side, AvatarModel> kvp in am.AdjacentModels) {
+							if (kvp.Value != null &&  (myHero.IsItYourMinion(kvp.Value) || kvp.Value == myHero)) {
+								am.Cast(kvp.Value, e.Value);
+							}
+						}
+					}							
+				}
+			}
+		}
+
+	}
 
 	private void DisableAllPanelsInteraction() {
 		Debug.Log("clearing all tiles");
@@ -321,39 +340,14 @@ public class PanelMinigame : MonoBehaviour {
 		}
 	}
 
-	public bool IsYourMinionOrHeroHere(AvatarModel am) {
-		bool isYourMinion = false;
-		if (am != null) {
-			//Debug.Log("Is your minion here? checking " + am.Card.Name);
-		}
-		for (int i = 0; true; i++) {
-			if (am == null) {
-				//not your minion
-				break;
-			}
-			if (am != null) {
-				isYourMinion = am == ActualTurnModel;
-				if (isYourMinion) {
-					break;
-				}
-			}
-			if (i > 50) {
-				throw new Exception("Fuck this shit");
-			}
-			am = am.Creator;
-			if (am != null ) {
-				//Debug.Log("creator is " + am.Card.Name);
-			}
-		}
-		return isYourMinion;
-	}
+
 
 
 	internal int MyMinionNumber() {
 		int myMinionsCount = 0;
 		List<AvatarModel> ams = PanelTiles.GetComponent<PanelTiles>().GetAllAvatarModels();
 		foreach (AvatarModel am in ams) {
-			if (IsYourMinionOrHeroHere(am) && am != ActualTurnModel) {
+			if (ActualTurnModel.IsItYourMinion(am)) {
 				myMinionsCount++;
 			}
 		}

@@ -1,9 +1,8 @@
 fileFormatVersion: 2
-guid: ffdcb498387a1b147a03250a6dd1ca79
+guid: 77602857f3d84284286f61ccd1dabaa5
 TextureImporter:
   fileIDToRecycleName:
-    21300000: zombie
-    21300002: Healing touch
+    21300000: Boulderfist Ogre
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -27,9 +26,9 @@ TextureImporter:
   maxTextureSize: 1024
   textureSettings:
     filterMode: 0
-    aniso: 1
+    aniso: -1
     mipBias: -1
-    wrapMode: 1
+    wrapMode: -1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
