@@ -18,5 +18,5 @@ public enum ParamType {
 	Taunt,
 	AddAttackOfMinionNumber,
 	AddHealthOfMinionNumber,
-	AddAttackThisTurnForAllYourMinions
+	AddAttackThisTurnForAllActualModelMinions
 }

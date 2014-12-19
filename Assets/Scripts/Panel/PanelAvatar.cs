@@ -256,7 +256,7 @@ public class AvatarModel {
 				actualModel.MaxHealth += PanelMinigame.Me.MyMinionNumber() -1 ; //because itself doesn't count
 				actualModel._ActualHealth += PanelMinigame.Me.MyMinionNumber() -1; //because itself doesn't count
 			}
-			if (c.Params.ContainsKey(ParamType.AddAttackThisTurnForAllYourMinions)) {
+			if (c.Params.ContainsKey(ParamType.AddAttackThisTurnForAllActualModelMinions)) {
 				foreach (AvatarModel amTmp in PanelMinigame.Me.ActualTurnModel.Minions) {
 					amTmp.AttackBonusThisTurn += 3;
 					foreach (AvatarModel amTmp2 in amTmp.Minions) {
