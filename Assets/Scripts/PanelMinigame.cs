@@ -41,10 +41,11 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.RockbiterWeapon);
 		lasiaModel.Deck.Add(Card.FlametongueTotem);
 		lasiaModel.Deck.Add(Card.RazorfenHunter);
-		lasiaModel.Deck.Add(Card.MurlocTidehunter);
 		lasiaModel.Deck.Add(Card.GnomishInventor);
+		lasiaModel.Deck.Add(Card.ChillwindYeti);
 		lasiaModel.Deck.Add(Card.Hex);
 		lasiaModel.Deck.Add(Card.ShatteredSunCleric);
+		lasiaModel.Deck.Add(Card.MurlocTidehunter);
 		lasiaModel.Deck.Add(Card.BloodfenRaptor);
 		lasiaModel.Deck.Add(Card.Thrallmar);
 		lasiaModel.Deck.Add(Card.Wisp);
