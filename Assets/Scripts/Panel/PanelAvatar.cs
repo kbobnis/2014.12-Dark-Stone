@@ -82,6 +82,11 @@ public class AvatarModel {
 	private bool OnBoard;
 	private int AttackBonusThisTurn;
 	private int AttackForAdjacent;
+	private bool _HasTaunt;
+
+	public bool HasTaunt {
+		get { return _HasTaunt; }
+	}
 
 	public List<Card> Hand {
 		get { return _Hand; }
@@ -124,6 +129,7 @@ public class AvatarModel {
 				case ParamType.Health: MaxHealth = kvp.Value; ActualHealth = kvp.Value; break;
 				case ParamType.Attack: _ActualDamage = kvp.Value; break;
 				case ParamType.Speed: Speed = kvp.Value; break;
+				case ParamType.Taunt: _HasTaunt = true; break;
 				//this doesnt show on board, but works nevertheless
 				case ParamType.AttackForAdjacent:
 					AttackForAdjacent = kvp.Value;

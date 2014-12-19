@@ -41,6 +41,7 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.RockbiterWeapon);
 		lasiaModel.Deck.Add(Card.FlametongueTotem);
 		lasiaModel.Deck.Add(Card.RazorfenHunter);
+		lasiaModel.Deck.Add(Card.SenjinShieldmasta);
 		lasiaModel.Deck.Add(Card.GnomishInventor);
 		lasiaModel.Deck.Add(Card.ChillwindYeti);
 		lasiaModel.Deck.Add(Card.Hex);
@@ -175,15 +176,23 @@ public class PanelMinigame : MonoBehaviour {
 				}
 			}
 		} else {
-			//if there is another minion, then this will be attack move
-			if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model != null) {
+			
+			//it there is a taunter nearby, you can not attack nor move here
+			bool enemysTaunterFound = false;
+			foreach (Side sTmp in SideMethods.AdjacentSides()) {
+				if (panelTile.Neighbours.ContainsKey(sTmp) && panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model != null && panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model.HasTaunt && !IsYourMinionHere(panelTile.Neighbours[sTmp].PanelAvatar.GetComponent<PanelAvatar>().Model)) {
+					enemysTaunterFound = true;
+				}
+			}
+
+			//if there is another minion, then this will be attack instead of move
+			if (!enemysTaunterFound && panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model != null) {
 				//can not attack your own minions
 				if (!IsYourMinionHere(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model) && mover.PanelAvatar.GetComponent<PanelAvatar>().Model.ActualDamage > 0) {
-
 					panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanAttackHere(mover);
 				}
-				
-			} else {
+
+			} else if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model == null){
 				panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanMoveHere(mover);
 				atLeastOneTile = true;
 			}

@@ -40,6 +40,7 @@ public class Card  {
 	public static readonly Card GnomishInventor = new Card("Gnomish Inventor", 4, new Dictionary<ParamType, int>() { { ParamType.Health, 4 }, { ParamType.Attack, 2 }, { ParamType.Distance, 1 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, GnomishInvention } });
 	public static readonly Card ChillwindYeti = new Card("Chillwind Yeti", 4, new Dictionary<ParamType, int>() { { ParamType.Health, 5 }, { ParamType.Attack, 4 }, { ParamType.Distance, 1 }, { ParamType.Speed, 1 } });
+	public static readonly Card SenjinShieldmasta= new Card("Senjin Shieldmasta", 4, new Dictionary<ParamType, int>() { { ParamType.Health, 5 }, { ParamType.Attack, 3 }, { ParamType.Distance, 1 }, { ParamType.Speed, 1 }, {ParamType.Taunt, 1} });
 
 	public static readonly Card IceBolt = new Card("Ice bolt", 2, new Dictionary<ParamType, int>() { { ParamType.Damage, 10 }, { ParamType.Speed, 2 }, { ParamType.Distance, 2 } });
 	public static readonly Card Mud = new Card("Mud", 4, new Dictionary<ParamType, int>() { { ParamType.Damage, 1 }, { ParamType.Distance, 1 } });

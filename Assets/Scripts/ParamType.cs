@@ -14,5 +14,6 @@ public enum ParamType {
 	AdditionalAttack,
 	AdditionalHealth,
 	ReplaceExisting,
-	AvatarDrawCard
+	AvatarDrawCard,
+	Taunt
 }
