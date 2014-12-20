@@ -16,7 +16,7 @@ public class PanelInteraction : MonoBehaviour {
 	public PanelTile WhatMoveOrAttack;
 
 	//casting spell
-	public AvatarModel Caster;
+	public PanelTile Caster;
 	public Card CastersCard;
 
 
@@ -45,7 +45,7 @@ public class PanelInteraction : MonoBehaviour {
 		Mode = PanelInteractionMode.Idle;
 	}
 
-	internal void CanCastHere(AvatarModel caster, Card card) {
+	internal void CanCastHere(PanelTile caster, Card card) {
 		Caster = caster;
 		CastersCard = card;
 		Mode = PanelInteractionMode.Casting;

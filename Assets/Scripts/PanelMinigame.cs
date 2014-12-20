@@ -74,6 +74,7 @@ public class PanelMinigame : MonoBehaviour {
 		PanelBottom.GetComponent<PanelBottom>().Prepare(lasiaModel);
 
 		ActualTurnModel = EnemysModel;
+		RevalidateEffects();
 		EndTurn();
 	}
 
@@ -115,48 +116,12 @@ public class PanelMinigame : MonoBehaviour {
 			} else {
 				//getting your main character
 				PanelTile panelTile = PanelTiles.GetComponent<PanelTiles>().FindTileForModel(ActualTurnModel);
-				int distance = card.Params.ContainsKey(ParamType.Distance) ? card.Params[ParamType.Distance] : 0;
-				foreach (Side s in SideMethods.AllSides()) {
-					if (SetInteractionToCastAround(ActualTurnModel, panelTile, card, s, distance)) {
-						Mode = global::Mode.CastingSpell;
-					}
-				}
+				Debug.Log("Card in hand selected, actual hero tile: " + panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name);
+				CastSpell(panelTile, card, panelTile, false);
 			}
 		}
 	}
 
-	private bool SetInteractionToCastAround(AvatarModel caster, PanelTile panelTile, Card card, Side s, int distance) {
-		bool atLeastOneTile = false;
-		if (distance > 0){
-			if (panelTile.Neighbours.ContainsKey(s)) {
-				if (SetInteractionToCastAround(caster, panelTile.Neighbours[s], card, s, distance - 1)) {
-					atLeastOneTile = true;
-				}
-			}
-		}
-		//you can not cast one minion on top of the other
-		AvatarModel am = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
-		if (card.Params.ContainsKey(ParamType.Health) && am != null && !card.Params.ContainsKey(ParamType.ReplaceExisting)) {
-			return atLeastOneTile;
-		}
-
-		if (am == null) {
-			//you can not cast healing touch on empty area
-			if (card.Params.ContainsKey(ParamType.Heal)) {
-				return atLeastOneTile;
-			}
-
-			//damage spell can not be cast on empty area 
-			if (card.Params.ContainsKey(ParamType.DealDamage)) {
-				return atLeastOneTile;
-			}
-
-		}
-
-		panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanCastHere(caster, card);
-		atLeastOneTile = true;
-		return atLeastOneTile;
-	}
 
 	private bool SetInteractionToMoveAround(PanelTile mover, PanelTile panelTile, Side s, int distance) {
 		bool atLeastOneTile = false;
@@ -197,7 +162,7 @@ public class PanelMinigame : MonoBehaviour {
 		PanelInteraction pi = panelTile.PanelInteraction.GetComponent<PanelInteraction>();
 		AvatarModel am = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
 		bool isYourCharacter = ActualTurnModel.IsItYourMinion(am) || ActualTurnModel == am;
-		Debug.Log("This tile has " + (isYourCharacter ? "yours" : "not yours") +" " + (am!=null?am.Card.Name:"no minion"));
+		Debug.Log("Mode: " + Mode + ", This tile has " + (isYourCharacter ? "yours" : "not yours") +" " + (am!=null?am.Card.Name:"no minion"));
 
 		switch (Mode) {
 			case global::Mode.Ready: {
@@ -265,35 +230,21 @@ public class PanelMinigame : MonoBehaviour {
 
 				PanelInteractionMode whatMode = pi.Mode;
 				Card whatCard = pi.CastersCard;
+				Debug.Log("Casting spell " + whatCard.Name);
 
 				if (pi.Mode == PanelInteractionMode.Casting) {
-					panelTile.PanelAvatar.GetComponent<PanelAvatar>().CastOn(pi.CastersCard, pi.Caster);
+					CastSpell(panelTile, pi.CastersCard, pi.Caster, true);
 				}
 				DisableAllPanelsInteraction();
 				Mode = global::Mode.Ready;
 
 				if (whatMode == PanelInteractionMode.Casting && panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model != null) {
-					Debug.Log("There is battlecry for " + whatCard.Name);
 					if (whatCard.Effects.ContainsKey(Effect.Battlecry)) {
+						Debug.Log("There is battlecry for " + whatCard.Name);
 						whatCard = whatCard.Effects[Effect.Battlecry];
-
-						//auto casting with self on self
-						if (!whatCard.Params.ContainsKey(ParamType.Distance)) {
-							panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Cast(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model, whatCard);
-						} else {
-							//manual casting 
-							int distance = whatCard.Params.ContainsKey(ParamType.Distance) ? whatCard.Params[ParamType.Distance] : 0;
-							foreach (Side s in SideMethods.AllSides()) {
-								if (SetInteractionToCastAround(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model, panelTile, whatCard, s, distance)) {
-									Mode = global::Mode.CastingSpell;
-								}
-							}
-							//battlecry can not be casted on itself
-							panelTile.PanelInteraction.GetComponent<PanelInteraction>().Clear();
-						}
+						CastSpell(panelTile, whatCard, panelTile, false);
 					}
 				}
-
 				break;
 			}
 			default: throw new NotImplementedException("Implement working with mode: " + Mode);
@@ -302,6 +253,68 @@ public class PanelMinigame : MonoBehaviour {
 		//revalidate effects
 		RevalidateEffects();
 	}
+
+	private void CastSpell(PanelTile onWhat, Card card, PanelTile caster, bool explicitlySelectedTile) {
+
+		if (explicitlySelectedTile) {
+			foreach (PanelTile pt in PanelTiles.GetComponent<PanelTiles>().GetAllPanelTiles()) {
+				if (pt.CanIHaveThisSpell(caster, onWhat, card)) {
+					pt.PanelAvatar.GetComponent<PanelAvatar>().CastOn(caster.PanelAvatar.GetComponent<PanelAvatar>().Model, card);
+				}
+			}
+		} else {
+			List<PanelTile> pts = PanelTiles.GetComponent<PanelTiles>().GetAllPanelTiles();
+			foreach (PanelTile pa in pts) {
+				if (CanBeCastedOn(caster, pa, card)) {
+					pa.PanelInteraction.GetComponent<PanelInteraction>().CanCastHere(caster, card);
+					Mode = global::Mode.CastingSpell;
+				}
+			}
+		}
+	}
+
+	private bool CanBeCastedOn(PanelTile caster, PanelTile castedOn, Card card) {
+
+		AvatarModel castedOnModel = castedOn.PanelAvatar.GetComponent<PanelAvatar>().Model;
+		AvatarModel castersModel = caster.PanelAvatar.GetComponent<PanelAvatar>().Model;
+
+		bool canCast = false;
+		switch (card.CardTarget) {
+			case CardTarget.Minion: 
+				canCast = castedOnModel != null && castedOnModel.Card.CardPersistency != CardPersistency.Hero; 
+				break;
+			case CardTarget.Empty: 
+				canCast = castedOnModel == null; 
+				break;
+			case CardTarget.FriendlyMinion: 
+				canCast = castedOnModel != null && castedOnModel.Card.CardPersistency != CardPersistency.Hero && castersModel.GetMyHero().IsItYourMinion(castedOnModel); 
+				break;
+			case CardTarget.Self: 
+				canCast = castersModel == castedOnModel; 
+				break;
+			case CardTarget.JustThrow: 
+				canCast = true;
+				break;
+			case CardTarget.Character:
+				canCast = castedOnModel != null;
+				break;
+			default: 
+				throw new NotImplementedException("Not implemented " + card.CardTarget);
+		}
+
+		//we have to check the distance
+		if (canCast) {
+			int distance = caster.GetDistanceTo(castedOn);
+			Debug.Log("Distance between " + castersModel.Card.Name + " and " + castedOn.Row + ", " + castedOn.Column + " is " + distance);
+			canCast =  distance <= card.CastDistance;
+		}
+		if (castedOnModel != null) {
+			Debug.Log("Can be casted on: " + castedOnModel.Card.Name + "? " + (canCast ? "yes" : "no"));
+		}
+
+		return canCast;
+	}
+
 
 	private void RevalidateEffects() {
 		PanelTiles.GetComponent<PanelTiles>().UpdateAdjacentModels();
@@ -341,7 +354,6 @@ public class PanelMinigame : MonoBehaviour {
 				}
 			}
 		}
-
 	}
 
 	private void DisableAllPanelsInteraction() {
@@ -351,19 +363,6 @@ public class PanelMinigame : MonoBehaviour {
 		}
 	}
 
-
-
-
-	internal int MyMinionNumber() {
-		int myMinionsCount = 0;
-		List<AvatarModel> ams = PanelTiles.GetComponent<PanelTiles>().GetAllAvatarModels();
-		foreach (AvatarModel am in ams) {
-			if (ActualTurnModel.IsItYourMinion(am)) {
-				myMinionsCount++;
-			}
-		}
-		return myMinionsCount;
-	}
 }
 
 public enum Mode {

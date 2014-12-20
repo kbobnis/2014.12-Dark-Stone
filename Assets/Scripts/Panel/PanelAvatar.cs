@@ -39,14 +39,6 @@ public class PanelAvatar : MonoBehaviour {
 
 	}
 
-	internal void CastOn(Card c, AvatarModel am) {
-
-		if (c == null) {
-			throw new Exception("Why you cast when there is no card");
-		}
-		Model = am.Cast(Model, c);
-	}
-
 	internal AvatarModel GetAndRemoveModel() {
 		AvatarModel pam = Model;
 		Model = null;
@@ -60,6 +52,10 @@ public class PanelAvatar : MonoBehaviour {
 		pam.ActualHealth -= Model.ActualAttack;
 		UpdateFromModel();
 		panelAvatar.UpdateFromModel();
+	}
+
+	public void CastOn(AvatarModel caster, Card c) {
+		Model = caster.Cast(Model, c);
 	}
 
 }
@@ -113,7 +109,10 @@ public class AvatarModel {
 	}
 
 	public int ActualHealth {
-		get { return _ActualHealth; }
+		get { 
+			
+			return _ActualHealth; 
+		}
 		set { _ActualHealth = value;
 			if (_ActualHealth > MaxHealth) {
 				_ActualHealth = MaxHealth;
@@ -190,7 +189,6 @@ public class AvatarModel {
 	}
 
 	internal AvatarModel Cast(AvatarModel castingOn, Card c) {
-		AvatarModel am = castingOn;
 		_ActualMana -= c.Cost;
 		if (_ActualMana < 0) {
 			//it can go under zero. if a minion is summoning it with battlecry
@@ -205,19 +203,22 @@ public class AvatarModel {
 				throw new Exception("Can not cast minion on top of other.");
 			}
 			if (c.Params.ContainsKey(ParamType.ReplaceExisting)) {
-				Minions.Remove(am);
+				Minions.Remove(castingOn);
 			}
-			am = new AvatarModel(c, true, this);
-			Minions.Add(am);
+			castingOn = new AvatarModel(c, true, this);
+			Minions.Add(castingOn);
 		} else {
+			Debug.Log("Casting " + c.Name + " on " + castingOn.Card.Name);
 
 			CastedCard castedCard = new CastedCard(castingOn, c);
-			//for one milisecond cards the effects where applied in constructor
-			if (c.CardPersistency != CardPersistency.OneMilisecond) {
-				am.Effects.Add(castedCard);
+
+			if (c.CardPersistency != CardPersistency.Instant) {
+				castingOn.Effects.Add(castedCard);
 			}
+			//because of healing this has to be after adding castedCard to effect. (max health update then healing)
+			castedCard.DealInstants(castingOn);
 		}
-		return am;
+		return castingOn;
 	}
 
 	internal void StartOfATurn() {
@@ -256,12 +257,24 @@ public class AvatarModel {
 	}
 
 	internal AvatarModel GetMyHero() {
-
+		if (_Creator == null) {
+			return this;
+		}
 		if (_Creator.Card.CardPersistency == CardPersistency.Hero) {
 			return _Creator;
 		}
 		return _Creator.GetMyHero();
 	}
+
+	public static int MyMinionsNumber(AvatarModel am) {
+		int count = am.Minions.Count;
+		foreach (AvatarModel am2 in am.Minions) {
+			count += MyMinionsNumber(am2);
+		}
+		return count;
+	}
+
+
 }
 
 

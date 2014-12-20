@@ -70,6 +70,10 @@ public class ScrollableList : MonoBehaviour
 			}
 
 			newItem.name = gameObject.name + " item at (" + i + "," + j + ")";
+			if (newItem.GetComponent<PanelTile>() != null) {
+				newItem.GetComponent<PanelTile>().Row = i;
+				newItem.GetComponent<PanelTile>().Column = j;
+			}
 			newItem.transform.parent = gameObject.transform;
 			
 			//move and size the new item

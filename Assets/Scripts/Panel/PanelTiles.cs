@@ -42,6 +42,27 @@ public class PanelTiles : MonoBehaviour {
 		}
 		return tmp;
 	}
+
+	internal List<PanelAvatar> GetAllPanelAvatars() {
+		List<PanelAvatar> tmp = new List<PanelAvatar>();
+		foreach (GameObject go in GetComponent<ScrollableList>().ElementsToPut) {
+			PanelTile pt = go.GetComponent<PanelTile>();
+			PanelAvatar pa = go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
+			if (pa != null) {
+				tmp.Add(pa);
+			}
+		}
+		return tmp;
+	}
+
+	internal List<PanelTile> GetAllPanelTiles() {
+		List<PanelTile> tmp = new List<PanelTile>();
+		foreach (GameObject go in GetComponent<ScrollableList>().ElementsToPut) {
+			PanelTile pt = go.GetComponent<PanelTile>();
+			tmp.Add(pt);
+		}
+		return tmp;
+	}
 }
 
 
