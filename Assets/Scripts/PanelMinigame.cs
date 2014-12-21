@@ -176,7 +176,7 @@ public class PanelMinigame : MonoBehaviour {
 							PanelInformation.GetComponent<PanelInformation>().SetText("No moves left");
 						} else {
 							//preparing interaction panels for moves
-							Debug.Log(am.MovesLeft + " moves left, ready to move");
+							Debug.Log(am.Card.Name + " (hero: " + am.GetMyHero().Card.Name + ") " + am.MovesLeft + " moves left, ready to move");
 							foreach (Side s in SideMethods.AllSides()) {
 								if (SetInteractionToMoveAround(panelTile, panelTile, s, 1)){
 									Mode = Mode.MovingOrAttacking;
@@ -230,9 +230,9 @@ public class PanelMinigame : MonoBehaviour {
 
 				PanelInteractionMode whatMode = pi.Mode;
 				Card whatCard = pi.CastersCard;
-				Debug.Log("Casting spell " + whatCard.Name);
 
 				if (pi.Mode == PanelInteractionMode.Casting) {
+					Debug.Log("Casting spell " + whatCard.Name + " by: " + pi.Caster.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name);
 					CastSpell(panelTile, pi.CastersCard, pi.Caster, true);
 				}
 				DisableAllPanelsInteraction();
@@ -259,7 +259,7 @@ public class PanelMinigame : MonoBehaviour {
 		if (explicitlySelectedTile) {
 			foreach (PanelTile pt in PanelTiles.GetComponent<PanelTiles>().GetAllPanelTiles()) {
 				if (pt.CanIHaveThisSpell(caster, onWhat, card)) {
-					pt.PanelAvatar.GetComponent<PanelAvatar>().CastOn(caster.PanelAvatar.GetComponent<PanelAvatar>().Model, card);
+					caster.PanelAvatar.GetComponent<PanelAvatar>().CastOn(pt.PanelAvatar.GetComponent<PanelAvatar>(), card);
 				}
 			}
 		} else {

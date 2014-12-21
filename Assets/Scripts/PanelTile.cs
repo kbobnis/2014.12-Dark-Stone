@@ -33,7 +33,7 @@ public class PanelTile : MonoBehaviour {
 	internal bool CanIHaveThisSpell(PanelTile caster, PanelTile onWhat, Card card) {
 
 		AvatarModel myModel = PanelAvatar.GetComponent<PanelAvatar>().Model;
-		AvatarModel onWhatModel = PanelAvatar.GetComponent<PanelAvatar>().Model;
+		AvatarModel onWhatModel = onWhat.PanelAvatar.GetComponent<PanelAvatar>().Model;
 
 		switch (card.IsCastOn) {
 			case IsCastOn.Target: return onWhat == this; break;

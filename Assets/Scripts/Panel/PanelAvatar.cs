@@ -22,6 +22,8 @@ public class PanelAvatar : MonoBehaviour {
 	public void UpdateFromModel() {
 
 		if (Model != null && Model.IsOnBoard() &&  Model.ActualHealth <= 0) {
+			//is dead
+			_Model.GetMyHero().Minions.Remove(_Model);
 			_Model = null;
 		}
 
@@ -54,8 +56,8 @@ public class PanelAvatar : MonoBehaviour {
 		panelAvatar.UpdateFromModel();
 	}
 
-	public void CastOn(AvatarModel caster, Card c) {
-		Model = caster.Cast(Model, c);
+	public void CastOn(PanelAvatar onWhat, Card c) {
+		onWhat.Model = Model.Cast(onWhat.Model, c);
 	}
 
 }
@@ -71,7 +73,7 @@ public class AvatarModel {
 	public List<Card> Deck = new List<Card>();
 	private List<Card> _Hand = new List<Card>();
 	public List<CastedCard> Effects = new List<CastedCard>();
-	private List<AvatarModel> Minions = new List<AvatarModel>();
+	public List<AvatarModel> Minions = new List<AvatarModel>();
 	private AvatarModel _Creator;
 	public Dictionary<Side, AvatarModel> AdjacentModels = new Dictionary<Side,AvatarModel>();
 	private int Draught;
@@ -208,8 +210,6 @@ public class AvatarModel {
 			castingOn = new AvatarModel(c, true, this);
 			Minions.Add(castingOn);
 		} else {
-			Debug.Log("Casting " + c.Name + " on " + castingOn.Card.Name);
-
 			CastedCard castedCard = new CastedCard(castingOn, c);
 
 			if (c.CardPersistency != CardPersistency.Instant) {
