@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class PanelAvatar : MonoBehaviour {
 
-	public GameObject PanelHealth, PanelAttack, PanelTile;
+	public GameObject PanelHealth, PanelAttack, PanelTile, ImageProtection, ImageTaunt;
 
 	private AvatarModel _Model = null;
 
@@ -29,12 +29,37 @@ public class PanelAvatar : MonoBehaviour {
 
 		GetComponent<Image>().enabled = _Model != null;
 		if (_Model != null) {
-			GetComponent<Image>().color = Color.white;
 			GetComponent<Image>().sprite = _Model.Card.Animation;
-			if (Model != null && (Model.MovesLeft == 0 || (!PanelMinigame.Me.ActualTurnModel.IsItYourMinion(Model) && PanelMinigame.Me.ActualTurnModel != Model) )) {
-				GetComponent<Image>().color = Color.black;
+			if (Model != null ) {
+				GetComponent<Image>().color = Model.MovesLeft > 0?Color.white:Color.black;
+				GetComponent<Image>().material = Image.defaultGraphicMaterial;
+
+				if ( !PanelMinigame.Me.ActualTurnModel.IsItYourMinion(Model) && PanelMinigame.Me.ActualTurnModel != Model) {
+					GetComponent<Image>().color = Color.red;
+					GetComponent<Image>().material = SpriteManager.Font.material;
+				}
 			}
 		}
+
+		bool hasPhysicalProtection = false;
+		if (Model != null) {
+			foreach (CastedCard cc in Model.Effects) {
+				if (cc.Params.ContainsKey(CastedCardParamType.PhysicalProtection)) {
+					hasPhysicalProtection = true;
+				}
+			}
+		}
+		ImageProtection.SetActive(hasPhysicalProtection);
+
+		bool hasTaunt = false;
+		if (Model != null) {
+			foreach (KeyValuePair<Effect, Card> kvp in Model.Card.Effects) {
+				if (kvp.Value.Params.ContainsKey(ParamType.PhysicalProtectionForFriendyAdjacentCharactersracters)) {
+					hasTaunt = true;
+				}
+			}
+		}
+		ImageTaunt.SetActive(hasTaunt);
 		
 		PanelHealth.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualHealth : 0);
 		PanelAttack.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualAttack : 0);

@@ -75,8 +75,8 @@ public class PanelMinigame : MonoBehaviour {
 		PanelBottom.GetComponent<PanelBottom>().Prepare(lasiaModel);
 
 		ActualTurnModel = EnemysModel;
-		RevalidateEffects();
 		EndTurn();
+		RevalidateEffects();
 	}
 
 	void Update() {
@@ -348,6 +348,7 @@ public class PanelMinigame : MonoBehaviour {
 					cc.MarkedToRemove = true;
 				}
 			}
+
 		}
 		
 		//add all every action revalidate effects
@@ -392,8 +393,6 @@ public class PanelMinigame : MonoBehaviour {
 				}
 			}
 		}
-
-
 	}
 
 	private void DisableAllPanelsInteraction() {

@@ -20,8 +20,11 @@ public class SpriteManager : MonoBehaviour{
 	public static Dictionary<AnimationType, Sprite> ShoeAnimations = new Dictionary<AnimationType, Sprite>();
 	public static Dictionary<AnimationType, Sprite> FireballAnimations = new Dictionary<AnimationType, Sprite>();
 
+	public static Font Font;
 
 	void Awake(){
+
+		Font = Resources.Load<Font>("MunroSmall");
 
 		ManaCrystallFull = Resources.Load<Sprite>("Images/manaCrystalFull");
 		ManaCrystalEmpty = Resources.Load<Sprite>("Images/manaCrystalEmpty");
