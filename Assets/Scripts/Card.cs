@@ -45,9 +45,8 @@ public class Card  {
 	}
 
 	public static readonly Card Wisp = new Card("Wisp", 0, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, {ParamType.Speed, 1}});
-
 	public static readonly Card RockbiterWeapon = new Card("Rockbiter Weapon", 1, CardPersistency.UntilEndTurn, CardTarget.FriendlyMinion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 3 } });
-	public static readonly Card FlametongueTotemAura = new Card("Flametongue Totem Aura", 1, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAddForAdjacentFriendlyCharacters, 2 } });
+	public static readonly Card FlametongueTotemAura = new Card("Flametongue Totem Aura", 1, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAddForAdjacentFriendlyMinions, 2 } });
 	public static readonly Card FlametongueTotem= new Card("Flametongue Totem", 2, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.Health, 3}, {ParamType.Speed, 1} },
 		new Dictionary<Effect,Card>() { {Effect.WhileAlive, FlametongueTotemAura} });
 	public static readonly Card Thrallmar = new Card("Thrallmar", 2, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 3 }, { ParamType.Attack, 2 }, { ParamType.Speed, 2 } });
@@ -77,7 +76,7 @@ public class Card  {
 	public static readonly Card FireElemental = new Card("Fire Elemental", 6, CardPersistency.Minion,CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 5 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, FireElementalsFireball } });
 	public static readonly Card BoulderfishOgre = new Card("Boulderfist Ogre", 6, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 7 }, { ParamType.Speed, 1 } });
-	public static readonly Card StormwindChampionsAura = new Card("Stormwind Champions Aura", 2, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAddForOtherFriendlyMinions, 1 }, { ParamType.HealthAddForFriendlyMinions, 1 } });
+	public static readonly Card StormwindChampionsAura = new Card("Stormwind Champions Aura", 2, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAddForOtherFriendlyMinions, 1 }, { ParamType.HealthAddForOtherFriendlyMinions, 1 } });
 	public static readonly Card StormwindChampion = new Card("Stormwind Champion", 7, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 6 }, { ParamType.Speed, 1 }},
 		new Dictionary<Effect, Card>() {{Effect.WhileAlive, StormwindChampionsAura} });
 
@@ -102,6 +101,7 @@ public class CastedCard {
 
 	public Dictionary<CastedCardParamType, int> Params = new Dictionary<CastedCardParamType, int>();
 	public Card Card;
+	public bool MarkedToRemove;
 
 	public CastedCard(AvatarModel am, Card c) {
 		Card = c;
@@ -133,12 +133,19 @@ public class CastedCard {
 			Params.Add(CastedCardParamType.AttackAdd, AvatarModel.MyMinionsNumber(am.GetMyHero()) - 1); //because itself doesn't count and its already casted
 		}
 
-		if (c.Params.ContainsKey(ParamType.AttackAddForAdjacentFriendlyCharacters)) {
-			Params.Add(CastedCardParamType.AttackAdd, c.Params[ParamType.AttackAddForAdjacentFriendlyCharacters]);
+		if (c.Params.ContainsKey(ParamType.AttackAddForAdjacentFriendlyMinions)) {
+			Params.Add(CastedCardParamType.AttackAdd, c.Params[ParamType.AttackAddForAdjacentFriendlyMinions]);
 		}
 
 		if (c.Params.ContainsKey(ParamType.PhysicalProtectionForFriendyAdjacentCharactersracters)) {
 			Params.Add(CastedCardParamType.PhysicalProtection, 1);
+		}
+
+		if (c.Params.ContainsKey(ParamType.AttackAddForOtherFriendlyMinions)) {
+			Params.Add(CastedCardParamType.AttackAdd, c.Params[ParamType.AttackAddForOtherFriendlyMinions]);
+		}
+		if (c.Params.ContainsKey(ParamType.HealthAddForOtherFriendlyMinions)) {
+			Params.Add(CastedCardParamType.HealthAdd, c.Params[ParamType.HealthAddForOtherFriendlyMinions]);
 		}
 
 	}
@@ -152,8 +159,9 @@ public class CastedCard {
 					am.ActualHealth -= kvp.Value;
 					Params.Remove(kvp.Key);
 					break;
-					//because adding health means increasing max health and healing this amount
 				case CastedCardParamType.HealthAdd:
+					am.ActualHealth += kvp.Value;
+					break;
 				case CastedCardParamType.Heal:
 					am.ActualHealth += kvp.Value;
 					Params.Remove(kvp.Key);

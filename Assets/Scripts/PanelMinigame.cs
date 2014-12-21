@@ -44,6 +44,7 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.SenjinShieldmasta);
 		lasiaModel.Deck.Add(Card.Bloodlust);
 		lasiaModel.Deck.Add(Card.BoulderfishOgre);
+		lasiaModel.Deck.Add(Card.StormwindChampion);
 		lasiaModel.Deck.Add(Card.FireElemental);
 		lasiaModel.Deck.Add(Card.FrostwolfWarlord);
 		lasiaModel.Deck.Add(Card.GnomishInventor);
@@ -146,7 +147,7 @@ public class PanelMinigame : MonoBehaviour {
 				}
 
 				//can not attack your own minions nor with physical protection
-				if (!hasPhysicalProtection && !ActualTurnModel.IsItYourMinion(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model) && mover.PanelAvatar.GetComponent<PanelAvatar>().Model.ActualAttack > 0) {
+				if (!hasPhysicalProtection && !ActualTurnModel.IsItYourMinion(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model) && ActualTurnModel != panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model && mover.PanelAvatar.GetComponent<PanelAvatar>().Model.ActualAttack > 0) {
 					panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanAttackHere(mover);
 				}
 
@@ -162,7 +163,19 @@ public class PanelMinigame : MonoBehaviour {
 		PanelInteraction pi = panelTile.PanelInteraction.GetComponent<PanelInteraction>();
 		AvatarModel am = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
 		bool isYourCharacter = ActualTurnModel.IsItYourMinion(am) || ActualTurnModel == am;
-		Debug.Log("Mode: " + Mode + ", This tile has " + (isYourCharacter ? "yours" : "not yours") +" " + (am!=null?am.Card.Name:"no minion"));
+		if (am != null) {
+			string effects = "";
+			foreach (CastedCard cc in am.Effects) {
+				string paramT = "(";
+				foreach(KeyValuePair<CastedCardParamType, int> kvp in cc.Params){
+					paramT += kvp.Key + ": " + kvp.Value + ";";
+				}
+				paramT += ")";
+				effects += cc.Card.Name + paramT + ", ";
+			}
+
+			Debug.Log(am.Card.Name + " (hero: " + am.GetMyHero().Card.Name + ") " + am.MovesLeft + " moves left, max health: " + am.MaxHealth + ", his hero: " + am.GetMyHero().Card.Name + ", effects: " + effects);
+		}
 
 		switch (Mode) {
 			case global::Mode.Ready: {
@@ -176,7 +189,7 @@ public class PanelMinigame : MonoBehaviour {
 							PanelInformation.GetComponent<PanelInformation>().SetText("No moves left");
 						} else {
 							//preparing interaction panels for moves
-							Debug.Log(am.Card.Name + " (hero: " + am.GetMyHero().Card.Name + ") " + am.MovesLeft + " moves left, ready to move");
+							
 							foreach (Side s in SideMethods.AllSides()) {
 								if (SetInteractionToMoveAround(panelTile, panelTile, s, 1)){
 									Mode = Mode.MovingOrAttacking;
@@ -305,11 +318,11 @@ public class PanelMinigame : MonoBehaviour {
 		//we have to check the distance
 		if (canCast) {
 			int distance = caster.GetDistanceTo(castedOn);
-			Debug.Log("Distance between " + castersModel.Card.Name + " and " + castedOn.Row + ", " + castedOn.Column + " is " + distance);
+			//Debug.Log("Distance between " + castersModel.Card.Name + " and " + castedOn.Row + ", " + castedOn.Column + " is " + distance);
 			canCast =  distance <= card.CastDistance;
 		}
 		if (castedOnModel != null) {
-			Debug.Log("Can be casted on: " + castedOnModel.Card.Name + "? " + (canCast ? "yes" : "no"));
+			//Debug.Log("Can be casted on: " + castedOnModel.Card.Name + "? " + (canCast ? "yes" : "no"));
 		}
 
 		return canCast;
@@ -319,41 +332,68 @@ public class PanelMinigame : MonoBehaviour {
 	private void RevalidateEffects() {
 		PanelTiles.GetComponent<PanelTiles>().UpdateAdjacentModels();
 
-		//remove all every action revalidate effects
+		//mark to remove all every action revalidate effects
 		List<AvatarModel> allModels = PanelTiles.GetComponent<PanelTiles>().GetAllAvatarModels();
 		foreach (AvatarModel am in allModels) {
+
+			//update their minions btw
+			foreach (AvatarModel amTmp in am.Minions.ToArray()) {
+				if (amTmp.ActualHealth <= 0) {
+					am.Minions.Remove(amTmp);
+				}
+			}
+
 			foreach (CastedCard cc in am.Effects.ToArray()) {
 				if (cc.Card.CardPersistency == CardPersistency.EveryActionRevalidate) {
-					am.Effects.Remove(cc);
+					cc.MarkedToRemove = true;
 				}
 			}
 		}
-
+		
 		//add all every action revalidate effects
 		foreach (AvatarModel am in allModels) {
+			AvatarModel myHero = am.GetMyHero();
+
 			foreach (KeyValuePair<Effect, Card> e in am.Card.Effects) {
 				if (e.Key == Effect.WhileAlive && e.Value.CardPersistency == CardPersistency.EveryActionRevalidate){
-
-					if (e.Value.Params.ContainsKey(ParamType.AttackAddForAdjacentFriendlyCharacters)) {
-						AvatarModel myHero = am.GetMyHero();
+						
+					if (e.Value.Params.ContainsKey(ParamType.AttackAddForAdjacentFriendlyMinions)) {
 						foreach (KeyValuePair<Side, AvatarModel> kvp in am.AdjacentModels) {
-							if (kvp.Value != null &&  (myHero.IsItYourMinion(kvp.Value) || kvp.Value == myHero)) {
+							if (kvp.Value != null &&  (myHero.IsItYourMinion(kvp.Value) && kvp.Value != myHero)) {
 								am.Cast(kvp.Value, e.Value);
 							}
 						}
-					}
-					if (e.Value.Params.ContainsKey(ParamType.PhysicalProtectionForFriendyAdjacentCharactersracters)) {
+					} else if (e.Value.Params.ContainsKey(ParamType.PhysicalProtectionForFriendyAdjacentCharactersracters)) {
 
-						AvatarModel myHero = am.GetMyHero();
 						foreach (KeyValuePair<Side, AvatarModel> kvp in am.AdjacentModels) {
 							if (kvp.Value != null && (myHero.IsItYourMinion(kvp.Value) || kvp.Value == myHero)) {
 								am.Cast(kvp.Value, e.Value);
 							}
 						}
+					} else if (e.Value.Params.ContainsKey(ParamType.AttackAddForOtherFriendlyMinions)){
+						foreach (AvatarModel am2 in PanelTiles.GetComponent<PanelTiles>().GetAllAvatarModels()) {
+							
+							if (am2 != null && am.GetMyHero().IsItYourMinion(am2) && am != am2 && am.GetMyHero() != am2) {
+								am.Cast(am2, e.Value);
+							}
+						}
 					}
 				}
 			}
 		}
+
+		//remove all effect which are still marked to remove
+		foreach (AvatarModel am in allModels) {
+			foreach (CastedCard cc in am.Effects.ToArray()) {
+				if (cc.Card.CardPersistency == CardPersistency.EveryActionRevalidate) {
+					if (cc.MarkedToRemove) {
+						am.Effects.Remove(cc);
+					}
+				}
+			}
+		}
+
+
 	}
 
 	private void DisableAllPanelsInteraction() {
