@@ -148,11 +148,14 @@ public class AvatarModel {
 				//can not cast minion on other minion
 				throw new Exception("Casting card: " + c.Name + ", on " + castingOn.Card.Name + " this can not happen");
 			}
+			AvatarModel owner = GetMyHero();
 			if (c.Params.ContainsKey(ParamType.ReplaceExisting)) {
 				Minions.Remove(castingOn);
+				owner = castingOn.GetMyHero();
 			}
 			castingOn = new AvatarModel(c, true, this);
-			Minions.Add(castingOn);
+			//minions will be a flat structure. there is no need for deep one. 
+			owner.Minions.Add(castingOn);
 		} else {
 			//check if there is already an effect like this and marked to remove. we will unmark it
 			bool foundTheSame = false;
@@ -192,9 +195,6 @@ public class AvatarModel {
 		}
 		foreach (AvatarModel am in Minions) {
 			am.EndOfATurn();
-			foreach (AvatarModel am2 in am.Minions) {
-				am2.EndOfATurn();
-			}
 		}
 	}
 
@@ -202,9 +202,6 @@ public class AvatarModel {
 
 		foreach (AvatarModel am2 in Minions) {
 			if (am2 == am) {
-				return true;
-			}
-			if (am2.IsItYourMinion(am)) {
 				return true;
 			}
 		}

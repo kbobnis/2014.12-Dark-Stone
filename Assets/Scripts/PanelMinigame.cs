@@ -58,6 +58,7 @@ public class PanelMinigame : MonoBehaviour {
 
 		PanelAvatar dementorAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel dementorModel = dementorAvatar.Model;
+		dementorModel.Deck.Add(Card.Wisp);
 		dementorModel.Deck.Add(Card.RockbiterWeapon);
 		dementorModel.Deck.Add(Card.FlametongueTotem);
 		dementorModel.Deck.Add(Card.RazorfenHunter);
@@ -67,13 +68,11 @@ public class PanelMinigame : MonoBehaviour {
 		dementorModel.Deck.Add(Card.ShatteredSunCleric);
 		dementorModel.Deck.Add(Card.BloodfenRaptor);
 		dementorModel.Deck.Add(Card.Thrallmar);
-		dementorModel.Deck.Add(Card.Wisp);
+		
 
 		MyModel = lasiaModel;
 		EnemysModel = dementorModel;
-
-		PanelBottom.GetComponent<PanelBottom>().Prepare(lasiaModel);
-
+		
 		ActualTurnModel = EnemysModel;
 		EndTurn();
 		RevalidateEffects();
@@ -98,6 +97,7 @@ public class PanelMinigame : MonoBehaviour {
 		ActualTurnModel.EndOfATurn();
 
 		ActualTurnModel = ActualTurnModel == MyModel?EnemysModel:MyModel;
+		PanelBottom.GetComponent<PanelBottom>().Prepare(ActualTurnModel);
 
 		ActualTurnModel.StartOfATurn();
 
