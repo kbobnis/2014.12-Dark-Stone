@@ -16,7 +16,7 @@ public class PanelAvatar : MonoBehaviour {
 	}
 
 	void Update() {
-		UpdateFromModel();
+		//UpdateFromModel();
 	}
 
 	public void UpdateFromModel() {
@@ -54,7 +54,7 @@ public class PanelAvatar : MonoBehaviour {
 		bool hasTaunt = false;
 		if (Model != null) {
 			foreach (KeyValuePair<Effect, Card> kvp in Model.Card.Effects) {
-				if (kvp.Value.Params.ContainsKey(ParamType.PhysicalProtectionForFriendyAdjacentCharactersracters)) {
+				if (kvp.Value.Params.ContainsKey(ParamType.PhysicalProtection)) {
 					hasTaunt = true;
 				}
 			}
@@ -84,6 +84,8 @@ public class PanelAvatar : MonoBehaviour {
 	public void CastOn(PanelAvatar onWhat, Card c) {
 		onWhat.Model = Model.Cast(onWhat.Model, c);
 	}
+
+
 
 }
 

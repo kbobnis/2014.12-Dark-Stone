@@ -30,15 +30,48 @@ public class PanelTile : MonoBehaviour {
 		return d;
 	}
 
-	internal bool CanIHaveThisSpell(PanelTile caster, PanelTile onWhat, Card card) {
+	internal bool CanHeHaveThisSpell(PanelTile target, PanelTile onWhat, Card card) {
 
-		AvatarModel myModel = PanelAvatar.GetComponent<PanelAvatar>().Model;
+		AvatarModel casterModel = PanelAvatar.GetComponent<PanelAvatar>().Model;
+		AvatarModel targetModel = target.PanelAvatar.GetComponent<PanelAvatar>().Model;
 		AvatarModel onWhatModel = onWhat.PanelAvatar.GetComponent<PanelAvatar>().Model;
 
+		bool canIHave = false;
 		switch (card.IsCastOn) {
-			case IsCastOn.Target: return onWhat == this; break;
-			case IsCastOn.AllFriendlyMinions: return onWhatModel != null && onWhatModel.GetMyHero().IsItYourMinion(myModel); break;
+			case IsCastOn.Target:
+				canIHave = onWhat == target;
+				break;
+			case IsCastOn.AllFriendlyMinions:
+				canIHave = onWhatModel != null && casterModel.GetMyHero().IsItYourMinion(onWhatModel);
+				break;
+			case IsCastOn.AdjacentFriendlyMinions:
+				if (onWhatModel != null && casterModel.GetMyHero().IsItYourMinion(onWhatModel)) {
+					foreach (Side s in SideMethods.AdjacentSides()) {
+						//we have to compare panelTiles instead of AvatarModels, because we could compare null to null
+						if (Neighbours.ContainsKey(s) && Neighbours[s] == onWhat) {
+							canIHave = true;
+						}
+					}
+				}
+				break;
+			case IsCastOn.AdjacentFriendlyCharacters:
+				if (onWhatModel != null && (casterModel.GetMyHero().IsItYourMinion(onWhatModel) || targetModel.GetMyHero() == casterModel)) {
+					foreach (Side s in SideMethods.AdjacentSides()) {
+						//we have to compare panelTiles instead of AvatarModels, because we could compare null to null
+						if (Neighbours.ContainsKey(s) && Neighbours[s] == onWhat) {
+							canIHave = true;
+						}
+					}
+				}
+				break;
+			case IsCastOn.OtherFriendlyMinions:
+				canIHave = onWhatModel != null && casterModel.GetMyHero().IsItYourMinion(onWhatModel) && targetModel != onWhatModel;
+				break;
+			default:
+				throw new NotImplementedException("Implement case: " + card.IsCastOn);
 		}
-		throw new NotImplementedException("Implement case: " + card.IsCastOn);
+		return canIHave;
 	}
+
+
 }

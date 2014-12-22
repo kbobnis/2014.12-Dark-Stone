@@ -146,7 +146,7 @@ public class AvatarModel {
 		if (c.Params.ContainsKey(ParamType.Health)) {
 			if (castingOn != null && !c.Params.ContainsKey(ParamType.ReplaceExisting)) {
 				//can not cast minion on other minion
-				throw new Exception("Casting card: " + c.Name + ", on " + castingOn.Card.Name + " this can not happen");
+				throw new Exception("Casting card: " + c.Name + " on " + castingOn.Card.Name + " this can not happen");
 			}
 			AvatarModel owner = GetMyHero();
 			if (c.Params.ContainsKey(ParamType.ReplaceExisting)) {
@@ -159,10 +159,11 @@ public class AvatarModel {
 		} else {
 			//check if there is already an effect like this and marked to remove. we will unmark it
 			bool foundTheSame = false;
-			foreach (CastedCard cc in Effects) {
+			foreach (CastedCard cc in castingOn.Effects) {
 				if (cc.Card == c && cc.MarkedToRemove){
 					cc.MarkedToRemove = false;
 					foundTheSame = true;
+					break;
 				}
 			}
 
@@ -170,6 +171,7 @@ public class AvatarModel {
 				CastedCard castedCard = new CastedCard(castingOn, c);
 
 				if (c.CardPersistency != CardPersistency.Instant) {
+					Debug.Log("Casting " + c.Name + " on " + castingOn.Card.Name);
 					castingOn.Effects.Add(castedCard);
 				}
 				//because of healing this has to be after adding castedCard to effect. (max health update then healing)
@@ -225,6 +227,8 @@ public class AvatarModel {
 		}
 		return count;
 	}
+
+
 
 
 
