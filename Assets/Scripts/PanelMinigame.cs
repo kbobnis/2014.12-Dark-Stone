@@ -58,32 +58,25 @@ public class PanelMinigame : MonoBehaviour {
 		
 		PanelAvatar lasiaAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[3 * 5 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel lasiaModel = lasiaAvatar.Model;
-
 		lasiaModel.Deck.Add(Card.MurlocTidehunter);
 		lasiaModel.Deck.Add(Card.ChillwindYeti);
 		lasiaModel.Deck.Add(Card.RockbiterWeapon);
 		lasiaModel.Deck.Add(Card.FlametongueTotem);
 		lasiaModel.Deck.Add(Card.StormwindChampion);
-		lasiaModel.Deck.Add(Card.StormwindChampion);
 		lasiaModel.Deck.Add(Card.StormwindChampion); 
-		
 		lasiaModel.Deck.Add(Card.RazorfenHunter);
 		lasiaModel.Deck.Add(Card.SenjinShieldmasta);
 		lasiaModel.Deck.Add(Card.Bloodlust);
 		lasiaModel.Deck.Add(Card.BoulderfishOgre);
-		
 		lasiaModel.Deck.Add(Card.FireElemental);
 		lasiaModel.Deck.Add(Card.FrostwolfWarlord);
 		lasiaModel.Deck.Add(Card.GnomishInventor);
-		
 		lasiaModel.Deck.Add(Card.Hex);
 		lasiaModel.Deck.Add(Card.ShatteredSunCleric);
-		
 		lasiaModel.Deck.Add(Card.BloodfenRaptor);
 		lasiaModel.Deck.Add(Card.Thrallmar);
 		lasiaModel.Deck.Add(Card.Wisp);
-		lasiaModel.EndOfATurn();
-		//lasiaModel.Deck.Shuffle();
+		lasiaModel.Deck.Shuffle();
 
 		PanelAvatar dementorAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel dementorModel = dementorAvatar.Model;
@@ -203,7 +196,7 @@ public class PanelMinigame : MonoBehaviour {
 		PanelInteraction pi = panelTile.PanelInteraction.GetComponent<PanelInteraction>();
 		AvatarModel am = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
 		if (am != null) {
-			PanelCardPreview.GetComponent<PanelCardPreview>().Preview(am.GetMyHero(), am.Card, false);
+			PanelCardPreview.GetComponent<PanelCardPreview>().Preview(am.GetMyHero(), am);
 		}
 		bool isYourCharacter = ActualTurnModel.IsItYourMinion(am) || ActualTurnModel == am;
 		if (am != null) {
@@ -327,7 +320,7 @@ public class PanelMinigame : MonoBehaviour {
 					pa.PanelInteraction.GetComponent<PanelInteraction>().CanCastHere(caster, card);
 					Mode = global::Mode.CastingSpell;
 					if (pa.PanelAvatar.GetComponent<PanelAvatar>().Model != null){
-						Debug.Log("Spell: " + card.Name + ", Can be casted on: " + pa.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name);
+						//Debug.Log("Spell: " + card.Name + ", Can be casted on: " + pa.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name);
 					}
 				}
 			}

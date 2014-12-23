@@ -14,7 +14,7 @@ public class PanelCardInHand : MonoBehaviour {
 	public void PointerDown() {
 		Debug.Log("Showing preview for card: " + Card.Name);
 		try {
-			PanelCardPreview.GetComponent<PanelCardPreview>().Preview(AvatarModel, Card, false);
+			PanelCardPreview.GetComponent<PanelCardPreview>().PreviewCard(AvatarModel, Card, false);
 			PanelMinigame.GetComponent<PanelMinigame>().CardInHandSelected(Card);
 		} catch (Exception e) {
 			Debug.Log("Exception: " + e);

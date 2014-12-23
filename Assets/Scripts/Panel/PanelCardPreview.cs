@@ -13,7 +13,7 @@ public static class CardMethods {
 			}
 		}
 		if (!shortV) {
-			text += "\n\n";
+			text += "\n";
 		}
 		if (Card.CardTarget != CardTarget.JustThrow && Card.CardTarget != CardTarget.Self && Card.CardTarget != CardTarget.Empty) {
 			text += "Cast on: " + Card.CardTarget + ",\n";
@@ -44,8 +44,23 @@ public class PanelCardPreview : MonoBehaviour {
 
 	public GameObject PanelAvatar, PanelDetails;
 
-	internal void Preview(AvatarModel avatarModel, Card Card, bool showCost) {
-		PanelAvatar.GetComponent<PanelAvatarCard>().Prepare(avatarModel, Card, showCost);
-		PanelDetails.GetComponentInChildren<Text>().text = Card.Name + "\n" + Card.Describe();
+	internal void PreviewCard(AvatarModel hero, Card card, bool showCost) {
+		PanelAvatar.GetComponent<PanelAvatarCard>().Prepare(hero, card, showCost);
+		PanelDetails.GetComponentInChildren<Text>().text = card.Name + "\n" + card.Describe();
+	}
+
+	internal void Preview(AvatarModel hero, AvatarModel targetModel) {
+		PreviewCard(hero, targetModel.Card, false);
+
+		string effectsText = "";
+		foreach(CastedCard cc in targetModel.Effects){
+			effectsText += cc.Card.Name + "( ";
+			foreach(KeyValuePair<CastedCardParamType, int> kvp in cc.Params){
+				effectsText += kvp.Key + ": " + kvp.Value + ",";
+			}
+			effectsText += "),";
+		}
+
+		PanelDetails.GetComponentInChildren<Text>().text = targetModel.Card.Name + "\n" + targetModel.Card.Describe() + "\n effects: " + effectsText;
 	}
 }
