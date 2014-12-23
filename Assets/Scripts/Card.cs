@@ -20,7 +20,8 @@ public enum IsCastOn {
 	OtherFriendlyMinions,
 	AdjacentFriendlyMinions,
 	AdjacentFriendlyCharacters,
-	AllEnemyCharacters
+	AllEnemyCharacters,
+	OtherItsCharacters
 }
 public enum CardPersistency {
 	Minion, UntilEndTurn, WhileHolderAlive, Instant, Hero, EveryActionRevalidate
@@ -77,9 +78,9 @@ public class Card  {
 	public static readonly Card GnomishInvention= new Card("Gnomish Invention", 0, CardPersistency.Instant, CardTarget.JustThrow, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.HeroDrawsCard, 1} });
 	public static readonly Card GnomishInventor = new Card("Gnomish Inventor", 4, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 4 }, { ParamType.Attack, 2 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, GnomishInvention } });
-	public static readonly Card SwipeClaw = new Card("Swipe Claw", 1, CardPersistency.Instant, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamage /*because i dont want to increase this will spell damage, basic swipe already have it */, 3 } });
-	public static readonly Card Swipe = new Card("Swipe", 4, CardPersistency.Instant, CardTarget.EnemyCharacter, 5, IsCastOn.AllEnemyCharacters, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 1 } },
-		new Dictionary<Effect,Card>() { { Effect.Battlecry, SwipeClaw } });
+	public static readonly Card SwipeRicochet = new Card("Swipe Ricochet", 1, CardPersistency.Instant, CardTarget.Self, 0, IsCastOn.OtherItsCharacters, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 1 } });
+	public static readonly Card Swipe = new Card("Swipe", 4, CardPersistency.Instant, CardTarget.EnemyCharacter, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 4 } },
+		new Dictionary<Effect,Card>() { { Effect.Battlecry, SwipeRicochet } });
 	public static readonly Card ChillwindYeti = new Card("Chillwind Yeti", 4, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 5 }, { ParamType.Attack, 4 }, { ParamType.Speed, 1 } });
 	public static readonly Card PhysicalProtectionForAdjacent = new Card("Physical Protection for Adjacent", 1, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.AdjacentFriendlyCharacters, new Dictionary<ParamType, int>() { { ParamType.PhysicalProtection, 1 } });
 	public static readonly Card SenjinShieldmasta= new Card("Senjin Shieldmasta", 4, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 5 }, { ParamType.Attack, 3 }, { ParamType.Speed, 1 } },
@@ -92,6 +93,7 @@ public class Card  {
 	public static readonly Card FireElemental = new Card("Fire Elemental", 6, CardPersistency.Minion,CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 5 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, FireElementalsFireball } });
 	public static readonly Card BoulderfishOgre = new Card("Boulderfist Ogre", 6, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 7 }, { ParamType.Speed, 1 } });
+	public static readonly Card Starfire = new Card("Starfire", 6, CardPersistency.Instant, CardTarget.Character, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 5 }, { ParamType.HeroDrawsCard, 1 } });
 	public static readonly Card StormwindChampionsAura = new Card("Stormwind Champions Aura", 2, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.OtherFriendlyMinions, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 1 }, { ParamType.HealthAdd, 1 } });
 	public static readonly Card StormwindChampion = new Card("Stormwind Champion", 7, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 6 }, { ParamType.Speed, 1 }},
 		new Dictionary<Effect, Card>() {{Effect.WhileAlive, StormwindChampionsAura} });
@@ -165,28 +167,28 @@ public class CastedCard {
 
 	}
 
-	internal void DealInstants(AvatarModel am) {
+	internal void DealInstants(AvatarModel castingBy, AvatarModel castingOn) {
 
 		foreach (KeyValuePair<CastedCardParamType, int> kvp in Params.ToArray()) {
 			switch (kvp.Key) {
 					
 				case CastedCardParamType.DealDamage:
-					am.ActualHealth -= kvp.Value;
+					castingOn.ActualHealth -= kvp.Value;
 					Params.Remove(kvp.Key);
 					break;
 				case CastedCardParamType.HealthAdd:
-					am.ActualHealth += kvp.Value;
+					castingOn.ActualHealth += kvp.Value;
 					break;
 				case CastedCardParamType.Heal:
-					am.ActualHealth += kvp.Value;
+					castingOn.ActualHealth += kvp.Value;
 					Params.Remove(kvp.Key);
 					break;
 				case CastedCardParamType.HeroDrawsCard:
-					am.GetMyHero().PullCardFromDeck();
+					castingBy.GetMyHero().PullCardFromDeck();
 					Params.Remove(kvp.Key);
 					break;
 				case CastedCardParamType.DealDamageSpell:
-					am.ActualHealth -= kvp.Value;
+					castingOn.ActualHealth -= kvp.Value;
 					Params.Remove(kvp.Key);
 					break;
 			}

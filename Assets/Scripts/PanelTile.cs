@@ -71,6 +71,9 @@ public class PanelTile : MonoBehaviour {
 				canIHave = onWhatModel != null && onWhatModel.GetMyHero() != casterModel.GetMyHero();
 					 
 				break;
+			case IsCastOn.OtherItsCharacters:
+				canIHave = onWhatModel!= null && onWhatModel != targetModel && targetModel.GetMyHero() == onWhatModel.GetMyHero();
+				break;
 			default:
 				throw new NotImplementedException("Implement case: " + card.IsCastOn);
 		}

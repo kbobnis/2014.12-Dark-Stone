@@ -81,8 +81,8 @@ public class PanelAvatar : MonoBehaviour {
 		panelAvatar.UpdateFromModel();
 	}
 
-	public void CastOn(PanelAvatar onWhat, Card c) {
-		onWhat.Model = Model.Cast(onWhat.Model, c);
+	public void CastOn(PanelAvatar onWhat, Card c, int cost) {
+		onWhat.Model = Model.Cast(onWhat.Model, c, cost);
 	}
 
 

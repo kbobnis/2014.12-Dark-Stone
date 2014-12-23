@@ -134,8 +134,8 @@ public class AvatarModel {
 		}
 	}
 
-	internal AvatarModel Cast(AvatarModel castingOn, Card c) {
-		_ActualMana -= c.Cost;
+	internal AvatarModel Cast(AvatarModel castingOn, Card c, int cost) {
+		_ActualMana -= cost;
 		if (_ActualMana < 0) {
 			//it can go under zero. if a minion is summoning it with battlecry
 			//throw new Exception("What is this situation. Mana can not go under zero. Casting: " + c.Name + " for " + c.Cost);
@@ -175,7 +175,7 @@ public class AvatarModel {
 					castingOn.Effects.Add(castedCard);
 				}
 				//because of healing this has to be after adding castedCard to effect. (max health update then healing)
-				castedCard.DealInstants(castingOn);
+				castedCard.DealInstants(this, castingOn);
 			}
 		}
 		return castingOn;
