@@ -59,6 +59,7 @@ public class PanelMinigame : MonoBehaviour {
 		PanelAvatar lasiaAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[3 * 5 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel lasiaModel = lasiaAvatar.Model;
 		lasiaModel.Deck.Add(Card.MurlocTidehunter);
+		lasiaModel.Deck.Add(Card.KoboldGeomancer);
 		lasiaModel.Deck.Add(Card.ChillwindYeti);
 		lasiaModel.Deck.Add(Card.RockbiterWeapon);
 		lasiaModel.Deck.Add(Card.FlametongueTotem);
@@ -76,7 +77,7 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.BloodfenRaptor);
 		lasiaModel.Deck.Add(Card.Thrallmar);
 		lasiaModel.Deck.Add(Card.Wisp);
-		lasiaModel.Deck.Shuffle();
+		//lasiaModel.Deck.Shuffle();
 
 		PanelAvatar dementorAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel dementorModel = dementorAvatar.Model;
@@ -294,6 +295,10 @@ public class PanelMinigame : MonoBehaviour {
 						bool explicitly = battlecryCard.CardTarget == CardTarget.JustThrow || battlecryCard.CardTarget == CardTarget.Self;
 						CastSpell(panelTile, battlecryCard, panelTile, explicitly);
 					}
+					if (whatCard.Effects.ContainsKey(Effect.WhileAlive) && whatCard.Effects[Effect.WhileAlive].CardPersistency == CardPersistency.WhileHolderAlive) {
+						Card whileAliveEffect = whatCard.Effects[Effect.WhileAlive];
+						CastSpell(panelTile, whileAliveEffect, panelTile, true);
+					}
 				}
 				break;
 			}
@@ -396,7 +401,7 @@ public class PanelMinigame : MonoBehaviour {
 				AvatarModel myHero = am.GetMyHero();
 
 				foreach (KeyValuePair<Effect, Card> e in am.Card.Effects) {
-					if (e.Key == Effect.WhileAlive) {
+					if (e.Key == Effect.WhileAlive && e.Value.CardPersistency == CardPersistency.EveryActionRevalidate ) {
 						CastSpell(pt, e.Value, pt, true);
 					}
 				}

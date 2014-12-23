@@ -14,4 +14,5 @@ public enum ParamType {
 	HeroDrawsCard,
 	PhysicalProtection,
 	ReplaceExisting,
+	SpellDamageAdd,
 }

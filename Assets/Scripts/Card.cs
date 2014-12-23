@@ -56,6 +56,9 @@ public class Card  {
 	public static readonly Card MurlocScout = new Card("Murloc Scout", 0, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, { ParamType.Speed, 1 } });	
 	public static readonly Card MurlocTidehunter = new Card("Murloc Tidehunter", 2, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 2 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>(){ {Effect.Battlecry, MurlocScout}} );
+	public static readonly Card KoboldsGeomancersPower = new Card("Kobold Geomancers Power", 1, CardPersistency.WhileHolderAlive, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.SpellDamageAdd, 1 } });
+	public static readonly Card KoboldGeomancer = new Card("Kobold Geomancer", 2, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 2 }, { ParamType.Attack, 2 }, { ParamType.Speed, 1 } },
+		new Dictionary<Effect, Card>() { { Effect.WhileAlive, KoboldsGeomancersPower } });
 	public static readonly Card ShatteredSunClericBlessing = new Card("Shattered Sun Cleric Blessing", 0, CardPersistency.WhileHolderAlive, CardTarget.OtherFriendlyMinion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.HealthAdd, 1 }, { ParamType.AttackAdd, 1 } });	
 	public static readonly Card ShatteredSunCleric = new Card("Shattered Sun Cleric", 3, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 2 }, { ParamType.Attack, 3 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, ShatteredSunClericBlessing } });
@@ -97,6 +100,7 @@ public enum CastedCardParamType {
 	DealDamage,
 	Heal,
 	HeroDrawsCard,
+	SpellDamageAdd,
 }
 
 public class CastedCard {
@@ -137,6 +141,10 @@ public class CastedCard {
 
 		if (c.Params.ContainsKey(ParamType.PhysicalProtection)) {
 			Params.Add(CastedCardParamType.PhysicalProtection, 1);
+		}
+
+		if (c.Params.ContainsKey(ParamType.SpellDamageAdd)) {
+			Params.Add(CastedCardParamType.SpellDamageAdd, c.Params[ParamType.SpellDamageAdd]);
 		}
 
 	}
