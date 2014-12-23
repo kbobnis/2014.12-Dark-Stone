@@ -5,7 +5,14 @@ using System;
 using System.Linq;
 
 public enum CardTarget {
-	Empty, FriendlyMinion, Self, Minion, JustThrow, Character, OtherFriendlyMinion
+	Empty, 
+	FriendlyMinion, 
+	Self, 
+	Minion, 
+	JustThrow, 
+	Character, 
+	OtherFriendlyMinion,
+	EnemyCharacter
 }
 public enum IsCastOn {
 	Target,
@@ -13,6 +20,7 @@ public enum IsCastOn {
 	OtherFriendlyMinions,
 	AdjacentFriendlyMinions,
 	AdjacentFriendlyCharacters,
+	AllEnemyCharacters
 }
 public enum CardPersistency {
 	Minion, UntilEndTurn, WhileHolderAlive, Instant, Hero, EveryActionRevalidate
@@ -69,6 +77,9 @@ public class Card  {
 	public static readonly Card GnomishInvention= new Card("Gnomish Invention", 0, CardPersistency.Instant, CardTarget.JustThrow, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.HeroDrawsCard, 1} });
 	public static readonly Card GnomishInventor = new Card("Gnomish Inventor", 4, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 4 }, { ParamType.Attack, 2 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, GnomishInvention } });
+	public static readonly Card SwipeClaw = new Card("Swipe Claw", 1, CardPersistency.Instant, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamage /*because i dont want to increase this will spell damage, basic swipe already have it */, 3 } });
+	public static readonly Card Swipe = new Card("Swipe", 4, CardPersistency.Instant, CardTarget.EnemyCharacter, 5, IsCastOn.AllEnemyCharacters, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 1 } },
+		new Dictionary<Effect,Card>() { { Effect.Battlecry, SwipeClaw } });
 	public static readonly Card ChillwindYeti = new Card("Chillwind Yeti", 4, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 5 }, { ParamType.Attack, 4 }, { ParamType.Speed, 1 } });
 	public static readonly Card PhysicalProtectionForAdjacent = new Card("Physical Protection for Adjacent", 1, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.AdjacentFriendlyCharacters, new Dictionary<ParamType, int>() { { ParamType.PhysicalProtection, 1 } });
 	public static readonly Card SenjinShieldmasta= new Card("Senjin Shieldmasta", 4, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 5 }, { ParamType.Attack, 3 }, { ParamType.Speed, 1 } },
@@ -101,6 +112,7 @@ public enum CastedCardParamType {
 	Heal,
 	HeroDrawsCard,
 	SpellDamageAdd,
+	DealDamageSpell,
 }
 
 public class CastedCard {
@@ -109,7 +121,7 @@ public class CastedCard {
 	public Card Card;
 	public bool MarkedToRemove;
 
-	public CastedCard(AvatarModel am, Card c) {
+	public CastedCard(AvatarModel castingBy, AvatarModel castingOn, Card c) {
 		Card = c;
 
 		if (c.Params.ContainsKey(ParamType.DealDamage)) {
@@ -132,11 +144,11 @@ public class CastedCard {
 			Params.Add(CastedCardParamType.HealthAdd, c.Params[ParamType.HealthAdd]);
 		}
 		if (c.Params.ContainsKey(ParamType.HealthAddOfOtherFriendlyMinionNumber)) {
-			Params.Add(CastedCardParamType.HealthAdd, AvatarModel.MyMinionsNumber(am.GetMyHero())- 1);//because itself doesn't count and its already casted
+			Params.Add(CastedCardParamType.HealthAdd, AvatarModel.MyMinionsNumber(castingOn.GetMyHero())- 1);//because itself doesn't count and its already casted
 		}
 		
 		if (c.Params.ContainsKey(ParamType.AttackAddOfOtherFriendlyMinionNumber)) {
-			Params.Add(CastedCardParamType.AttackAdd, AvatarModel.MyMinionsNumber(am.GetMyHero()) - 1); //because itself doesn't count and its already casted
+			Params.Add(CastedCardParamType.AttackAdd, AvatarModel.MyMinionsNumber(castingOn.GetMyHero()) - 1); //because itself doesn't count and its already casted
 		}
 
 		if (c.Params.ContainsKey(ParamType.PhysicalProtection)) {
@@ -145,6 +157,10 @@ public class CastedCard {
 
 		if (c.Params.ContainsKey(ParamType.SpellDamageAdd)) {
 			Params.Add(CastedCardParamType.SpellDamageAdd, c.Params[ParamType.SpellDamageAdd]);
+		}
+
+		if (c.Params.ContainsKey(ParamType.DealDamageSpell)) {
+			Params.Add(CastedCardParamType.DealDamageSpell, c.Params[ParamType.DealDamageSpell] + castingBy.SpellDamageAdd());
 		}
 
 	}
@@ -167,6 +183,10 @@ public class CastedCard {
 					break;
 				case CastedCardParamType.HeroDrawsCard:
 					am.GetMyHero().PullCardFromDeck();
+					Params.Remove(kvp.Key);
+					break;
+				case CastedCardParamType.DealDamageSpell:
+					am.ActualHealth -= kvp.Value;
 					Params.Remove(kvp.Key);
 					break;
 			}

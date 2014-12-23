@@ -168,7 +168,7 @@ public class AvatarModel {
 			}
 
 			if (!foundTheSame) {
-				CastedCard castedCard = new CastedCard(castingOn, c);
+				CastedCard castedCard = new CastedCard(this, castingOn, c);
 
 				if (c.CardPersistency != CardPersistency.Instant) {
 					Debug.Log("Casting " + c.Name + " on " + castingOn.Card.Name);
@@ -201,6 +201,9 @@ public class AvatarModel {
 	}
 
 	public bool IsItYourMinion(AvatarModel am) {
+		if (Card.CardPersistency != CardPersistency.Hero) {
+			throw new Exception("This should be called only for heroes");
+		}
 
 		foreach (AvatarModel am2 in Minions) {
 			if (am2 == am) {
@@ -228,9 +231,15 @@ public class AvatarModel {
 		return count;
 	}
 
-
-
-
-
-	
+	internal int SpellDamageAdd() {
+		int add = 0;
+		foreach (AvatarModel am in Minions) {
+			foreach (CastedCard cc in am.Effects) {
+				if (cc.Params.ContainsKey(CastedCardParamType.SpellDamageAdd)) {
+					add += cc.Params[CastedCardParamType.SpellDamageAdd];
+				}
+			}
+		}
+		return add;
+	}
 }

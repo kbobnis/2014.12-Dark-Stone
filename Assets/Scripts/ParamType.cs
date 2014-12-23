@@ -9,6 +9,7 @@ public enum ParamType {
 	HealthAdd,
 	HealthAddOfOtherFriendlyMinionNumber,
 	DealDamage,
+	DealDamageSpell,
 	Speed,
 	Heal,
 	HeroDrawsCard,

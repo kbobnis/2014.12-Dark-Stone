@@ -60,8 +60,9 @@ public class PanelMinigame : MonoBehaviour {
 		AvatarModel lasiaModel = lasiaAvatar.Model;
 		lasiaModel.Deck.Add(Card.MurlocTidehunter);
 		lasiaModel.Deck.Add(Card.KoboldGeomancer);
-		lasiaModel.Deck.Add(Card.ChillwindYeti);
 		lasiaModel.Deck.Add(Card.RockbiterWeapon);
+		lasiaModel.Deck.Add(Card.Swipe);
+		lasiaModel.Deck.Add(Card.ChillwindYeti);
 		lasiaModel.Deck.Add(Card.FlametongueTotem);
 		lasiaModel.Deck.Add(Card.StormwindChampion);
 		lasiaModel.Deck.Add(Card.StormwindChampion); 
@@ -359,6 +360,9 @@ public class PanelMinigame : MonoBehaviour {
 				break;
 			case CardTarget.OtherFriendlyMinion: 
 				canCast = castersModel != castedOnModel && castedOnModel != null && castedOnModel.Card.CardPersistency != CardPersistency.Hero && castersModel.GetMyHero().IsItYourMinion(castedOnModel); 
+				break;
+			case CardTarget.EnemyCharacter:
+				canCast = castedOnModel != null && !castersModel.GetMyHero().IsItYourMinion(castedOnModel) && castersModel.GetMyHero() != castedOnModel.GetMyHero();
 				break;
 			default: 
 				throw new NotImplementedException("Not implemented " + card.CardTarget);

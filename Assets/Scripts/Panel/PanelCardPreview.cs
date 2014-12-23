@@ -5,11 +5,16 @@ using System.Collections.Generic;
 
 public static class CardMethods {
 	
-	public static string Describe(this Card Card, bool shortV=false){
+	public static string Describe(this Card Card, AvatarModel heroOwner, bool shortV=false){
 		string text = "";
 		foreach (KeyValuePair<ParamType, int> kvp in Card.Params) {
 			if ((shortV || (kvp.Key != ParamType.Attack && kvp.Key != ParamType.Health)) && (kvp.Key != ParamType.Speed || kvp.Value != 1)) {
-				text += kvp.Key + ": " + kvp.Value + ", ";
+
+				string value = ""+ kvp.Value;
+				if (kvp.Key == ParamType.DealDamageSpell && heroOwner.SpellDamageAdd() > 0) {
+					value = "*" + (heroOwner.SpellDamageAdd() + kvp.Value) + "*";
+				}
+				text += kvp.Key + ": " + value + ", ";
 			}
 		}
 		if (!shortV) {
@@ -26,7 +31,7 @@ public static class CardMethods {
 			if (kvp.Key != Effect.WhileAlive) {
 				text += kvp.Key + ": ";
 			}
-			text += kvp.Value.Describe(true) + ", ";
+			text += kvp.Value.Describe(heroOwner, true) + ", ";
 		}
 		if (!shortV) {
 			text += "\n";
@@ -46,7 +51,7 @@ public class PanelCardPreview : MonoBehaviour {
 
 	internal void PreviewCard(AvatarModel hero, Card card, bool showCost) {
 		PanelAvatar.GetComponent<PanelAvatarCard>().Prepare(hero, card, showCost);
-		PanelDetails.GetComponentInChildren<Text>().text = card.Name + "\n" + card.Describe();
+		PanelDetails.GetComponentInChildren<Text>().text = card.Name + "\n" + card.Describe(hero);
 	}
 
 	internal void Preview(AvatarModel hero, AvatarModel targetModel) {
@@ -61,6 +66,6 @@ public class PanelCardPreview : MonoBehaviour {
 			effectsText += "),";
 		}
 
-		PanelDetails.GetComponentInChildren<Text>().text = targetModel.Card.Name + "\n" + targetModel.Card.Describe() + "\n effects: " + effectsText;
+		PanelDetails.GetComponentInChildren<Text>().text = targetModel.Card.Name + "\n" + targetModel.Card.Describe(hero) + "\n effects: " + effectsText;
 	}
 }
