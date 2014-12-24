@@ -21,7 +21,8 @@ public enum IsCastOn {
 	AdjacentFriendlyMinions,
 	AdjacentFriendlyCharacters,
 	AllEnemyCharacters,
-	OtherItsCharacters
+	OtherItsCharacters,
+	FriendlyHero
 }
 public enum CardPersistency {
 	Minion, UntilEndTurn, WhileHolderAlive, Instant, Hero, EveryActionRevalidate
@@ -55,6 +56,7 @@ public class Card  {
 		IsCastOn = cardIsCastOn;
 	}
 
+	public static readonly Card Innervate = new Card("Innervate", 0, CardPersistency.UntilEndTurn, CardTarget.JustThrow, 0, IsCastOn.FriendlyHero, new Dictionary<ParamType, int>() { {ParamType.ManaCrystalAdd, 2} });
 	public static readonly Card Wisp = new Card("Wisp", 0, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, {ParamType.Speed, 1}});
 	public static readonly Card RockbiterWeapon = new Card("Rockbiter Weapon", 1, CardPersistency.UntilEndTurn, CardTarget.FriendlyMinion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 3 } });
 	public static readonly Card FlametongueTotemAura = new Card("Flametongue Totem Aura", 1, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.AdjacentFriendlyMinions, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 2 } });
@@ -97,6 +99,7 @@ public class Card  {
 	public static readonly Card StormwindChampionsAura = new Card("Stormwind Champions Aura", 2, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.OtherFriendlyMinions, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 1 }, { ParamType.HealthAdd, 1 } });
 	public static readonly Card StormwindChampion = new Card("Stormwind Champion", 7, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 6 }, { ParamType.Speed, 1 }},
 		new Dictionary<Effect, Card>() {{Effect.WhileAlive, StormwindChampionsAura} });
+	public static readonly Card IronbarkProtector = new Card("Ironbark Protector", 8, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 8 }, { ParamType.Health, 8 }, { ParamType.Speed, 1 } });
 
 	//heroes
 	public static readonly Card Dementor = new Card("Dementor", 5, CardPersistency.Hero, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 30 }, {ParamType.Speed, 1} });
@@ -115,6 +118,7 @@ public enum CastedCardParamType {
 	HeroDrawsCard,
 	SpellDamageAdd,
 	DealDamageSpell,
+	ManaCrystalAdd,
 }
 
 public class CastedCard {
@@ -163,6 +167,10 @@ public class CastedCard {
 
 		if (c.Params.ContainsKey(ParamType.DealDamageSpell)) {
 			Params.Add(CastedCardParamType.DealDamageSpell, c.Params[ParamType.DealDamageSpell] + castingBy.SpellDamageAdd());
+		}
+
+		if (c.Params.ContainsKey(ParamType.ManaCrystalAdd)) {
+			Params.Add(CastedCardParamType.ManaCrystalAdd, c.Params[ParamType.ManaCrystalAdd]);
 		}
 
 	}

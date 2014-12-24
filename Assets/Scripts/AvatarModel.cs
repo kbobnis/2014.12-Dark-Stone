@@ -34,7 +34,17 @@ public class AvatarModel {
 	}
 
 	public int ActualMana {
-		get { return _ActualMana; }
+
+		get {
+			int actual = _ActualMana;
+			foreach (CastedCard c in Effects) {
+				if (c.Params.ContainsKey(CastedCardParamType.ManaCrystalAdd)) {
+					actual += c.Params[CastedCardParamType.ManaCrystalAdd];
+				}
+			}
+
+			return actual; 
+		}
 	}
 
 	public AvatarModel Creator {

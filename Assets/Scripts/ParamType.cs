@@ -16,4 +16,5 @@ public enum ParamType {
 	PhysicalProtection,
 	ReplaceExisting,
 	SpellDamageAdd,
+	ManaCrystalAdd,
 }

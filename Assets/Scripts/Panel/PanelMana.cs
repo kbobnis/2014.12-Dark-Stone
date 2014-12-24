@@ -16,7 +16,7 @@ public class PanelMana : MonoBehaviour {
 	void Update () {
 		if (AvatarModel != null){
 			for (int i = 0; i < Images.Length; i++) {
-				Images[i].SetActive(i < AvatarModel.MaxMana);
+				Images[i].SetActive(i < AvatarModel.MaxMana || i < AvatarModel.ActualMana);
 				Images[i].GetComponent<Image>().sprite = (i < AvatarModel.ActualMana) ? SpriteManager.ManaCrystallFull : SpriteManager.ManaCrystalEmpty;
 			}
 		}
