@@ -60,6 +60,7 @@ public class PanelMinigame : MonoBehaviour {
 		AvatarModel lasiaModel = lasiaAvatar.Model;
 		lasiaModel.Deck.Add(Card.MurlocTidehunter);
 		lasiaModel.Deck.Add(Card.Innervate);
+		lasiaModel.Deck.Add(Card.Claw);
 		lasiaModel.Deck.Add(Card.ChillwindYeti);
 		lasiaModel.Deck.Add(Card.KoboldGeomancer);
 		lasiaModel.Deck.Add(Card.RockbiterWeapon);

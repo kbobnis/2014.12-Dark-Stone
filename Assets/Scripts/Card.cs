@@ -58,6 +58,9 @@ public class Card  {
 
 	public static readonly Card Innervate = new Card("Innervate", 0, CardPersistency.UntilEndTurn, CardTarget.JustThrow, 0, IsCastOn.FriendlyHero, new Dictionary<ParamType, int>() { {ParamType.ManaCrystalAdd, 2} });
 	public static readonly Card Wisp = new Card("Wisp", 0, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, {ParamType.Speed, 1}});
+	public static readonly Card ClawsArmor = new Card("Claws Armor", 0, CardPersistency.WhileHolderAlive, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.ArmorAdd, 2} });
+	public static readonly Card Claw = new Card("Claw", 1, CardPersistency.UntilEndTurn, CardTarget.JustThrow, 0, IsCastOn.FriendlyHero, new Dictionary<ParamType, int>() { {ParamType.AttackAdd, 2 } }, 
+		new Dictionary<Effect,Card>() { { Effect.Battlecry, ClawsArmor} });
 	public static readonly Card RockbiterWeapon = new Card("Rockbiter Weapon", 1, CardPersistency.UntilEndTurn, CardTarget.FriendlyMinion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 3 } });
 	public static readonly Card FlametongueTotemAura = new Card("Flametongue Totem Aura", 1, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.AdjacentFriendlyMinions, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 2 } });
 	public static readonly Card FlametongueTotem= new Card("Flametongue Totem", 2, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.Health, 3}, {ParamType.Speed, 1} },
@@ -119,6 +122,7 @@ public enum CastedCardParamType {
 	SpellDamageAdd,
 	DealDamageSpell,
 	ManaCrystalAdd,
+	ArmorAdd,
 }
 
 public class CastedCard {
@@ -173,6 +177,10 @@ public class CastedCard {
 			Params.Add(CastedCardParamType.ManaCrystalAdd, c.Params[ParamType.ManaCrystalAdd]);
 		}
 
+		if (c.Params.ContainsKey(ParamType.ArmorAdd)) {
+			Params.Add(CastedCardParamType.ArmorAdd, c.Params[ParamType.ArmorAdd]);
+		}
+
 	}
 
 	internal void DealInstants(AvatarModel castingBy, AvatarModel castingOn) {
@@ -197,6 +205,10 @@ public class CastedCard {
 					break;
 				case CastedCardParamType.DealDamageSpell:
 					castingOn.ActualHealth -= kvp.Value;
+					Params.Remove(kvp.Key);
+					break;
+				case CastedCardParamType.ArmorAdd:
+					castingOn.Armor += kvp.Value;
 					Params.Remove(kvp.Key);
 					break;
 			}

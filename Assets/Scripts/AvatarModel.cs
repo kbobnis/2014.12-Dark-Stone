@@ -19,6 +19,7 @@ public class AvatarModel {
 	public Dictionary<Side, AvatarModel> AdjacentModels = new Dictionary<Side, AvatarModel>();
 	private int Draught;
 	private bool OnBoard;
+	public int Armor;
 
 	public List<Card> Hand {
 		get { return _Hand; }
@@ -69,11 +70,27 @@ public class AvatarModel {
 			return _ActualHealth;
 		}
 		set {
-			_ActualHealth = value;
+			int delta = _ActualHealth - value;
+			int deltaHealth = RemoveArmorBy(delta);
+			_ActualHealth -= deltaHealth;
 			if (_ActualHealth > MaxHealth) {
 				_ActualHealth = MaxHealth;
 			}
 		}
+	}
+
+	private int RemoveArmorBy(int delta) {
+		int res = delta;
+		
+		if (delta > 0) {
+			Armor -= delta;
+			if (Armor < 0) {
+				res = -Armor;
+				Armor = 0;
+			}
+		}
+		
+		return res;
 	}
 
 	public int MaxHealth {

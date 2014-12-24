@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class PanelAvatar : MonoBehaviour {
 
-	public GameObject PanelHealth, PanelAttack, PanelTile, ImageProtection, ImageTaunt;
+	public GameObject PanelHealth, PanelAttack, PanelTile, PanelArmor, ImageProtection, ImageTaunt;
 
 	private AvatarModel _Model = null;
 
@@ -63,6 +63,7 @@ public class PanelAvatar : MonoBehaviour {
 		
 		PanelHealth.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualHealth : 0);
 		PanelAttack.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualAttack : 0);
+		PanelArmor.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.Armor : 0);
 
 	}
 
