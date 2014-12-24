@@ -84,10 +84,11 @@ public class AvatarModel {
 		
 		if (delta > 0) {
 			Armor -= delta;
+			delta = 0;
 			if (Armor < 0) {
 				res = -Armor;
 				Armor = 0;
-			}
+			} 
 		}
 		
 		return res;
