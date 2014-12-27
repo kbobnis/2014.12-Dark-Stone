@@ -5,7 +5,7 @@ using System;
 
 public class AvatarModel {
 
-	public static readonly int HandSize = 4;
+	public static readonly int HandSize = 10;
 	public static readonly int MaxCrystals = 10;
 
 	private Card _Card;
@@ -50,6 +50,7 @@ public class AvatarModel {
 
 	public AvatarModel Creator {
 		get { return _Creator; }
+		set { _Creator = value; }
 	}
 	public AvatarModel(Card card, bool onBoard, AvatarModel creator) {
 		_Creator = creator;
@@ -131,6 +132,7 @@ public class AvatarModel {
 	}
 
 	public void PullCardFromDeck() {
+		Debug.Log("Pulling card from deck by " + Card.Name);
 		Card c = Deck.Count > 0 ? Deck[0] : null;
 		if (c == null) {
 			Draught++;
@@ -197,9 +199,10 @@ public class AvatarModel {
 
 			if (!foundTheSame) {
 				CastedCard castedCard = new CastedCard(this, castingOn, c);
+				
 
 				if (c.CardPersistency != CardPersistency.Instant) {
-					Debug.Log("Casting " + c.Name + " on " + castingOn.Card.Name);
+					Debug.Log("Casting " + c.Name + " on " + castingOn.Card.Name);	
 					castingOn.Effects.Add(castedCard);
 				}
 				//because of healing this has to be after adding castedCard to effect. (max health update then healing)

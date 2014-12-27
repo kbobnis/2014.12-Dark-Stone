@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class PanelAvatar : MonoBehaviour {
 
-	public GameObject PanelHealth, PanelAttack, PanelTile, PanelArmor, ImageProtection, ImageTaunt;
+	public GameObject PanelTile, ImageProtection, ImageTaunt, PanelAvatarCard;
 
 	private AvatarModel _Model = null;
 
@@ -25,20 +25,6 @@ public class PanelAvatar : MonoBehaviour {
 			//is dead
 			_Model.GetMyHero().Minions.Remove(_Model);
 			_Model = null;
-		}
-
-		GetComponent<Image>().enabled = _Model != null;
-		if (_Model != null) {
-			GetComponent<Image>().sprite = _Model.Card.Animation;
-			if (Model != null ) {
-				GetComponent<Image>().color = Model.MovesLeft > 0?Color.white:Color.black;
-				GetComponent<Image>().material = Image.defaultGraphicMaterial;
-
-				if ( !PanelMinigame.Me.ActualTurnModel.IsItYourMinion(Model) && PanelMinigame.Me.ActualTurnModel != Model) {
-					GetComponent<Image>().color = Color.red;
-					GetComponent<Image>().material = SpriteManager.Font.material;
-				}
-			}
 		}
 
 		bool hasPhysicalProtection = false;
@@ -60,11 +46,8 @@ public class PanelAvatar : MonoBehaviour {
 			}
 		}
 		ImageTaunt.SetActive(hasTaunt);
-		
-		PanelHealth.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualHealth : 0);
-		PanelAttack.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.ActualAttack : 0);
-		PanelArmor.GetComponent<PanelValue>().Prepare(_Model != null ? _Model.Armor : 0);
-
+		AvatarModel heroModel = Model != null ? Model.GetMyHero() : null;
+		PanelAvatarCard.GetComponent<PanelAvatarCard>().PreviewModel(heroModel, Model, PanelMinigame.Me.ActualTurnModel.IsItYourMinion(Model) || PanelMinigame.Me.ActualTurnModel == heroModel);
 	}
 
 	internal AvatarModel GetAndRemoveModel() {
@@ -85,8 +68,6 @@ public class PanelAvatar : MonoBehaviour {
 	public void CastOn(PanelAvatar onWhat, Card c, int cost) {
 		onWhat.Model = Model.Cast(onWhat.Model, c, cost);
 	}
-
-
 
 }
 

@@ -4,8 +4,8 @@ using UnityEngine.UI;
 
 public class PanelValue : MonoBehaviour {
 
-	public GameObject TextValue;
 	private int ActualValue;
+	public GameObject Text;
 
 	void Awake() {
 		UpdateImage();
@@ -19,13 +19,11 @@ public class PanelValue : MonoBehaviour {
 
 	private void UpdateImage() {
 		GetComponent<Image>().enabled = false;
-		TextValue.SetActive(false);
+		Text.SetActive( false);
 		if (ActualValue > 0) {
 			GetComponent<Image>().enabled = true;
-			TextValue.SetActive(true);
-			TextValue.GetComponent<Text>().text = "" + ActualValue;
+			Text.SetActive(true);
+			Text.GetComponent<Text>().text = "" + ActualValue;
 		}
 	}
-
-	
 }

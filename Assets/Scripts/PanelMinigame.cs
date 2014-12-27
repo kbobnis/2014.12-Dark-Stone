@@ -36,6 +36,9 @@ public class PanelMinigame : MonoBehaviour {
 	public static PanelMinigame Me;
 
 	internal void Prepare() {
+
+		AvatarModel am = new AvatarModel(Card.Lasia, false, null);
+
 		Me = this;
 		PanelInformation.SetActive(true);
 
@@ -60,22 +63,23 @@ public class PanelMinigame : MonoBehaviour {
 		AvatarModel lasiaModel = lasiaAvatar.Model;
 		lasiaModel.Deck.Add(Card.MurlocTidehunter);
 		lasiaModel.Deck.Add(Card.Innervate);
+		lasiaModel.Deck.Add(Card.IronfurGrizzly);
 		lasiaModel.Deck.Add(Card.Claw);
+		lasiaModel.Deck.Add(Card.GnomishInventor);
 		lasiaModel.Deck.Add(Card.ChillwindYeti);
 		lasiaModel.Deck.Add(Card.KoboldGeomancer);
 		lasiaModel.Deck.Add(Card.RockbiterWeapon);
 		lasiaModel.Deck.Add(Card.Swipe);
+		lasiaModel.Deck.Add(Card.MindControl);
 		lasiaModel.Deck.Add(Card.Starfire);
 		lasiaModel.Deck.Add(Card.FlametongueTotem);
 		lasiaModel.Deck.Add(Card.StormwindChampion);
-		lasiaModel.Deck.Add(Card.StormwindChampion); 
 		lasiaModel.Deck.Add(Card.RazorfenHunter);
 		lasiaModel.Deck.Add(Card.SenjinShieldmasta);
 		lasiaModel.Deck.Add(Card.Bloodlust);
 		lasiaModel.Deck.Add(Card.BoulderfishOgre);
 		lasiaModel.Deck.Add(Card.FireElemental);
 		lasiaModel.Deck.Add(Card.FrostwolfWarlord);
-		lasiaModel.Deck.Add(Card.GnomishInventor);
 		lasiaModel.Deck.Add(Card.Hex);
 		lasiaModel.Deck.Add(Card.ShatteredSunCleric);
 		lasiaModel.Deck.Add(Card.BloodfenRaptor);
@@ -111,6 +115,9 @@ public class PanelMinigame : MonoBehaviour {
 		ActualTurnModel = EnemysModel;
 		EndTurn();
 		RevalidateEffects();
+
+		PanelCardPreview.GetComponent<PanelCardPreview>().PreviewCard(lasiaModel, Card.GnomishInventor);
+		
 	}
 
 	void Update() {
@@ -132,8 +139,6 @@ public class PanelMinigame : MonoBehaviour {
 		ActualTurnModel.EndOfATurn();
 
 		ActualTurnModel = ActualTurnModel == MyModel?EnemysModel:MyModel;
-		PanelBottom.GetComponent<PanelBottom>().Prepare(ActualTurnModel);
-
 		ActualTurnModel.StartOfATurn();
 		RevalidateEffects();
 
@@ -144,12 +149,15 @@ public class PanelMinigame : MonoBehaviour {
 
 
 	internal void CardInHandSelected(Card card) {
+		Debug.Log("Card in hand selected: " + (card!=null?card.Name:"empty"));
+		PanelCardPreview.GetComponent<PanelCardPreview>().PreviewCard(ActualTurnModel, card);
 
 		if (Mode != global::Mode.Ready) {
 			DisableAllPanelsInteraction();
 			Mode = global::Mode.Ready;
 			//PanelInformation.GetComponent<PanelInformation>().SetText("Finish actual action before casting spells");
 		} else {
+
 			if (card.Cost > ActualTurnModel.ActualMana) {
 				//PanelInformation.GetComponent<PanelInformation>().SetText("Not enough mana crystals.\nYou have " + ActualTurnModel.ActualMana + " mana crystals. And spell " + card.Name + " costs " + card.Cost + " mana crystals");
 			} else {
@@ -199,15 +207,17 @@ public class PanelMinigame : MonoBehaviour {
 	}
 
 	internal void PointerDownOn(PanelTile panelTile) {
+		Debug.Log("pointer down on: " + panelTile.gameObject.name);
 		PanelInteraction pi = panelTile.PanelInteraction.GetComponent<PanelInteraction>();
-		AvatarModel am = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
-		if (am != null) {
-			PanelCardPreview.GetComponent<PanelCardPreview>().Preview(am.GetMyHero(), am);
-		}
-		bool isYourCharacter = ActualTurnModel.IsItYourMinion(am) || ActualTurnModel == am;
-		if (am != null) {
+		AvatarModel heroModel = panelTile.PanelAvatar.GetComponent<PanelAvatar>().PanelAvatarCard.GetComponent<PanelAvatarCard>().HeroModel;
+		AvatarModel targetModel = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
+		
+		PanelCardPreview.GetComponent<PanelCardPreview>().Preview(heroModel, targetModel);
+
+		bool isYourCharacter = ActualTurnModel.IsItYourMinion(targetModel) || ActualTurnModel == heroModel;
+		if (heroModel != null) {
 			string effects = "";
-			foreach (CastedCard cc in am.Effects) {
+			foreach (CastedCard cc in heroModel.Effects) {
 				string paramT = "(";
 				foreach(KeyValuePair<CastedCardParamType, int> kvp in cc.Params){
 					paramT += kvp.Key + ": " + kvp.Value + ";";
@@ -216,24 +226,23 @@ public class PanelMinigame : MonoBehaviour {
 				effects += cc.Card.Name + paramT + ", ";
 			}
 
-			Debug.Log(am.Card.Name + " (hero: " + am.GetMyHero().Card.Name + ") " + am.MovesLeft + " moves left, max health: " + am.MaxHealth + ", effects: " + effects);
+			Debug.Log(heroModel.Card.Name + " (hero: " + heroModel.GetMyHero().Card.Name + ") " + heroModel.MovesLeft + " moves left, max health: " + heroModel.MaxHealth + ", effects: " + effects);
 		}
 
 		switch (Mode) {
 			case global::Mode.Ready: {
 
-					if (!isYourCharacter && am != null) {
+					if (!isYourCharacter && targetModel != null) {
 						//PanelInformation.GetComponent<PanelInformation>().SetText("This is your enemys minion");
 					}
 					if (isYourCharacter) {
 						//has no moves
-						if (am.MovesLeft <= 0) {
+						if (targetModel.MovesLeft <= 0) {
 							//PanelInformation.GetComponent<PanelInformation>().SetText("No moves left");
 						} else {
 							//preparing interaction panels for moves
-							
 							foreach (Side s in SideMethods.AllSides()) {
-								if (SetInteractionToMoveAround(panelTile, panelTile, s, 1)){
+								if (SetInteractionToMoveAround(panelTile, panelTile, s, 1)) {
 									Mode = Mode.MovingOrAttacking;
 								}
 							}
@@ -248,16 +257,23 @@ public class PanelMinigame : MonoBehaviour {
 				PanelInteractionMode mode = pi.Mode;
 				if (pi.Mode == PanelInteractionMode.Moving || pi.Mode == PanelInteractionMode.Attacking) {
 					whatWantsToMoveOrAttackHere = pi.WhatMoveOrAttack;
-					whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft--;
-					movesLeft = whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft;
+					if (!isYourCharacter) {
+						whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft--;
+						movesLeft = whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model.MovesLeft;
+					}
 					//is here something?
-					if (am != null) {
+					if (heroModel != null) {
 						if ( isYourCharacter) {
 							//can not move on your mininion
 							PanelInformation.GetComponent<PanelInformation>().SetText("Can not attack your own minion");
 						} else {
 							//battle
 							whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().BattleOutWith(panelTile.PanelAvatar.GetComponent<PanelAvatar>());
+							if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model == null) {
+								//move if killed
+								panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model = whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model;
+								whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model = null;
+							}
 						}
 					} else {
 						//move
@@ -319,7 +335,7 @@ public class PanelMinigame : MonoBehaviour {
 		if (explicitlySelectedTile) {
 			foreach (PanelTile pt in PanelTiles.GetComponent<PanelTiles>().GetAllPanelTiles()) {
 				if (castingHero.CanHeHaveThisSpell(target, pt, card)) {
-					//Debug.Log(caster.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name + " is casting on " + pt.gameObject.name + " card: " + card.Name);
+					Debug.Log(caster.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name + " is casting on " + pt.gameObject.name + " card: " + card.Name);
 					castingHero.PanelAvatar.GetComponent<PanelAvatar>().CastOn(pt.PanelAvatar.GetComponent<PanelAvatar>(), card, cost);
 				}
 			}
@@ -352,6 +368,9 @@ public class PanelMinigame : MonoBehaviour {
 				break;
 			case CardTarget.FriendlyMinion: 
 				canCast = castedOnModel != null && castedOnModel.Card.CardPersistency != CardPersistency.Hero && castersModel.GetMyHero().IsItYourMinion(castedOnModel); 
+				break;
+			case CardTarget.EnemyMinion:
+				canCast = castedOnModel != null && castedOnModel.Card.CardPersistency == CardPersistency.Minion && castedOnModel.GetMyHero() != castersModel.GetMyHero();
 				break;
 			case CardTarget.Self: 
 				canCast = castersModel == castedOnModel; 
@@ -431,6 +450,8 @@ public class PanelMinigame : MonoBehaviour {
 			}
 			pt.PanelAvatar.GetComponent<PanelAvatar>().UpdateFromModel();
 		}
+		//to update the hand
+		PanelBottom.GetComponent<PanelBottom>().HeroModel = ActualTurnModel;
 	}
 
 	private void DisableAllPanelsInteraction() {

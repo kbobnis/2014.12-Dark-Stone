@@ -7,7 +7,20 @@ using System;
 
 public class PanelTile : MonoBehaviour {
 
-	public GameObject PanelMinigame, PanelAvatar, PanelInteraction;
+	public GameObject PanelMinigame, PanelAvatar, PanelInteraction, PanelAvatarCardPrefab;
+	public WhereAmI WhereAmI;
+
+	public void Create(int row, int column, WhereAmI whereAmI) {
+		WhereAmI = whereAmI;
+		Row = row;
+		Column = column;
+		GameObject panelAvatarCard = Instantiate(PanelAvatarCardPrefab) as GameObject;
+		PanelAvatar.GetComponent<PanelAvatar>().PanelAvatarCard = panelAvatarCard;
+		panelAvatarCard.transform.parent = PanelAvatar.transform;
+		RectTransform rt = panelAvatarCard.GetComponent<RectTransform>();
+		rt.offsetMin = new Vector2();
+		rt.offsetMax = new Vector2();
+	}
 
 	public Dictionary<Side, PanelTile> Neighbours = new Dictionary<Side, PanelTile>();
 	public int Row;
@@ -15,12 +28,20 @@ public class PanelTile : MonoBehaviour {
 
 	public void Touched(BaseEventData bed) {
 		try {
-			PanelMinigame.GetComponent<PanelMinigame>().PointerDownOn(this);
+			switch (WhereAmI) {
+				case global::WhereAmI.Board:
+					PanelMinigame.GetComponent<PanelMinigame>().PointerDownOn(this);
+					break;
+				case global::WhereAmI.Hand:
+					PanelMinigame.GetComponent<PanelMinigame>().CardInHandSelected(PanelAvatar.GetComponent<PanelAvatar>().PanelAvatarCard.GetComponent<PanelAvatarCard>().Card);
+					break;
+				default:
+					throw new NotImplementedException("Not implemented");
+			}
 		} catch (Exception e) {
 			Debug.Log("Exception: " + e);
 		}
 	}
-
 
 	internal int GetDistanceTo(PanelTile to) {
 		int d = Mathf.Abs(to.Row - Row) + Mathf.Abs(to.Column - Column);

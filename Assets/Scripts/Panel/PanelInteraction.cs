@@ -19,7 +19,6 @@ public class PanelInteraction : MonoBehaviour {
 	public PanelTile Caster;
 	public Card CastersCard;
 
-
 	void Awake() {
 		UpdateImage();
 	}

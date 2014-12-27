@@ -5,22 +5,60 @@ using UnityEngine.UI;
 
 public class PanelAvatarCard : MonoBehaviour {
 
-	public GameObject PanelCost, PanelAttack, PanelHealth;
+	public GameObject PanelCrystal, PanelAttack, PanelHealth, PanelArmor, CardImage, ImageOval, ImageColor;
 
+	public AvatarModel HeroModel;
+	public Card Card;
 
-	internal void Prepare(AvatarModel heroModel, Card Card, bool enableCostColor) {
-		if (Card == null) {
-			throw new Exception("Not nice to prepare with empty card");
-		}
+	public void Prepare(AvatarModel heroModel , Card card){
+		HeroModel = heroModel;
+		Card = card;
 
-		GetComponent<Image>().sprite = Card.Animation;
-		if (enableCostColor) {
-			GetComponent<Image>().color = heroModel.ActualMana >= Card.Cost ? Color.white : Color.black;
-		}
+		CardImage.SetActive(Card != null);
+		ImageColor.SetActive(Card != null);
+		ImageOval.SetActive(Card != null);
+		PanelCrystal.SetActive(Card != null);
+		PanelAttack.SetActive(Card != null);
+		PanelHealth.SetActive(Card != null);
+		//minion has green background
+		ImageColor.GetComponent<Image>().color = (card!=null&&card.CardPersistency.IsCharacter()) ? Color.green : Color.red;
+		//minion has oval
+		ImageOval.SetActive(card!=null && Card.CardPersistency.IsCharacter());
 
-		PanelCost.GetComponent<PanelValue>().Prepare(Card.Cost);
-		PanelAttack.GetComponent<PanelValue>().Prepare(Card.Params.ContainsKey(ParamType.Attack) ? Card.Params[ParamType.Attack] : 0);
-		PanelHealth.GetComponent<PanelValue>().Prepare(Card.Params.ContainsKey(ParamType.Health) ? Card.Params[ParamType.Health] : 0);
+		CardImage.GetComponent<Image>().sprite = card != null?card.Animation:null;
 	}
 
+	public void PreviewCardHand(AvatarModel heroModel, Card card) {
+		Prepare(heroModel, card);
+		
+		PanelCrystal.GetComponent<PanelValue>().Prepare(Card!=null? Card.Cost:0);
+		PanelAttack.GetComponent<PanelValue>().Prepare(Card!=null && Card.Params.ContainsKey(ParamType.Attack) ? Card.Params[ParamType.Attack] : 0);
+		PanelHealth.GetComponent<PanelValue>().Prepare(Card != null && Card.Params.ContainsKey(ParamType.Health) ? Card.Params[ParamType.Health] : 0);
+
+
+		CardImage.GetComponent<Image>().color = card != null && card.Cost > heroModel.ActualMana ? Color.black : Color.white;
+		//PanelCrystal.GetComponent<Image>().color = card != null && card.Cost > heroModel.ActualMana ? Color.black : Color.white;
+		PanelCrystal.GetComponent<PanelValue>().Text.GetComponent<Text>().color = card != null && card.Cost > heroModel.ActualMana ? Color.black : Color.white;
+	}
+
+	internal void PreviewModel(AvatarModel heroModel, AvatarModel target, bool friendly) {
+		Card c = target != null ? target.Card : null;
+		Prepare(heroModel, c);
+
+		//on board there is no color
+		ImageColor.SetActive(false);
+		PanelAttack.GetComponent<PanelValue>().Prepare(target!=null ? target.ActualAttack:0);
+		PanelHealth.GetComponent<PanelValue>().Prepare(target!=null ? target.ActualHealth:0);
+		PanelArmor.GetComponent<PanelValue>().Prepare(target != null ? target.Armor : 0);
+
+		if (target != null) {
+			CardImage.GetComponent<Image>().color = target.MovesLeft > 0 ? Color.white : Color.black;
+			CardImage.GetComponent<Image>().material = Image.defaultGraphicMaterial;
+
+			if (!friendly) {
+				CardImage.GetComponent<Image>().color = Color.red;
+				CardImage.GetComponent<Image>().material = SpriteManager.Font.material;
+			}
+		}
+	}
 }

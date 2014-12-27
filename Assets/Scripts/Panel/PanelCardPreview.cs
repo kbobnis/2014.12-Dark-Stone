@@ -3,69 +3,35 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public static class CardMethods {
-	
-	public static string Describe(this Card Card, AvatarModel heroOwner, bool shortV=false){
-		string text = "";
-		foreach (KeyValuePair<ParamType, int> kvp in Card.Params) {
-			if ((shortV || (kvp.Key != ParamType.Attack && kvp.Key != ParamType.Health)) && (kvp.Key != ParamType.Speed || kvp.Value != 1)) {
-
-				string value = ""+ kvp.Value;
-				if (kvp.Key == ParamType.DealDamageSpell && heroOwner.SpellDamageAdd() > 0) {
-					value = "*" + (heroOwner.SpellDamageAdd() + kvp.Value) + "*";
-				}
-				text += kvp.Key + ": " + value + ", ";
-			}
-		}
-		if (!shortV) {
-			text += "\n";
-		}
-		if (Card.CardTarget != CardTarget.JustThrow && Card.CardTarget != CardTarget.Self && Card.CardTarget != CardTarget.Empty) {
-			text += "Cast on: " + Card.CardTarget + ",\n";
-		}
-		if (Card.IsCastOn != IsCastOn.Target && Card.CardTarget != CardTarget.Empty) {
-			text += "Affects: " + Card.IsCastOn + ",\n";
-		}
-		
-		foreach (KeyValuePair<Effect, Card> kvp in Card.Effects) {
-			if (kvp.Key != Effect.WhileAlive) {
-				text += kvp.Key + ": ";
-			}
-			text += kvp.Value.Describe(heroOwner, true) + ", ";
-		}
-		if (!shortV) {
-			text += "\n";
-		}
-
-
-		if (Card.CardPersistency != CardPersistency.EveryActionRevalidate && Card.CardPersistency != CardPersistency.WhileHolderAlive && Card.CardPersistency != CardPersistency.Instant) {
-			text += Card.CardPersistency + ",";
-		}
-		return text;
-	}
-}
-
 public class PanelCardPreview : MonoBehaviour {
 
-	public GameObject PanelAvatar, PanelDetails;
+	public GameObject PanelAvatar, TextDescription, TextName;
 
-	internal void PreviewCard(AvatarModel hero, Card card, bool showCost) {
-		PanelAvatar.GetComponent<PanelAvatarCard>().Prepare(hero, card, showCost);
-		PanelDetails.GetComponentInChildren<Text>().text = card.Name + "\n" + card.Describe(hero);
+
+	public void PreviewCard(AvatarModel hero, Card card) {
+		PanelAvatar.GetComponent<PanelAvatarCard>().PreviewCardHand(hero, card);
+		TextName.GetComponent<Text>().text = card!=null?card.Name:"";
+		TextDescription.GetComponent<Text>().text = card!=null?card.Describe(hero):"";
 	}
 
 	internal void Preview(AvatarModel hero, AvatarModel targetModel) {
-		PreviewCard(hero, targetModel.Card, false);
-
+		Card tmp = targetModel != null ? targetModel.Card : null;
+		PreviewCard(hero, tmp);
+		
 		string effectsText = "";
-		foreach(CastedCard cc in targetModel.Effects){
-			effectsText += cc.Card.Name + "( ";
-			foreach(KeyValuePair<CastedCardParamType, int> kvp in cc.Params){
-				effectsText += kvp.Key + ": " + kvp.Value + ",";
+		if (targetModel != null) {
+			if (targetModel.Effects.Count > 0) {
+				effectsText += "\n effects: ";
 			}
-			effectsText += "),";
+			foreach (CastedCard cc in targetModel.Effects) {
+				effectsText += "( ";
+				foreach (KeyValuePair<CastedCardParamType, int> kvp in cc.Params) {
+					effectsText += kvp.Key + ": " + kvp.Value + ",";
+				}
+				effectsText += "),";
+			}
 		}
 
-		PanelDetails.GetComponentInChildren<Text>().text = targetModel.Card.Name + "\n" + targetModel.Card.Describe(hero) + "\n effects: " + effectsText;
+		TextDescription.GetComponent<Text>().text = tmp!=null?(tmp.Describe(hero) + effectsText):"";
 	}
 }

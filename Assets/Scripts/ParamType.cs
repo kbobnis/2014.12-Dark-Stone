@@ -18,4 +18,5 @@ public enum ParamType {
 	SpellDamageAdd,
 	ManaCrystalAdd,
 	ArmorAdd,
+	TakeControl,
 }
