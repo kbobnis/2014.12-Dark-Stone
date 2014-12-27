@@ -67,6 +67,7 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.Claw);
 		lasiaModel.Deck.Add(Card.GnomishInventor);
 		lasiaModel.Deck.Add(Card.ChillwindYeti);
+		lasiaModel.Deck.Add(Card.Sprint);
 		lasiaModel.Deck.Add(Card.Flamestrike);
 		lasiaModel.Deck.Add(Card.KoboldGeomancer);
 		lasiaModel.Deck.Add(Card.RockbiterWeapon);

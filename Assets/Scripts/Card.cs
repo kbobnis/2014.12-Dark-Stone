@@ -114,6 +114,7 @@ public class Card  {
 	public static readonly Card StormwindChampion = new Card("Stormwind Champion", 7, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 6 }, { ParamType.Speed, 1 }},
 		new Dictionary<Effect, Card>() {{Effect.WhileAlive, StormwindChampionsAura} });
 	public static readonly Card Flamestrike = new Card("Flamestrike", 7, CardPersistency.Instant, CardTarget.JustThrow, 0, IsCastOn.AllEnemyMinions, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 4 }});
+	public static readonly Card Sprint = new Card("Sprint", 7, CardPersistency.Instant, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.HeroDrawsCard, 4 } });
 	public static readonly Card IronbarkProtector = new Card("Ironbark Protector", 8, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 8 }, { ParamType.Health, 8 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect,Card>() {{ Effect.WhileAlive, PhysicalProtectionForAdjacent}});
 	public static readonly Card MindControl = new Card("Mind Control", 10, CardPersistency.Instant, CardTarget.EnemyMinion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.TakeControl, 1 } });
@@ -197,7 +198,7 @@ public class CastedCard {
 		}
 
 		if (c.Params.ContainsKey(ParamType.HeroDrawsCard)) {
-			Params.Add(CastedCardParamType.HeroDrawsCard, 1);
+			Params.Add(CastedCardParamType.HeroDrawsCard, c.Params[ParamType.HeroDrawsCard]);
 		}
 
 		if (c.Params.ContainsKey(ParamType.AttackAdd)) {
@@ -263,7 +264,9 @@ public class CastedCard {
 					Params.Remove(kvp.Key);
 					break;
 				case CastedCardParamType.HeroDrawsCard:
-					castingBy.GetMyHero().PullCardFromDeck();
+					for (int i = 0; i < kvp.Value; i++) {
+						castingBy.GetMyHero().PullCardFromDeck();
+					}
 					Params.Remove(kvp.Key);
 					break;
 				case CastedCardParamType.DealDamageSpell:
