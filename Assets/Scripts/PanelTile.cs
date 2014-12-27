@@ -90,13 +90,15 @@ public class PanelTile : MonoBehaviour {
 				break;
 			case IsCastOn.AllEnemyCharacters:
 				canIHave = onWhatModel != null && onWhatModel.GetMyHero() != casterModel.GetMyHero();
-					 
 				break;
 			case IsCastOn.OtherItsCharacters:
 				canIHave = onWhatModel!= null && onWhatModel != targetModel && targetModel.GetMyHero() == onWhatModel.GetMyHero();
 				break;
 			case IsCastOn.FriendlyHero:
 				canIHave = casterModel.GetMyHero() == onWhatModel;
+				break;
+			case IsCastOn.AllEnemyMinions:
+				canIHave = onWhatModel != null && onWhatModel.GetMyHero() != casterModel.GetMyHero() && onWhatModel.GetMyHero().IsItYourMinion(onWhatModel);
 				break;
 			default:
 				throw new NotImplementedException("Implement case: " + card.IsCastOn);

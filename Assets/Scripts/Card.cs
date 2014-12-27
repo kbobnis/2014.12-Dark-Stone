@@ -22,6 +22,7 @@ public enum IsCastOn {
 	AdjacentFriendlyMinions,
 	AdjacentFriendlyCharacters,
 	AllEnemyCharacters,
+	AllEnemyMinions,
 	OtherItsCharacters,
 	FriendlyHero
 }
@@ -112,6 +113,7 @@ public class Card  {
 	public static readonly Card StormwindChampionsAura = new Card("Stormwind Champions Aura", 2, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.OtherFriendlyMinions, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 1 }, { ParamType.HealthAdd, 1 } });
 	public static readonly Card StormwindChampion = new Card("Stormwind Champion", 7, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 6 }, { ParamType.Speed, 1 }},
 		new Dictionary<Effect, Card>() {{Effect.WhileAlive, StormwindChampionsAura} });
+	public static readonly Card Flamestrike = new Card("Flamestrike", 7, CardPersistency.Instant, CardTarget.JustThrow, 0, IsCastOn.AllEnemyMinions, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 4 }});
 	public static readonly Card IronbarkProtector = new Card("Ironbark Protector", 8, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 8 }, { ParamType.Health, 8 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect,Card>() {{ Effect.WhileAlive, PhysicalProtectionForAdjacent}});
 	public static readonly Card MindControl = new Card("Mind Control", 10, CardPersistency.Instant, CardTarget.EnemyMinion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.TakeControl, 1 } });
