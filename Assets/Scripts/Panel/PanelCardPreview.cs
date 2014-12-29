@@ -8,7 +8,7 @@ public class PanelCardPreview : MonoBehaviour {
 	public GameObject PanelAvatar, TextDescription, TextName;
 
 
-	public void PreviewCard(AvatarModel hero, Card card) {
+	public void PreviewCard(AvatarModel hero, Card card, bool withEffects=false) {
 		PanelAvatar.GetComponent<PanelAvatarCard>().PreviewCardHand(hero, card);
 		TextName.GetComponent<Text>().text = card!=null?card.Name:"";
 		TextDescription.GetComponent<Text>().text = card!=null?card.Describe(hero):"";

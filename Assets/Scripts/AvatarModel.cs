@@ -76,6 +76,8 @@ public class AvatarModel {
 		OnBoard = onBoard;
 
 		ActualHealth = card.Params[ParamType.Health];
+
+		//adding taunt effect if needed to
 	}
 
 	public int ActualHealth {
@@ -199,7 +201,9 @@ public class AvatarModel {
 			castingOn = new AvatarModel(c, true, this);
 			//minions will be a flat structure. there is no need for deep one. 
 			owner.Minions.Add(castingOn);
-		} else {
+		} 
+		
+		{
 			//check if there is already an effect like this and marked to remove. we will unmark it
 			bool foundTheSame = false;
 			foreach (CastedCard cc in castingOn.Effects) {
@@ -212,7 +216,6 @@ public class AvatarModel {
 
 			if (!foundTheSame) {
 				CastedCard castedCard = new CastedCard(this, castingOn, c);
-				
 
 				if (c.CardPersistency != CardPersistency.Instant) {
 					Debug.Log("Casting " + c.Name + " on " + castingOn.Card.Name);	
