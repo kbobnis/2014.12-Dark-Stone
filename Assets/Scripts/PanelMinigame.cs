@@ -61,9 +61,9 @@ public class PanelMinigame : MonoBehaviour {
 		
 		PanelAvatar lasiaAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[3 * 5 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel lasiaModel = lasiaAvatar.Model;
-		lasiaModel.Deck.Add(Card.WildGrowth);
 		lasiaModel.Deck.Add(Card.Moonfire);
 		lasiaModel.Deck.Add(Card.MurlocTidehunter);
+		lasiaModel.Deck.Add(Card.HealingTouch);
 		lasiaModel.Deck.Add(Card.Innervate);
 		lasiaModel.Deck.Add(Card.MarkOfTheWild);
 		lasiaModel.Deck.Add(Card.IronfurGrizzly);
