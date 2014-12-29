@@ -290,9 +290,7 @@ public class AvatarModel {
 		return add;
 	}
 
-	public bool IsFriendly(AvatarModel avatarModel) {
-		bool isFriendly = GetMyHero().IsItYourMinion(avatarModel) || GetMyHero() == avatarModel;
-		Debug.Log(Card.Name + " Is friendly to " + avatarModel.Card.Name + "("+(isFriendly?"yes":"no")+") is it his minion? " + (GetMyHero().IsItYourMinion(avatarModel) ? "yes" : "no") + " is it me? " + (GetMyHero() == avatarModel?"yes":"no"));
-		return isFriendly;
+	public bool IsFriendlyCharacter(AvatarModel avatarModel) {
+		return GetMyHero().IsItYourMinion(avatarModel) || GetMyHero() == avatarModel;
 	}
 }

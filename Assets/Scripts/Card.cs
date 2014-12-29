@@ -24,7 +24,8 @@ public enum IsCastOn {
 	AllEnemyCharacters,
 	AllEnemyMinions,
 	OtherItsCharacters,
-	FriendlyHero
+	FriendlyHero,
+	AllFriendlyCharacters
 }
 public enum CardPersistency {
 	Minion, UntilEndTurn, WhileHolderAlive, Instant, Hero, EveryActionRevalidate
@@ -89,7 +90,8 @@ public class Card  {
 	public static readonly Card ShatteredSunClericBlessing = new Card("Shattered Sun Cleric Blessing", 0, CardPersistency.WhileHolderAlive, CardTarget.OtherFriendlyMinion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.HealthAdd, 1 }, { ParamType.AttackAdd, 1 } });	
 	public static readonly Card ShatteredSunCleric = new Card("Shattered Sun Cleric", 3, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 2 }, { ParamType.Attack, 3 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, ShatteredSunClericBlessing } });
-	public static readonly Card HealingTouch= new Card("Healing Touch", 3, CardPersistency.Instant, CardTarget.Character, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Heal, 8 } });	
+	public static readonly Card HealingTouch= new Card("Healing Touch", 3, CardPersistency.Instant, CardTarget.Character, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Heal, 8 } });
+	public static readonly Card SavageRoar= new Card("Savage Roar", 3, CardPersistency.UntilEndTurn, CardTarget.JustThrow, 0, IsCastOn.AllFriendlyCharacters, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 2 } });	
 	public static readonly Card Hex = new Card("Hex", 3, CardPersistency.Minion, CardTarget.Minion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.ReplaceExisting, 1}, { ParamType.Health, 1 }, {ParamType.Speed, 1} });
 	public static readonly Card IronfurGrizzly = new Card("Ironfur Grizzly", 3, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 3 }, { ParamType.Attack, 3 }, { ParamType.Speed, 1 }, {ParamType.Taunt, 1}});
 	public static readonly Card RazorfensBoar = new Card("Razorfens Boar", 1, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, { ParamType.Speed, 1 } });		

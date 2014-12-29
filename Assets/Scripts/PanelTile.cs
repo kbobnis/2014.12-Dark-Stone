@@ -100,6 +100,9 @@ public class PanelTile : MonoBehaviour {
 			case IsCastOn.AllEnemyMinions:
 				canIHave = onWhatModel != null && onWhatModel.GetMyHero() != casterModel.GetMyHero() && onWhatModel.GetMyHero().IsItYourMinion(onWhatModel);
 				break;
+			case IsCastOn.AllFriendlyCharacters:
+				canIHave = onWhatModel != null && casterModel.IsFriendlyCharacter(onWhatModel);
+				break;
 			default:
 				throw new NotImplementedException("Implement case: " + card.IsCastOn);
 		}
@@ -115,7 +118,7 @@ public class PanelTile : MonoBehaviour {
 		foreach (Side s in SideMethods.AllSides()) {
 			if (Neighbours.ContainsKey(s)) {
 				AvatarModel m = Neighbours[s].PanelAvatar.GetComponent<PanelAvatar>().Model;
-				if (m != null && !m.IsFriendly(PanelAvatar.GetComponent<PanelAvatar>().Model)) {
+				if (m != null && !m.IsFriendlyCharacter(PanelAvatar.GetComponent<PanelAvatar>().Model)) {
 					foreach (CastedCard cc in m.Effects) {
 						if (cc.Params.ContainsKey(CastedCardParamType.Taunt)) {
 							Debug.Log("Found taunt on " + m.Card.Name);
@@ -135,7 +138,7 @@ public class PanelTile : MonoBehaviour {
 				if (whereMove.PanelAvatar.GetComponent<PanelAvatar>().Model == null) {
 					whereMove.PanelInteraction.GetComponent<PanelInteraction>().CanMoveHere(this);
 					canMove = true;
-				} else if (!PanelAvatar.GetComponent<PanelAvatar>().Model.IsFriendly(whereMove.PanelAvatar.GetComponent<PanelAvatar>().Model)
+				} else if (!PanelAvatar.GetComponent<PanelAvatar>().Model.IsFriendlyCharacter(whereMove.PanelAvatar.GetComponent<PanelAvatar>().Model)
 						&& am.ActualAttack > 0 
 						&& (!foundTaunt || whereTaunts.Contains(s))) {
 					whereMove.PanelInteraction.GetComponent<PanelInteraction>().CanAttackHere(this);
