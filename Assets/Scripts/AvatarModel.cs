@@ -137,7 +137,7 @@ public class AvatarModel {
 		_ActualMana = MaxMana;
 	}
 
-	private void RefillMovements() {
+	public void RefillMovements() {
 		int speed = Card.Params[ParamType.Speed];
 
 		_MovesLeft = speed;

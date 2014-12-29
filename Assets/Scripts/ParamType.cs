@@ -20,4 +20,5 @@ public enum ParamType {
 	ArmorAdd,
 	TakeControl,
 	Taunt,
+	Charge,
 }
