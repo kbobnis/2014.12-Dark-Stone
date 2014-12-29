@@ -35,10 +35,9 @@ public class PanelAvatarCard : MonoBehaviour {
 		PanelAttack.GetComponent<PanelValue>().Prepare(Card!=null && Card.Params.ContainsKey(ParamType.Attack) ? Card.Params[ParamType.Attack] : 0);
 		PanelHealth.GetComponent<PanelValue>().Prepare(Card != null && Card.Params.ContainsKey(ParamType.Health) ? Card.Params[ParamType.Health] : 0);
 
-
-		CardImage.GetComponent<Image>().color = card != null && card.Cost > heroModel.ActualMana ? Color.black : Color.white;
+		CardImage.GetComponent<Image>().color = card != null && heroModel != null && card.Cost > heroModel.ActualMana ? Color.black : Color.white;
 		//PanelCrystal.GetComponent<Image>().color = card != null && card.Cost > heroModel.ActualMana ? Color.black : Color.white;
-		PanelCrystal.GetComponent<PanelValue>().Text.GetComponent<Text>().color = card != null && card.Cost > heroModel.ActualMana ? Color.black : Color.white;
+		//PanelCrystal.GetComponent<PanelValue>().Text.GetComponent<Text>().color = card != null && heroModel != null && card.Cost > heroModel.ActualMana ? Color.black : Color.white;
 	}
 
 	internal void PreviewModel(AvatarModel heroModel, AvatarModel target, bool friendly) {

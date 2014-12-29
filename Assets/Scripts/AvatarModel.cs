@@ -273,4 +273,8 @@ public class AvatarModel {
 		}
 		return add;
 	}
+
+	public bool IsFriendly(AvatarModel avatarModel) {
+		return GetMyHero().IsItYourMinion(avatarModel) || GetMyHero() == avatarModel;
+	}
 }

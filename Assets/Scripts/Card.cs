@@ -65,6 +65,7 @@ public class Card  {
 		IsCastOn = cardIsCastOn;
 	}
 
+	public static readonly Card Moonfire = new Card("Moonfire", 0, CardPersistency.Instant, CardTarget.Character, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 1 } });
 	public static readonly Card Innervate = new Card("Innervate", 0, CardPersistency.UntilEndTurn, CardTarget.JustThrow, 0, IsCastOn.FriendlyHero, new Dictionary<ParamType, int>() { {ParamType.ManaCrystalAdd, 2} });
 	public static readonly Card Wisp = new Card("Wisp", 0, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, {ParamType.Speed, 1}});
 	public static readonly Card ClawsArmor = new Card("Claws Armor", 0, CardPersistency.WhileHolderAlive, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.ArmorAdd, 2} });
@@ -72,6 +73,7 @@ public class Card  {
 		new Dictionary<Effect,Card>() { { Effect.Battlecry, ClawsArmor} });
 	public static readonly Card RockbiterWeapon = new Card("Rockbiter Weapon", 1, CardPersistency.UntilEndTurn, CardTarget.FriendlyMinion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 3 } });
 	public static readonly Card FlametongueTotemAura = new Card("Flametongue Totem Aura", 1, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.AdjacentFriendlyMinions, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 2 } });
+	public static readonly Card MarkOfTheWild = new Card("Mark of the Wild", 2, CardPersistency.WhileHolderAlive, CardTarget.Minion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 2 }, { ParamType.HealthAdd, 2 }, { ParamType.Taunt, 1 } });
 	public static readonly Card FlametongueTotem= new Card("Flametongue Totem", 2, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.Health, 3}, {ParamType.Speed, 1} },
 		new Dictionary<Effect,Card>() { {Effect.WhileAlive, FlametongueTotemAura} });
 	public static readonly Card Thrallmar = new Card("Thrallmar", 2, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 3 }, { ParamType.Attack, 2 }, { ParamType.Speed, 2 } });
@@ -86,9 +88,7 @@ public class Card  {
 	public static readonly Card ShatteredSunCleric = new Card("Shattered Sun Cleric", 3, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 2 }, { ParamType.Attack, 3 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, ShatteredSunClericBlessing } });
 	public static readonly Card Hex = new Card("Hex", 3, CardPersistency.Minion, CardTarget.Minion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.ReplaceExisting, 1}, { ParamType.Health, 1 }, {ParamType.Speed, 1} });
-	public static readonly Card PhysicalProtectionForAdjacent = new Card("Physical Protection for Adjacent", 1, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.AdjacentFriendlyCharacters, new Dictionary<ParamType, int>() { { ParamType.PhysicalProtection, 1 } });
-	public static readonly Card IronfurGrizzly = new Card("Ironfur Grizzly", 3, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 3 }, { ParamType.Attack, 3 }, { ParamType.Speed, 1 }},
-		new Dictionary<Effect,Card>() { { Effect.WhileAlive, PhysicalProtectionForAdjacent}});		
+	public static readonly Card IronfurGrizzly = new Card("Ironfur Grizzly", 3, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 3 }, { ParamType.Attack, 3 }, { ParamType.Speed, 1 }, {ParamType.Taunt, 1}});
 	public static readonly Card RazorfensBoar = new Card("Razorfens Boar", 1, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, { ParamType.Speed, 1 } });		
 	public static readonly Card RazorfenHunter = new Card("Razorfen Hunter", 3, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 3 }, {ParamType.Attack, 2}, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, RazorfensBoar} });
@@ -99,8 +99,7 @@ public class Card  {
 	public static readonly Card Swipe = new Card("Swipe", 4, CardPersistency.Instant, CardTarget.EnemyCharacter, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 4 } },
 		new Dictionary<Effect,Card>() { { Effect.Battlecry, SwipeRicochet } });
 	public static readonly Card ChillwindYeti = new Card("Chillwind Yeti", 4, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 5 }, { ParamType.Attack, 4 }, { ParamType.Speed, 1 } });
-	public static readonly Card SenjinShieldmasta= new Card("Senjin Shieldmasta", 4, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 5 }, { ParamType.Attack, 3 }, { ParamType.Speed, 1 } },
-		new Dictionary<Effect, Card>() { { Effect.WhileAlive, PhysicalProtectionForAdjacent } });
+	public static readonly Card SenjinShieldmasta = new Card("Senjin Shieldmasta", 4, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 5 }, { ParamType.Attack, 3 }, { ParamType.Speed, 1 }, { ParamType.Taunt, 1 } });
 	public static readonly Card FrostwolfCall = new Card("Frostwolf Call", 1, CardPersistency.WhileHolderAlive, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAddOfOtherFriendlyMinionNumber, 1 }, { ParamType.HealthAddOfOtherFriendlyMinionNumber, 1 } });
 	public static readonly Card FrostwolfWarlord = new Card("Frostwolf Warlord", 5, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 4 }, { ParamType.Attack, 4 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, FrostwolfCall} } );
@@ -116,8 +115,7 @@ public class Card  {
 	public static readonly Card Flamestrike = new Card("Flamestrike", 7, CardPersistency.Instant, CardTarget.JustThrow, 0, IsCastOn.AllEnemyMinions, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 4 }});
 	public static readonly Card Sprint = new Card("Sprint", 7, CardPersistency.Instant, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.HeroDrawsCard, 4 } });
 	public static readonly Card CoreHound = new Card("Core Hound", 7, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 9 }, {ParamType.Health, 5}, {ParamType.Speed, 1} });
-	public static readonly Card IronbarkProtector = new Card("Ironbark Protector", 8, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 8 }, { ParamType.Health, 8 }, { ParamType.Speed, 1 } },
-		new Dictionary<Effect,Card>() {{ Effect.WhileAlive, PhysicalProtectionForAdjacent}});
+	public static readonly Card IronbarkProtector = new Card("Ironbark Protector", 8, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 8 }, { ParamType.Health, 8 }, { ParamType.Speed, 1 }, { ParamType.Taunt, 1 } });
 	public static readonly Card MindControl = new Card("Mind Control", 10, CardPersistency.Instant, CardTarget.EnemyMinion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.TakeControl, 1 } });
 
 	//heroes
@@ -168,8 +166,8 @@ public class Card  {
 
 public enum CastedCardParamType {
 	AttackAdd,
-	HealthAdd, //this includes max health
-	PhysicalProtection, //can not be targeted with physical attack
+	HealthAdd, //this includes max health increase
+	Taunt,
 
 	//instants -> will be removed after dealing instants
 	DealDamage,
@@ -217,8 +215,8 @@ public class CastedCard {
 			Params.Add(CastedCardParamType.AttackAdd, AvatarModel.MyMinionsNumber(castingOn.GetMyHero()) - 1); //because itself doesn't count and its already casted
 		}
 
-		if (c.Params.ContainsKey(ParamType.PhysicalProtection)) {
-			Params.Add(CastedCardParamType.PhysicalProtection, 1);
+		if (c.Params.ContainsKey(ParamType.Taunt)) {
+			Params.Add(CastedCardParamType.Taunt, c.Params[ParamType.Taunt]);
 		}
 
 		if (c.Params.ContainsKey(ParamType.SpellDamageAdd)) {

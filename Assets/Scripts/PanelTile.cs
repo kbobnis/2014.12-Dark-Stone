@@ -7,7 +7,7 @@ using System;
 
 public class PanelTile : MonoBehaviour {
 
-	public GameObject PanelMinigame, PanelAvatar, PanelInteraction, PanelAvatarCardPrefab;
+	public GameObject PanelAvatar, PanelInteraction, PanelAvatarCardPrefab;
 	public WhereAmI WhereAmI;
 
 	public void Create(int row, int column, WhereAmI whereAmI) {
@@ -30,10 +30,10 @@ public class PanelTile : MonoBehaviour {
 		try {
 			switch (WhereAmI) {
 				case global::WhereAmI.Board:
-					PanelMinigame.GetComponent<PanelMinigame>().PointerDownOn(this);
+					PanelMinigame.Me.GetComponent<PanelMinigame>().PointerDownOn(this);
 					break;
 				case global::WhereAmI.Hand:
-					PanelMinigame.GetComponent<PanelMinigame>().CardInHandSelected(PanelAvatar.GetComponent<PanelAvatar>().PanelAvatarCard.GetComponent<PanelAvatarCard>().Card);
+					PanelMinigame.Me.GetComponent<PanelMinigame>().CardInHandSelected(PanelAvatar.GetComponent<PanelAvatar>().PanelAvatarCard.GetComponent<PanelAvatarCard>().Card);
 					break;
 				default:
 					throw new NotImplementedException("Not implemented");
@@ -105,6 +105,48 @@ public class PanelTile : MonoBehaviour {
 		}
 		return canIHave;
 	}
+
+	public bool SetInteractionToMoveAround() {
+		bool canMove = false;
+
+		//check for adjacent taunt
+		bool foundTaunt = false;
+		List<Side> whereTaunts = new List<Side>();
+		foreach (Side s in SideMethods.AllSides()) {
+			if (Neighbours.ContainsKey(s)) {
+				AvatarModel m = Neighbours[s].PanelAvatar.GetComponent<PanelAvatar>().Model;
+				if (m != null && !m.IsFriendly(PanelAvatar.GetComponent<PanelAvatar>().Model)) {
+					foreach (CastedCard cc in m.Effects) {
+						if (cc.Params.ContainsKey(CastedCardParamType.Taunt)) {
+							Debug.Log("Found taunt on " + m.Card.Name);
+							foundTaunt = true;
+							whereTaunts.Add(s);
+						}
+					}
+				}
+			}
+		}
+
+		AvatarModel am = PanelAvatar.GetComponent<PanelAvatar>().Model;
+		foreach (Side s in SideMethods.AllSides()) {
+			if (Neighbours.ContainsKey(s)) {
+				PanelTile whereMove = Neighbours[s];
+				
+				if (whereMove.PanelAvatar.GetComponent<PanelAvatar>().Model == null) {
+					whereMove.PanelInteraction.GetComponent<PanelInteraction>().CanMoveHere(this);
+					canMove = true;
+				} else if (!PanelAvatar.GetComponent<PanelAvatar>().Model.IsFriendly(whereMove.PanelAvatar.GetComponent<PanelAvatar>().Model)
+						&& whereMove.PanelAvatar.GetComponent<PanelAvatar>().Model.ActualAttack > 0 
+						&& (!foundTaunt || whereTaunts.Contains(s))) {
+					whereMove.PanelInteraction.GetComponent<PanelInteraction>().CanAttackHere(this);
+					canMove = true;
+				}
+			}
+		}
+
+		return canMove;
+	}
+
 
 
 }

@@ -13,10 +13,10 @@ public enum ParamType {
 	Speed,
 	Heal,
 	HeroDrawsCard,
-	PhysicalProtection,
 	ReplaceExisting,
 	SpellDamageAdd,
 	ManaCrystalAdd,
 	ArmorAdd,
 	TakeControl,
+	Taunt
 }

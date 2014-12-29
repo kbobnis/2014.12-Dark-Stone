@@ -27,20 +27,12 @@ public class PanelAvatar : MonoBehaviour {
 			_Model = null;
 		}
 
-		bool hasPhysicalProtection = false;
-		if (Model != null) {
-			foreach (CastedCard cc in Model.Effects) {
-				if (cc.Params.ContainsKey(CastedCardParamType.PhysicalProtection)) {
-					hasPhysicalProtection = true;
-				}
-			}
-		}
-		ImageProtection.SetActive(hasPhysicalProtection);
+		ImageProtection.SetActive(false);
 
 		bool hasTaunt = false;
 		if (Model != null) {
-			foreach (KeyValuePair<Effect, Card> kvp in Model.Card.Effects) {
-				if (kvp.Value.Params.ContainsKey(ParamType.PhysicalProtection)) {
+			foreach (CastedCard cc in Model.Effects) {
+				if (cc.Params.ContainsKey(CastedCardParamType.Taunt)) {
 					hasTaunt = true;
 				}
 			}

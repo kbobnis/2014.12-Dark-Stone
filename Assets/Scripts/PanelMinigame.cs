@@ -61,8 +61,10 @@ public class PanelMinigame : MonoBehaviour {
 		
 		PanelAvatar lasiaAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[3 * 5 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel lasiaModel = lasiaAvatar.Model;
+		lasiaModel.Deck.Add(Card.Moonfire);
 		lasiaModel.Deck.Add(Card.MurlocTidehunter);
 		lasiaModel.Deck.Add(Card.Innervate);
+		lasiaModel.Deck.Add(Card.MarkOfTheWild);
 		lasiaModel.Deck.Add(Card.IronfurGrizzly);
 		lasiaModel.Deck.Add(Card.Claw);
 		lasiaModel.Deck.Add(Card.GnomishInventor);
@@ -173,41 +175,6 @@ public class PanelMinigame : MonoBehaviour {
 	}
 
 
-	private bool SetInteractionToMoveAround(PanelTile mover, PanelTile panelTile, Side s, int distance) {
-		bool atLeastOneTile = false;
-		if (distance > 0) {
-			if (panelTile.Neighbours.ContainsKey(s)) {
-				if (SetInteractionToMoveAround(mover, panelTile.Neighbours[s], s, distance - 1)) {
-					atLeastOneTile = true;
-				}
-			}
-		} else {
-			
-			AvatarModel am = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
-			if (am != null) {
-
-				bool hasPhysicalProtection = false;
-
-				foreach (CastedCard cc in am.Effects) {
-					if (cc.Params.ContainsKey(CastedCardParamType.PhysicalProtection)) {
-						hasPhysicalProtection = true;
-						break;
-					}
-				}
-
-				//can not attack your own minions nor with physical protection
-				if (!hasPhysicalProtection && !ActualTurnModel.IsItYourMinion(panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model) && ActualTurnModel != panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model && mover.PanelAvatar.GetComponent<PanelAvatar>().Model.ActualAttack > 0) {
-					panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanAttackHere(mover);
-					atLeastOneTile = true;
-				}
-
-			} else if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model == null){
-				panelTile.PanelInteraction.GetComponent<PanelInteraction>().CanMoveHere(mover);
-				atLeastOneTile = true;
-			}
-		}
-		return atLeastOneTile;
-	}
 
 	internal void PointerDownOn(PanelTile panelTile) {
 		Debug.Log("pointer down on: " + panelTile.gameObject.name);
@@ -243,11 +210,9 @@ public class PanelMinigame : MonoBehaviour {
 						if (targetModel.MovesLeft <= 0) {
 							//PanelInformation.GetComponent<PanelInformation>().SetText("No moves left");
 						} else {
-							//preparing interaction panels for moves
-							foreach (Side s in SideMethods.AllSides()) {
-								if (SetInteractionToMoveAround(panelTile, panelTile, s, 1)) {
-									Mode = Mode.MovingOrAttacking;
-								}
+
+							if (panelTile.SetInteractionToMoveAround()) {
+								Mode = global::Mode.MovingOrAttacking;
 							}
 						}
 					}
@@ -320,6 +285,7 @@ public class PanelMinigame : MonoBehaviour {
 						CastSpell(panelTile, battlecryCard, panelTile, pi.Caster, explicitly, 0);
 					}
 					if (whatCard.Effects.ContainsKey(Effect.WhileAlive) && whatCard.Effects[Effect.WhileAlive].CardPersistency == CardPersistency.WhileHolderAlive) {
+						Debug.Log("There is while alive for " + whatCard.Name);
 						Card whileAliveEffect = whatCard.Effects[Effect.WhileAlive];
 						CastSpell(panelTile, whileAliveEffect, pi.Caster, pi.Caster, true, 0);
 					}
