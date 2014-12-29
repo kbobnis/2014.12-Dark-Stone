@@ -136,7 +136,7 @@ public class PanelTile : MonoBehaviour {
 					whereMove.PanelInteraction.GetComponent<PanelInteraction>().CanMoveHere(this);
 					canMove = true;
 				} else if (!PanelAvatar.GetComponent<PanelAvatar>().Model.IsFriendly(whereMove.PanelAvatar.GetComponent<PanelAvatar>().Model)
-						&& whereMove.PanelAvatar.GetComponent<PanelAvatar>().Model.ActualAttack > 0 
+						&& am.ActualAttack > 0 
 						&& (!foundTaunt || whereTaunts.Contains(s))) {
 					whereMove.PanelInteraction.GetComponent<PanelInteraction>().CanAttackHere(this);
 					canMove = true;

@@ -65,6 +65,7 @@ public class Card  {
 		IsCastOn = cardIsCastOn;
 	}
 
+
 	public static readonly Card Moonfire = new Card("Moonfire", 0, CardPersistency.Instant, CardTarget.Character, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 1 } });
 	public static readonly Card Innervate = new Card("Innervate", 0, CardPersistency.UntilEndTurn, CardTarget.JustThrow, 0, IsCastOn.FriendlyHero, new Dictionary<ParamType, int>() { {ParamType.ManaCrystalAdd, 2} });
 	public static readonly Card Wisp = new Card("Wisp", 0, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, {ParamType.Speed, 1}});
@@ -73,6 +74,7 @@ public class Card  {
 		new Dictionary<Effect,Card>() { { Effect.Battlecry, ClawsArmor} });
 	public static readonly Card RockbiterWeapon = new Card("Rockbiter Weapon", 1, CardPersistency.UntilEndTurn, CardTarget.FriendlyMinion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 3 } });
 	public static readonly Card FlametongueTotemAura = new Card("Flametongue Totem Aura", 1, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.AdjacentFriendlyMinions, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 2 } });
+	public static readonly Card WildGrowth = new Card("Wild Growth", 2, CardPersistency.WhileHolderAlive, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.ManaCrystalEmptyAdd, 1 } });
 	public static readonly Card MarkOfTheWild = new Card("Mark of the Wild", 2, CardPersistency.WhileHolderAlive, CardTarget.Minion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 2 }, { ParamType.HealthAdd, 2 }, { ParamType.Taunt, 1 } });
 	public static readonly Card FlametongueTotem= new Card("Flametongue Totem", 2, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.Health, 3}, {ParamType.Speed, 1} },
 		new Dictionary<Effect,Card>() { {Effect.WhileAlive, FlametongueTotemAura} });
@@ -177,6 +179,7 @@ public enum CastedCardParamType {
 	DealDamageSpell,
 	ManaCrystalAdd,
 	ArmorAdd,
+	ManaCrystalEmptyAdd,
 }
 
 public class CastedCard {
@@ -229,6 +232,10 @@ public class CastedCard {
 
 		if (c.Params.ContainsKey(ParamType.ManaCrystalAdd)) {
 			Params.Add(CastedCardParamType.ManaCrystalAdd, c.Params[ParamType.ManaCrystalAdd]);
+		}
+
+		if (c.Params.ContainsKey(ParamType.ManaCrystalEmptyAdd)) {
+			Params.Add(CastedCardParamType.ManaCrystalEmptyAdd, c.Params[ParamType.ManaCrystalEmptyAdd]);
 		}
 
 		if (c.Params.ContainsKey(ParamType.ArmorAdd)) {

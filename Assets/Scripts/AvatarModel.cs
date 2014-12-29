@@ -48,6 +48,21 @@ public class AvatarModel {
 		}
 	}
 
+	public int MaxMana {
+		get {
+			int actual = _MaxMana;
+			foreach (CastedCard c in Effects) {
+				if (c.Params.ContainsKey(CastedCardParamType.ManaCrystalAdd)) {
+					actual += c.Params[CastedCardParamType.ManaCrystalAdd];
+				}
+				if (c.Params.ContainsKey(CastedCardParamType.ManaCrystalEmptyAdd)) {
+					actual += c.Params[CastedCardParamType.ManaCrystalEmptyAdd];
+				}
+			}
+			return actual; 
+		}
+	}
+
 	public AvatarModel Creator {
 		get { return _Creator; }
 		set { _Creator = value; }
@@ -114,12 +129,10 @@ public class AvatarModel {
 		}
 	}
 
-	public int MaxMana {
-		get { return _MaxMana; }
-	}
+
 
 	private void RefillCrystals() {
-		_ActualMana = _MaxMana;
+		_ActualMana = MaxMana;
 	}
 
 	private void RefillMovements() {
@@ -275,6 +288,8 @@ public class AvatarModel {
 	}
 
 	public bool IsFriendly(AvatarModel avatarModel) {
-		return GetMyHero().IsItYourMinion(avatarModel) || GetMyHero() == avatarModel;
+		bool isFriendly = GetMyHero().IsItYourMinion(avatarModel) || GetMyHero() == avatarModel;
+		Debug.Log(Card.Name + " Is friendly to " + avatarModel.Card.Name + "("+(isFriendly?"yes":"no")+") is it his minion? " + (GetMyHero().IsItYourMinion(avatarModel) ? "yes" : "no") + " is it me? " + (GetMyHero() == avatarModel?"yes":"no"));
+		return isFriendly;
 	}
 }

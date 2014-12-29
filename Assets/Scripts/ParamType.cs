@@ -16,7 +16,8 @@ public enum ParamType {
 	ReplaceExisting,
 	SpellDamageAdd,
 	ManaCrystalAdd,
+	ManaCrystalEmptyAdd,
 	ArmorAdd,
 	TakeControl,
-	Taunt
+	Taunt,
 }
