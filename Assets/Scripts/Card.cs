@@ -110,6 +110,7 @@ public class Card  {
 	public static readonly Card RazorfensBoar = new Card("Razorfens Boar", 1, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, { ParamType.Speed, 1 } });		
 	public static readonly Card RazorfenHunter = new Card("Razorfen Hunter", 3, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 3 }, {ParamType.Attack, 2}, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, RazorfensBoar} });
+	public static readonly Card DalaranMage = new Card("Dalaran Mage", 3, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 4 }, { ParamType.Attack, 1 }, { ParamType.Speed, 1 }, { ParamType.SpellDamageAdd, 1 } });
 	public static readonly Card GnomishInventor = new Card("Gnomish Inventor", 4, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 4 }, { ParamType.Attack, 2 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, GnomishInvention } });
 	public static readonly Card SwipeRicochet = new Card("Swipe Ricochet", 1, CardPersistency.Instant, CardTarget.Self, 0, IsCastOn.OtherItsCharacters, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 1 } });
