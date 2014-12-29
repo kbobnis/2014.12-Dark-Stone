@@ -114,6 +114,9 @@ public class Card  {
 	public static readonly Card IronforgeRifleman = new Card("Ironforge Rifleman", 3, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 2}, { ParamType.Attack, 2 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect,Card>() { { Effect.Battlecry, ElvenShot }} );
 	public static readonly Card MagmaRager = new Card("Magma Rager", 3, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 5 }, { ParamType.Speed, 1 }  });
+	public static readonly Card RaidLeaderAura = new Card("Raid Leader Aura", 1, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.AllFriendlyMinions, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 1 } });
+	public static readonly Card RaidLeader = new Card("Raid Leader", 3, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 2 }, { ParamType.Health, 2 }, { ParamType.Speed, 1 } },
+		new Dictionary<Effect,Card>() { { Effect.WhileAlive, RaidLeaderAura }} );
 	public static readonly Card GnomishInventor = new Card("Gnomish Inventor", 4, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 4 }, { ParamType.Attack, 2 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, GnomishInvention } });
 	public static readonly Card SwipeRicochet = new Card("Swipe Ricochet", 1, CardPersistency.Instant, CardTarget.Self, 0, IsCastOn.OtherItsCharacters, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 1 } });
