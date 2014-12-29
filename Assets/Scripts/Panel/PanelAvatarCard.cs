@@ -23,7 +23,7 @@ public class PanelAvatarCard : MonoBehaviour {
 		//minion has green background
 		ImageColor.GetComponent<Image>().color = (card!=null&&card.CardPersistency.IsCharacter()) ? Color.green : Color.red;
 		//minion has oval
-		ImageOval.SetActive(card!=null && Card.CardPersistency.IsCharacter());
+		//ImageOval.SetActive(card!=null && Card.CardPersistency.IsCharacter());
 
 		CardImage.GetComponent<Image>().sprite = card != null?card.Animation:null;
 	}

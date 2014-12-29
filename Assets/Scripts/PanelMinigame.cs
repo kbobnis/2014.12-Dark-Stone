@@ -63,6 +63,8 @@ public class PanelMinigame : MonoBehaviour {
 		AvatarModel lasiaModel = lasiaAvatar.Model;
 		lasiaModel.Deck.Add(Card.StonetuskBoar);
 		lasiaModel.Deck.Add(Card.RiverCrocolisk);
+		lasiaModel.Deck.Add(Card.MagmaRager);
+		lasiaModel.Deck.Add(Card.IronforgeRifleman);
 		lasiaModel.Deck.Add(Card.NoviceEngineer);
 		lasiaModel.Deck.Add(Card.Moonfire);
 		lasiaModel.Deck.Add(Card.DalaranMage);
