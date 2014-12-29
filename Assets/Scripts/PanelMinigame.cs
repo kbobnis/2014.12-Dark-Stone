@@ -62,6 +62,7 @@ public class PanelMinigame : MonoBehaviour {
 		PanelAvatar lasiaAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[3 * 5 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel lasiaModel = lasiaAvatar.Model;
 		lasiaModel.Deck.Add(Card.StonetuskBoar);
+		lasiaModel.Deck.Add(Card.RiverCrocolisk);
 		lasiaModel.Deck.Add(Card.NoviceEngineer);
 		lasiaModel.Deck.Add(Card.Moonfire);
 		lasiaModel.Deck.Add(Card.FrostwolfGrunt);
