@@ -67,6 +67,7 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.StormwindKnight);
 		lasiaModel.Deck.Add(Card.StormpikeCommando);
 		lasiaModel.Deck.Add(Card.RecklessRocketeer);
+		lasiaModel.Deck.Add(Card.WarGolem);
 		lasiaModel.Deck.Add(Card.Nightblade);
 		lasiaModel.Deck.Add(Card.LordOfTheArena);
 		lasiaModel.Deck.Add(Card.Archmage);
