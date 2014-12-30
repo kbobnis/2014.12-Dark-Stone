@@ -158,6 +158,7 @@ public class Card  {
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, FireElementalsFireball } });
 	public static readonly Card BoulderfishOgre = new Card("Boulderfist Ogre", 6, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 7 }, { ParamType.Speed, 1 } });
 	public static readonly Card Starfire = new Card("Starfire", 6, CardPersistency.Instant, CardTarget.Character, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 5 }, { ParamType.HeroDrawsCard, 1 } });
+	public static readonly Card Archmage = new Card("Archmage", 6, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 4 }, { ParamType.Health, 7 }, { ParamType.Speed, 1 }, {ParamType.SpellDamageAdd, 1} });
 	public static readonly Card StormwindChampionsAura = new Card("Stormwind Champions Aura", 2, CardPersistency.EveryActionRevalidate, CardTarget.Self, 0, IsCastOn.OtherFriendlyMinions, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 1 }, { ParamType.HealthAdd, 1 } });
 	public static readonly Card StormwindChampion = new Card("Stormwind Champion", 7, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 6 }, { ParamType.Speed, 1 }},
 		new Dictionary<Effect, Card>() {{Effect.WhileAlive, StormwindChampionsAura} });
