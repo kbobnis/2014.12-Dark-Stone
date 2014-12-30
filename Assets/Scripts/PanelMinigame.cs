@@ -277,12 +277,7 @@ public class PanelMinigame : MonoBehaviour {
 				//automatically enter next move interaction if moves are left
 				if (movesLeft > 0) {
 					Debug.Log("Moves left: " + movesLeft);
-
-					if (mode == PanelInteractionMode.Moving) {
-						PointerDownOn(panelTile);
-					} else {
-						PointerDownOn(whatWantsToMoveOrAttackHere);
-					}
+					PointerDownOn(panelTile);
 				}			
 
 				break;
