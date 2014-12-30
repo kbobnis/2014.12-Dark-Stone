@@ -65,6 +65,7 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.RiverCrocolisk);
 		lasiaModel.Deck.Add(Card.Wolfrider);
 		lasiaModel.Deck.Add(Card.StormwindKnight);
+		lasiaModel.Deck.Add(Card.Nightblade);
 		lasiaModel.Deck.Add(Card.GurubashiBerserker);
 		lasiaModel.Deck.Add(Card.DarkscaleHealer);
 		lasiaModel.Deck.Add(Card.BootyBayBodyguard);
@@ -298,7 +299,7 @@ public class PanelMinigame : MonoBehaviour {
 					if (whatCard.Effects.ContainsKey(Effect.Battlecry)) {
 						Debug.Log("There is battlecry for " + whatCard.Name);
 						Card battlecryCard = whatCard.Effects[Effect.Battlecry];
-						bool explicitly = battlecryCard.CardTarget == CardTarget.JustThrow || battlecryCard.CardTarget == CardTarget.Self;
+						bool explicitly = battlecryCard.CardTarget == CardTarget.JustThrow || battlecryCard.CardTarget == CardTarget.Self || battlecryCard.CardTarget == CardTarget.EnemyHero;
 						CastSpell(panelTile, battlecryCard, panelTile, pi.Caster, explicitly, 0);
 					}
 					if (whatCard.Effects.ContainsKey(Effect.WhileAlive) && whatCard.Effects[Effect.WhileAlive].CardPersistency == CardPersistency.WhileHolderAlive) {
@@ -372,6 +373,9 @@ public class PanelMinigame : MonoBehaviour {
 				break;
 			case CardTarget.EnemyCharacter:
 				canCast = castedOnModel != null && !castersModel.GetMyHero().IsItYourMinion(castedOnModel) && castersModel.GetMyHero() != castedOnModel.GetMyHero();
+				break;
+			case CardTarget.EnemyHero:
+				canCast = castedOnModel != null && !castersModel.IsFriendlyCharacter(castedOnModel) && castedOnModel.Card.CardPersistency == CardPersistency.Hero;
 				break;
 			default: 
 				throw new NotImplementedException("Not implemented " + card.CardTarget);
