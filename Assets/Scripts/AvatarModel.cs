@@ -90,6 +90,10 @@ public class AvatarModel {
 		set {
 			int delta = _ActualHealth - value;
 			int deltaHealth = RemoveArmorBy(delta);
+			
+			if (deltaHealth > 0 && Card.Effects.ContainsKey(Effect.AfterTakingDamage)) {
+				Cast(this, Card.Effects[Effect.AfterTakingDamage], 0);
+			}
 			_ActualHealth -= deltaHealth;
 			if (_ActualHealth > MaxHealth) {
 				_ActualHealth = MaxHealth;
@@ -195,10 +199,10 @@ public class AvatarModel {
 			}
 			AvatarModel owner = GetMyHero();
 			if (c.Params.ContainsKey(ParamType.ReplaceExisting)) {
-				Minions.Remove(castingOn);
 				owner = castingOn.GetMyHero();
+				owner.Minions.Remove(castingOn);
 			}
-			castingOn = new AvatarModel(c, true, this);
+			castingOn = new AvatarModel(c, true, owner);
 			//minions will be a flat structure. there is no need for deep one. 
 			owner.Minions.Add(castingOn);
 		} 
