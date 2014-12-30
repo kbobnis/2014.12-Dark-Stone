@@ -65,6 +65,7 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.RiverCrocolisk);
 		lasiaModel.Deck.Add(Card.Wolfrider);
 		lasiaModel.Deck.Add(Card.StormwindKnight);
+		lasiaModel.Deck.Add(Card.DarkscaleHealer);
 		lasiaModel.Deck.Add(Card.BootyBayBodyguard);
 		lasiaModel.Deck.Add(Card.OgreMagi);
 		lasiaModel.Deck.Add(Card.OasisSnapjaw);
@@ -324,7 +325,7 @@ public class PanelMinigame : MonoBehaviour {
 		if (explicitlySelectedTile) {
 			foreach (PanelTile pt in PanelTiles.GetComponent<PanelTiles>().GetAllPanelTiles()) {
 				if (castingHero.CanHeHaveThisSpell(target, pt, card)) {
-					Debug.Log(caster.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name + " is casting on " + pt.gameObject.name + " card: " + card.Name);
+					//Debug.Log(caster.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name + " is casting on " + pt.gameObject.name + " card: " + card.Name);
 					castingHero.PanelAvatar.GetComponent<PanelAvatar>().CastOn(pt.PanelAvatar.GetComponent<PanelAvatar>(), card, cost);
 				}
 			}
