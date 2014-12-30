@@ -150,6 +150,9 @@ public class Card  {
 	public static readonly Card NightbladesBlade = new Card("Nightblades Blade", 1, CardPersistency.Instant, CardTarget.Self, 5, IsCastOn.EnemyHero, new Dictionary<ParamType, int>() { { ParamType.DealDamage, 3 } });
 	public static readonly Card Nightblade = new Card("Nightblade", 5, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 4 }, { ParamType.Attack, 4 }, { ParamType.Speed, 1 } },
 			new Dictionary<Effect, Card>() { { Effect.Battlecry, NightbladesBlade } });
+	public static readonly Card StormpikesShot = new Card("Stormpikes Shot", 1, CardPersistency.Instant, CardTarget.Character, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamage, 2 } });	
+	public static readonly Card StormpikeCommando = new Card("Stormpike Commando", 5, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 2 }, { ParamType.Attack, 4 }, { ParamType.Speed, 1 } },
+				new Dictionary<Effect, Card>() { { Effect.Battlecry, StormpikesShot } });
 	public static readonly Card FireElementalsFireball = new Card("Fire Elementals Fireball", 2, CardPersistency.Instant, CardTarget.Character, 5, IsCastOn.Target, new Dictionary<ParamType, int>() {{ParamType.DealDamage, 3} });
 	public static readonly Card FireElemental = new Card("Fire Elemental", 6, CardPersistency.Minion,CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 5 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, FireElementalsFireball } });
