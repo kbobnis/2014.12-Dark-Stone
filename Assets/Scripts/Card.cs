@@ -136,6 +136,7 @@ public class Card  {
 	public static readonly Card FrostwolfWarlord = new Card("Frostwolf Warlord", 5, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 4 }, { ParamType.Attack, 4 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, FrostwolfCall} } );
 	public static readonly Card Bloodlust = new Card("Bloodlust", 5, CardPersistency.UntilEndTurn, CardTarget.JustThrow, 0, IsCastOn.AllFriendlyMinions, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 3 } });
+	public static readonly Card BootyBayBodyguard = new Card("Booty Bay Bodyguard", 5, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 4 }, { ParamType.Attack, 5 }, { ParamType.Speed, 1 }, { ParamType.Taunt, 1 } });
 	public static readonly Card FireElementalsFireball = new Card("Fire Elementals Fireball", 2, CardPersistency.Instant, CardTarget.Character, 5, IsCastOn.Target, new Dictionary<ParamType, int>() {{ParamType.DealDamage, 3} });
 	public static readonly Card FireElemental = new Card("Fire Elemental", 6, CardPersistency.Minion,CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 6 }, { ParamType.Health, 5 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, FireElementalsFireball } });
