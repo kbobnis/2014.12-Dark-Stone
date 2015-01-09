@@ -5,14 +5,13 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 
 public enum WhereAmI{
-	Hand, Board,
+	Hand, Board, TopInfo
 }
 
 public class ScrollableList : MonoBehaviour
 {
     public GameObject itemPrefab;
 	public bool FitToSize;
-	public WhereAmI WhereAmI;
 
 	private int columnCount = 1;
 	public List<GameObject> ElementsToPut = new List<GameObject>();
@@ -76,7 +75,7 @@ public class ScrollableList : MonoBehaviour
 
 			newItem.name = gameObject.name + " item at (" + i + "," + j + ")";
 			if (newItem.GetComponent<PanelTile>() != null) {
-				newItem.GetComponent<PanelTile>().Create(i, j, WhereAmI);
+				newItem.GetComponent<PanelTile>().Create(i, j);
 			}
 			newItem.transform.parent = gameObject.transform;
 			

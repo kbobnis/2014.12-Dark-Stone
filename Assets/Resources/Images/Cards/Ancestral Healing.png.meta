@@ -1,9 +1,8 @@
 fileFormatVersion: 2
-guid: bbfb4d850b763bc4e83f1614eba6fcef
+guid: 3be9c17d02e50a4488a7a1ff20dc6c2d
 TextureImporter:
   fileIDToRecycleName:
-    21300000: zlydementorDead
-    21300002: zlyDementorDead
+    21300000: Ancestral Healing
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -27,9 +26,9 @@ TextureImporter:
   maxTextureSize: 1024
   textureSettings:
     filterMode: 0
-    aniso: 1
+    aniso: -1
     mipBias: -1
-    wrapMode: 1
+    wrapMode: -1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50

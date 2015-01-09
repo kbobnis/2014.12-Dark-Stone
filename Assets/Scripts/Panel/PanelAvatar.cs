@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class PanelAvatar : MonoBehaviour {
 
-	public GameObject PanelTile, ImageProtection, ImageTaunt, PanelAvatarCard;
+	public GameObject PanelTile, ImageTaunt, PanelAvatarCard;
 
 	private AvatarModel _Model = null;
 
@@ -26,8 +26,6 @@ public class PanelAvatar : MonoBehaviour {
 			_Model.GetMyHero().Minions.Remove(_Model);
 			_Model = null;
 		}
-
-		ImageProtection.SetActive(false);
 
 		bool hasTaunt = false;
 		if (Model != null) {

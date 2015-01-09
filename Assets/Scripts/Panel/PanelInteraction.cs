@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System;
 
 public class PanelInteraction : MonoBehaviour {
 
@@ -21,6 +22,14 @@ public class PanelInteraction : MonoBehaviour {
 
 	void Awake() {
 		UpdateImage();
+	}
+
+	public void PointerDownOn(BaseEventData bed) {
+		try {
+				PanelMinigame.Me.GetComponent<PanelMinigame>().PointerDownOn(gameObject.transform.parent.gameObject.GetComponent<PanelTile>());
+		} catch (Exception e) {
+			Debug.Log("Exception: " + e);
+		}
 	}
 
 

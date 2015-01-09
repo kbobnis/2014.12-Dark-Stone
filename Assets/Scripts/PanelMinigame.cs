@@ -27,7 +27,7 @@ public static class Methods {
 
 public class PanelMinigame : MonoBehaviour {
 
-	public GameObject PanelTiles, PanelTilesBg, PanelInformation, PanelCardPreview, PanelBottom, ButtonEndTurn;
+	public GameObject PanelBoardFront, PanelBoardBack, PanelInformation, PanelCardPreview, PanelMyHeroStatus, ButtonEndTurn, PanelEnemyStatus;
 
 	private AvatarModel MyModel, EnemysModel;
 	public AvatarModel ActualTurnModel;
@@ -52,14 +52,14 @@ public class PanelMinigame : MonoBehaviour {
 			templates.Add(col);
 		}
 
-		PanelTilesBg.GetComponent<ScrollableList>().Build(templates);
+		PanelBoardBack.GetComponent<ScrollableList>().Build(templates);
 
 		templates[3][2].AddTemplate(Card.Lasia);
 		templates[0][2].AddTemplate(Card.Dementor);
 
-		PanelTiles.GetComponent<ScrollableList>().Build(templates);
+		PanelBoardFront.GetComponent<ScrollableList>().Build(templates);
 		
-		PanelAvatar lasiaAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[3 * 5 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
+		PanelAvatar lasiaAvatar = PanelBoardFront.GetComponent<ScrollableList>().ElementsToPut[3 * 5 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel lasiaModel = lasiaAvatar.Model;
 		lasiaModel.Deck.Add(Card.StonetuskBoar);
 		lasiaModel.Deck.Add(Card.RiverCrocolisk);
@@ -119,28 +119,22 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.Thrallmar);
 		lasiaModel.Deck.Add(Card.Wisp);
 		lasiaModel.Deck.Add(Card.IronbarkProtector);
-		//lasiaModel.Deck.Shuffle();
+		lasiaModel.Deck.Shuffle();
+		lasiaModel.PullCardFromDeck();
+		lasiaModel.PullCardFromDeck();
+		lasiaModel.PullCardFromDeck();
+		lasiaModel.PullCardFromDeck();
 
-		PanelAvatar dementorAvatar = PanelTiles.GetComponent<ScrollableList>().ElementsToPut[2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
+		PanelAvatar dementorAvatar = PanelBoardFront.GetComponent<ScrollableList>().ElementsToPut[2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel dementorModel = dementorAvatar.Model;
-		dementorModel.Deck.Add(Card.RockbiterWeapon);
-		dementorModel.Deck.Add(Card.FlametongueTotem);
-		dementorModel.Deck.Add(Card.RazorfenHunter);
-		dementorModel.Deck.Add(Card.SenjinShieldmasta);
-		dementorModel.Deck.Add(Card.Bloodlust);
-		dementorModel.Deck.Add(Card.BoulderfishOgre);
-		dementorModel.Deck.Add(Card.StormwindChampion);
-		dementorModel.Deck.Add(Card.FireElemental);
-		dementorModel.Deck.Add(Card.FrostwolfWarlord);
-		dementorModel.Deck.Add(Card.GnomishInventor);
-		dementorModel.Deck.Add(Card.ChillwindYeti);
-		dementorModel.Deck.Add(Card.Hex);
-		dementorModel.Deck.Add(Card.ShatteredSunCleric);
-		dementorModel.Deck.Add(Card.MurlocTidehunter);
-		dementorModel.Deck.Add(Card.BloodfenRaptor);
-		dementorModel.Deck.Add(Card.Thrallmar);
-		dementorModel.Deck.Add(Card.Wisp);
+		foreach (Card c in lasiaModel.Deck) {
+			dementorModel.Deck.Add(c);
+		}
 		dementorModel.Deck.Shuffle();
+		dementorModel.PullCardFromDeck();
+		dementorModel.PullCardFromDeck();
+		dementorModel.PullCardFromDeck();
+		dementorModel.PullCardFromDeck();
 
 		MyModel = lasiaModel;
 		EnemysModel = dementorModel;
@@ -188,17 +182,16 @@ public class PanelMinigame : MonoBehaviour {
 		if (Mode != global::Mode.Ready) {
 			DisableAllPanelsInteraction();
 			Mode = global::Mode.Ready;
+		}
 			//PanelInformation.GetComponent<PanelInformation>().SetText("Finish actual action before casting spells");
-		} else {
 
-			if (card.Cost > ActualTurnModel.ActualMana) {
-				//PanelInformation.GetComponent<PanelInformation>().SetText("Not enough mana crystals.\nYou have " + ActualTurnModel.ActualMana + " mana crystals. And spell " + card.Name + " costs " + card.Cost + " mana crystals");
-			} else {
-				//getting your main character
-				PanelTile panelTile = PanelTiles.GetComponent<PanelTiles>().FindTileForModel(ActualTurnModel);
-				Debug.Log("Card in hand selected, actual hero tile: " + panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name);
-				CastSpell(panelTile, card, panelTile, panelTile, false, card.Cost);
-			}
+		if (card.Cost > ActualTurnModel.ActualMana) {
+			//PanelInformation.GetComponent<PanelInformation>().SetText("Not enough mana crystals.\nYou have " + ActualTurnModel.ActualMana + " mana crystals. And spell " + card.Name + " costs " + card.Cost + " mana crystals");
+		} else {
+			//getting your main character
+			PanelTile panelTile = PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(ActualTurnModel);
+			Debug.Log("Card in hand selected, actual hero tile: " + panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name);
+			CastSpell(panelTile, card, panelTile, panelTile, false, card.Cost);
 		}
 	}
 
@@ -325,14 +318,14 @@ public class PanelMinigame : MonoBehaviour {
 	private void CastSpell(PanelTile target, Card card, PanelTile caster, PanelTile castingHero, bool explicitlySelectedTile, int cost) {
 
 		if (explicitlySelectedTile) {
-			foreach (PanelTile pt in PanelTiles.GetComponent<PanelTiles>().GetAllPanelTiles()) {
+			foreach (PanelTile pt in PanelBoardFront.GetComponent<PanelTiles>().GetAllPanelTiles()) {
 				if (castingHero.CanHeHaveThisSpell(target, pt, card)) {
 					//Debug.Log(caster.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name + " is casting on " + pt.gameObject.name + " card: " + card.Name);
 					castingHero.PanelAvatar.GetComponent<PanelAvatar>().CastOn(pt.PanelAvatar.GetComponent<PanelAvatar>(), card, cost);
 				}
 			}
 		} else {
-			List<PanelTile> pts = PanelTiles.GetComponent<PanelTiles>().GetAllPanelTiles();
+			List<PanelTile> pts = PanelBoardFront.GetComponent<PanelTiles>().GetAllPanelTiles();
 			foreach (PanelTile pa in pts) {
 				if (CanBeCastedOn(caster, pa, card)) {
 					pa.PanelInteraction.GetComponent<PanelInteraction>().CanCastHere(caster, card);
@@ -401,10 +394,10 @@ public class PanelMinigame : MonoBehaviour {
 
 
 	private void RevalidateEffects() {
-		PanelTiles.GetComponent<PanelTiles>().UpdateAdjacentModels();
+		PanelBoardFront.GetComponent<PanelTiles>().UpdateAdjacentModels();
 
 		//mark to remove all every action revalidate effects
-		List<AvatarModel> allModels = PanelTiles.GetComponent<PanelTiles>().GetAllAvatarModels();
+		List<AvatarModel> allModels = PanelBoardFront.GetComponent<PanelTiles>().GetAllAvatarModels();
 		foreach (AvatarModel am in allModels) {
 
 			foreach (CastedCard cc in am.Effects.ToArray()) {
@@ -416,7 +409,7 @@ public class PanelMinigame : MonoBehaviour {
 		}
 		
 		//add all every action revalidate effects
-		foreach (PanelTile pt in PanelTiles.GetComponent<PanelTiles>().GetAllPanelTiles()) {
+		foreach (PanelTile pt in PanelBoardFront.GetComponent<PanelTiles>().GetAllPanelTiles()) {
 
 			AvatarModel am = pt.PanelAvatar.GetComponent<PanelAvatar>().Model;
 			if (am != null) {
@@ -431,7 +424,7 @@ public class PanelMinigame : MonoBehaviour {
 		}
 
 		//remove all effect which are still marked to remove
-		foreach (PanelTile pt in PanelTiles.GetComponent<PanelTiles>().GetAllPanelTiles()) {
+		foreach (PanelTile pt in PanelBoardFront.GetComponent<PanelTiles>().GetAllPanelTiles()) {
 
 			AvatarModel am = pt.PanelAvatar.GetComponent<PanelAvatar>().Model;
 			if (am != null) {
@@ -446,12 +439,14 @@ public class PanelMinigame : MonoBehaviour {
 			pt.PanelAvatar.GetComponent<PanelAvatar>().UpdateFromModel();
 		}
 		//to update the hand
-		PanelBottom.GetComponent<PanelBottom>().HeroModel = ActualTurnModel;
+		PanelMyHeroStatus.GetComponent<PanelHeroStatus>().HeroModel = ActualTurnModel;
+		//update the top status
+		PanelEnemyStatus.GetComponent<PanelHeroStatus>().HeroModel = MyModel == ActualTurnModel ? EnemysModel : MyModel;
 	}
 
 	private void DisableAllPanelsInteraction() {
 		Debug.Log("clearing all tiles");
-		foreach (GameObject tile in PanelTiles.GetComponent<ScrollableList>().ElementsToPut) {
+		foreach (GameObject tile in PanelBoardFront.GetComponent<ScrollableList>().ElementsToPut) {
 			tile.GetComponent<PanelTile>().PanelInteraction.GetComponent<PanelInteraction>().Clear();
 		}
 	}

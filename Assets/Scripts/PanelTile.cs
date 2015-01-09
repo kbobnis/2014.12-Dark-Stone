@@ -8,13 +8,12 @@ using System;
 public class PanelTile : MonoBehaviour {
 
 	public GameObject PanelAvatar, PanelInteraction, PanelAvatarCardPrefab;
-	public WhereAmI WhereAmI;
 
-	public void Create(int row, int column, WhereAmI whereAmI) {
-		WhereAmI = whereAmI;
+	public void Create(int row, int column) {
 		Row = row;
 		Column = column;
 		GameObject panelAvatarCard = Instantiate(PanelAvatarCardPrefab) as GameObject;
+		panelAvatarCard.GetComponent<PanelAvatarCard>().WhereAmI = global::WhereAmI.Board;
 		PanelAvatar.GetComponent<PanelAvatar>().PanelAvatarCard = panelAvatarCard;
 		panelAvatarCard.transform.parent = PanelAvatar.transform;
 		RectTransform rt = panelAvatarCard.GetComponent<RectTransform>();
@@ -25,23 +24,6 @@ public class PanelTile : MonoBehaviour {
 	public Dictionary<Side, PanelTile> Neighbours = new Dictionary<Side, PanelTile>();
 	public int Row;
 	public int Column;
-
-	public void Touched(BaseEventData bed) {
-		try {
-			switch (WhereAmI) {
-				case global::WhereAmI.Board:
-					PanelMinigame.Me.GetComponent<PanelMinigame>().PointerDownOn(this);
-					break;
-				case global::WhereAmI.Hand:
-					PanelMinigame.Me.GetComponent<PanelMinigame>().CardInHandSelected(PanelAvatar.GetComponent<PanelAvatar>().PanelAvatarCard.GetComponent<PanelAvatarCard>().Card);
-					break;
-				default:
-					throw new NotImplementedException("Not implemented");
-			}
-		} catch (Exception e) {
-			Debug.Log("Exception: " + e);
-		}
-	}
 
 	internal int GetDistanceTo(PanelTile to) {
 		int d = Mathf.Abs(to.Row - Row) + Mathf.Abs(to.Column - Column);

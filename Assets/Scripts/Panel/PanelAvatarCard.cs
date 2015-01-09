@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class PanelAvatarCard : MonoBehaviour {
 
@@ -9,6 +10,7 @@ public class PanelAvatarCard : MonoBehaviour {
 
 	public AvatarModel HeroModel;
 	public Card Card;
+	public WhereAmI WhereAmI = WhereAmI.TopInfo;
 
 	public void Prepare(AvatarModel heroModel , Card card){
 		HeroModel = heroModel;
@@ -26,6 +28,27 @@ public class PanelAvatarCard : MonoBehaviour {
 		//ImageOval.SetActive(card!=null && Card.CardPersistency.IsCharacter());
 
 		CardImage.GetComponent<Image>().sprite = card != null?card.Animation:null;
+	}
+
+	public void Touched(BaseEventData bed) {
+		try {
+			switch (WhereAmI) {
+				case global::WhereAmI.Board:
+					PanelMinigame.Me.GetComponent<PanelMinigame>().PointerDownOn(gameObject.transform.parent.gameObject.transform.parent.gameObject.GetComponent<PanelTile>());
+					break;
+				case global::WhereAmI.Hand:
+					PanelMinigame.Me.GetComponent<PanelMinigame>().CardInHandSelected(Card);
+					break;
+				case global::WhereAmI.TopInfo:
+					//nothing to do here;
+					Debug.Log("Touched in top info");
+					break;
+				default:
+					throw new NotImplementedException("Not implemented");
+			}
+		} catch (Exception e) {
+			Debug.Log("Exception: " + e);
+		}
 	}
 
 	public void PreviewCardHand(AvatarModel heroModel, Card card) {
