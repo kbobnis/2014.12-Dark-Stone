@@ -47,6 +47,7 @@ public class PanelAvatar : MonoBehaviour {
 	}
 
 	internal void BattleOutWith(PanelAvatar panelAvatar) {
+		PanelMinigame.Me.AnimationRequests.Add(new AnimationRequestStruct(this.Model, AnimationRequest.BattleOutWith, panelAvatar));
 		AvatarModel pam = panelAvatar.Model;
 
 		Model.ActualHealth -= pam.ActualAttack;

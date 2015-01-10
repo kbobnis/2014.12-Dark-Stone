@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class PanelHeroStatus : MonoBehaviour {
 
-	public GameObject PanelManaCrystal, PanelHand;
+	public GameObject PanelManaCrystal, PanelHand, Deck;
 
 	private AvatarModel _HeroModel;
 
@@ -46,6 +46,8 @@ public class PanelHeroStatus : MonoBehaviour {
 		} else if (PanelHand.GetComponent<PanelHand>() != null) {
 			PanelHand.GetComponent<PanelHand>().UpdateWith(_HeroModel, _HeroModel.Hand);
 		}
+
+		Deck.GetComponentInChildren<Text>().text = "" + _HeroModel.Deck.Count;
 	}
 
 }

@@ -77,7 +77,7 @@ public class Card  {
 	public static readonly Card ElvenShot = new Card("Elven Shot", 0, CardPersistency.Instant, CardTarget.Character, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamage, 1 } });	
 	public static readonly Card ElvenArcher = new Card("Elven Archer", 1, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { {Effect.Battlecry, ElvenShot}});
-	//public static readonly Card AncestralHealing = new Card("Ancestral Healing", 0, CardPersistency.WhileHolderAlive, CardTarget.Minion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Taunt, 1 },  });
+	public static readonly Card AncestralHealing = new Card("Ancestral Healing", 0, CardPersistency.WhileHolderAlive, CardTarget.Minion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Taunt, 1 }, {ParamType.HealFull, 1} });
 	public static readonly Card ClawsArmor = new Card("Claws Armor", 0, CardPersistency.WhileHolderAlive, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.ArmorAdd, 2} });
 	public static readonly Card Claw = new Card("Claw", 1, CardPersistency.UntilEndTurn, CardTarget.JustThrow, 0, IsCastOn.FriendlyHero, new Dictionary<ParamType, int>() { {ParamType.AttackAdd, 2 } }, 
 		new Dictionary<Effect,Card>() { { Effect.Battlecry, ClawsArmor} });
@@ -232,6 +232,7 @@ public enum CastedCardParamType {
 	ManaCrystalAdd,
 	ArmorAdd,
 	ManaCrystalEmptyAdd,
+	HealFull,
 }
 
 public class CastedCard {
@@ -282,6 +283,10 @@ public class CastedCard {
 			Params.Add(CastedCardParamType.DealDamageSpell, c.Params[ParamType.DealDamageSpell] + castingBy.SpellDamageAdd());
 		}
 
+		if (c.Params.ContainsKey(ParamType.HealFull)) {
+			Params.Add(CastedCardParamType.HealFull, 1);
+		}
+
 		if (c.Params.ContainsKey(ParamType.ManaCrystalAdd)) {
 			Params.Add(CastedCardParamType.ManaCrystalAdd, c.Params[ParamType.ManaCrystalAdd]);
 		}
@@ -309,7 +314,8 @@ public class CastedCard {
 		foreach (KeyValuePair<CastedCardParamType, int> kvp in Params.ToArray()) {
 
 			string on = castingOn != null ? castingOn.Card.Name : "empty";
-			Debug.Log("Dealing instant: " + kvp.Key + " on " + on);
+			//Debug.Log("Dealing instant: " + kvp.Key + " on " + on);
+			PanelMinigame.Me.AnimationRequests.Add(new AnimationRequestStruct(castingOn, AnimationRequest.DealInstantOn, kvp));
 			switch (kvp.Key) {
 					
 				case CastedCardParamType.DealDamage:
@@ -321,6 +327,10 @@ public class CastedCard {
 					break;
 				case CastedCardParamType.Heal:
 					castingOn.ActualHealth += kvp.Value;
+					Params.Remove(kvp.Key);
+					break;
+				case CastedCardParamType.HealFull:
+					castingOn.ActualHealth = castingOn.MaxHealth;
 					Params.Remove(kvp.Key);
 					break;
 				case CastedCardParamType.HeroDrawsCard:

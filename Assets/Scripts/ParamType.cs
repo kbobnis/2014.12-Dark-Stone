@@ -21,4 +21,5 @@ public enum ParamType {
 	TakeControl,
 	Taunt,
 	Charge,
+	HealFull,
 }

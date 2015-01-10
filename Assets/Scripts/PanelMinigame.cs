@@ -25,6 +25,19 @@ public static class Methods {
 	}
 }
 
+public class AnimationRequestStruct {
+	public AnimationRequest AnimationRequest;
+	public object Param;
+	public AvatarModel AvatarModel;
+
+	public AnimationRequestStruct(AvatarModel avatarModel, global::AnimationRequest animationRequest, object param=null) {
+		AnimationRequest = animationRequest;
+		AvatarModel = avatarModel;
+		Param = param;
+	}
+
+}
+
 public class PanelMinigame : MonoBehaviour {
 
 	public GameObject PanelBoardFront, PanelBoardBack, PanelInformation, PanelCardPreview, PanelMyHeroStatus, ButtonEndTurn, PanelEnemyStatus;
@@ -34,6 +47,10 @@ public class PanelMinigame : MonoBehaviour {
 	//to be visible in inspector
 	public Mode Mode = Mode.Ready;
 	public static PanelMinigame Me;
+
+	public List<AnimationRequestStruct> AnimationRequests = new List<AnimationRequestStruct>();
+	private bool AnimatingNow = false;
+	private float AnimationStart;
 
 	internal void Prepare() {
 
@@ -61,6 +78,7 @@ public class PanelMinigame : MonoBehaviour {
 		
 		PanelAvatar lasiaAvatar = PanelBoardFront.GetComponent<ScrollableList>().ElementsToPut[3 * 5 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel lasiaModel = lasiaAvatar.Model;
+		lasiaModel.Deck.Add(Card.AncestralHealing);
 		lasiaModel.Deck.Add(Card.StonetuskBoar);
 		lasiaModel.Deck.Add(Card.RiverCrocolisk);
 		lasiaModel.Deck.Add(Card.Wolfrider);
@@ -151,6 +169,7 @@ public class PanelMinigame : MonoBehaviour {
 		if (MyModel != null && EnemysModel != null && (MyModel.ActualHealth <= 0 || EnemysModel.ActualHealth <= 0)) {
 			PanelInformation.GetComponent<PanelInformation>().SetText((MyModel.ActualHealth > 0 ? "You won" : "You lost"));
 		}
+
 	}
 
 	public void EndTurn() {
@@ -176,7 +195,8 @@ public class PanelMinigame : MonoBehaviour {
 
 
 	internal void CardInHandSelected(Card card) {
-		Debug.Log("Card in hand selected: " + (card!=null?card.Name:"empty"));
+		//Debug.Log("Card in hand selected: " + (card!=null?card.Name:"empty"));
+		AnimationRequests.Add(new AnimationRequestStruct(ActualTurnModel, AnimationRequest.CardInHandSelected, card));
 		PanelCardPreview.GetComponent<PanelCardPreview>().PreviewCard(ActualTurnModel, card);
 
 		if (Mode != global::Mode.Ready) {
@@ -198,7 +218,7 @@ public class PanelMinigame : MonoBehaviour {
 
 
 	internal void PointerDownOn(PanelTile panelTile) {
-		Debug.Log("pointer down on: " + panelTile.gameObject.name);
+		//Debug.Log("pointer down on: " + panelTile.gameObject.name);
 		PanelInteraction pi = panelTile.PanelInteraction.GetComponent<PanelInteraction>();
 		AvatarModel heroModel = panelTile.PanelAvatar.GetComponent<PanelAvatar>().PanelAvatarCard.GetComponent<PanelAvatarCard>().HeroModel;
 		AvatarModel targetModel = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
@@ -217,7 +237,7 @@ public class PanelMinigame : MonoBehaviour {
 				effects += cc.Card.Name + paramT + ", ";
 			}
 
-			Debug.Log(heroModel.Card.Name + " (hero: " + heroModel.GetMyHero().Card.Name + ") " + heroModel.MovesLeft + " moves left, max health: " + heroModel.MaxHealth + ", effects: " + effects);
+			//Debug.Log(heroModel.Card.Name + " (hero: " + heroModel.GetMyHero().Card.Name + ") " + heroModel.MovesLeft + " moves left, max health: " + heroModel.MaxHealth + ", effects: " + effects);
 		}
 
 		switch (Mode) {
@@ -445,11 +465,13 @@ public class PanelMinigame : MonoBehaviour {
 	}
 
 	private void DisableAllPanelsInteraction() {
-		Debug.Log("clearing all tiles");
+		Debug.Log("clearing all tiles, meaining: also deselecting potencial card in hand");
+
 		foreach (GameObject tile in PanelBoardFront.GetComponent<ScrollableList>().ElementsToPut) {
 			tile.GetComponent<PanelTile>().PanelInteraction.GetComponent<PanelInteraction>().Clear();
 		}
 	}
+
 
 }
 

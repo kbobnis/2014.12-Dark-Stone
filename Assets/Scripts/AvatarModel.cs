@@ -3,6 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
+
+public enum AnimationRequest {
+	RemoveArmor,
+	ReceiveDamage,
+	BurnCard,
+	PullCardFromDeck,
+	InsertWaitingCardIntoHand,
+	BattleOutWith,
+	CardInHandSelected,
+	ReplaceMinionOn,
+	PutMinionOnTile,
+	DealInstantOn,
+}
+
 public class AvatarModel {
 
 	public static readonly int HandSize = 10;
@@ -90,9 +104,12 @@ public class AvatarModel {
 		set {
 			int delta = _ActualHealth - value;
 			int deltaHealth = RemoveArmorBy(delta);
-			
-			if (deltaHealth > 0 && Card.Effects.ContainsKey(Effect.AfterTakingDamage)) {
-				Cast(this, Card.Effects[Effect.AfterTakingDamage], 0);
+
+			if (deltaHealth > 0 ) {
+				PanelMinigame.Me.AnimationRequests.Add(new AnimationRequestStruct(this, global::AnimationRequest.ReceiveDamage, deltaHealth));
+				if (Card.Effects.ContainsKey(Effect.AfterTakingDamage)) {
+					Cast(this, Card.Effects[Effect.AfterTakingDamage], 0);
+				}
 			}
 			_ActualHealth -= deltaHealth;
 			if (_ActualHealth > MaxHealth) {
@@ -104,7 +121,8 @@ public class AvatarModel {
 	private int RemoveArmorBy(int delta) {
 		int res = delta;
 		
-		if (delta > 0) {
+		if (delta > 0 && Armor > 0) {
+			PanelMinigame.Me.AnimationRequests.Add(new AnimationRequestStruct(this, AnimationRequest.RemoveArmor, delta));
 			Armor -= delta;
 			delta = 0;
 			if (Armor < 0) {
@@ -151,17 +169,18 @@ public class AvatarModel {
 	}
 
 	public void PullCardFromDeck() {
-		Debug.Log("Pulling card from deck by " + Card.Name);
+		PanelMinigame.Me.AnimationRequests.Add(new AnimationRequestStruct(this, global::AnimationRequest.PullCardFromDeck));
 		Card c = Deck.Count > 0 ? Deck[0] : null;
 		if (c == null) {
+			PanelMinigame.Me.AnimationRequests.Add(new AnimationRequestStruct(this, global::AnimationRequest.BurnCard));
 			Draught++;
 			ActualHealth -= Draught;
+			
 		} else {
 			Deck.Remove(c);
 			if (_Hand.Count < AvatarModel.HandSize) {
+				PanelMinigame.Me.AnimationRequests.Add(new AnimationRequestStruct(this, global::AnimationRequest.InsertWaitingCardIntoHand));
 				_Hand.Add(c);
-			} else {
-				Debug.Log("Burning card " + c.Name + " from deck");
 			}
 		}
 	}
@@ -191,8 +210,8 @@ public class AvatarModel {
 		}
 		Hand.Remove(c);
 
-		//if is a monster, then adding as minion
-		if (c.Params.ContainsKey(ParamType.Health)) {
+		//minion
+		if (c.CardPersistency == CardPersistency.Minion) {
 			if (castingOn != null && !c.Params.ContainsKey(ParamType.ReplaceExisting)) {
 				//can not cast minion on other minion
 				throw new Exception("Casting card: " + c.Name + " on " + castingOn.Card.Name + " this can not happen");
@@ -201,33 +220,34 @@ public class AvatarModel {
 			if (c.Params.ContainsKey(ParamType.ReplaceExisting)) {
 				owner = castingOn.GetMyHero();
 				owner.Minions.Remove(castingOn);
+				PanelMinigame.Me.AnimationRequests.Add(new AnimationRequestStruct(this, AnimationRequest.ReplaceMinionOn, castingOn));
+			} else {
+				PanelMinigame.Me.AnimationRequests.Add(new AnimationRequestStruct(this, AnimationRequest.PutMinionOnTile, castingOn));
 			}
 			castingOn = new AvatarModel(c, true, owner);
 			//minions will be a flat structure. there is no need for deep one. 
 			owner.Minions.Add(castingOn);
 		} 
 		
-		{
-			//check if there is already an effect like this and marked to remove. we will unmark it
-			bool foundTheSame = false;
-			foreach (CastedCard cc in castingOn.Effects) {
-				if (cc.Card == c && cc.MarkedToRemove){
-					cc.MarkedToRemove = false;
-					foundTheSame = true;
-					break;
-				}
+		//check if there is already an effect like this and marked to remove. we will unmark it
+		bool foundTheSame = false;
+		foreach (CastedCard cc in castingOn.Effects) {
+			if (cc.Card == c && cc.MarkedToRemove){
+				cc.MarkedToRemove = false;
+				foundTheSame = true;
+				break;
 			}
+		}
 
-			if (!foundTheSame) {
-				CastedCard castedCard = new CastedCard(this, castingOn, c);
+		if (!foundTheSame) {
+			CastedCard castedCard = new CastedCard(this, castingOn, c);
 
-				if (c.CardPersistency != CardPersistency.Instant) {
-					Debug.Log("Casting " + c.Name + " on " + castingOn.Card.Name);	
-					castingOn.Effects.Add(castedCard);
-				}
-				//because of healing this has to be after adding castedCard to effect. (max health update then healing)
-				castedCard.DealInstants(this, castingOn);
+			if (c.CardPersistency != CardPersistency.Instant && castedCard.Params.Count > 0) {
+				Debug.Log("Casting " + c.Name + " on " + castingOn.Card.Name);
+				castingOn.Effects.Add(castedCard);
 			}
+			//because of healing this has to be after adding castedCard to effect. (max health update then healing)
+			castedCard.DealInstants(this, castingOn);
 		}
 		return castingOn;
 	}

@@ -20,13 +20,18 @@ public class PanelInteraction : MonoBehaviour {
 	public PanelTile Caster;
 	public Card CastersCard;
 
+	//receiving damage
+	private int ReceivingDamage;
+
 	void Awake() {
 		UpdateImage();
 	}
 
 	public void PointerDownOn(BaseEventData bed) {
 		try {
+			if (Mode != PanelInteractionMode.AnimationAttack) {
 				PanelMinigame.Me.GetComponent<PanelMinigame>().PointerDownOn(gameObject.transform.parent.gameObject.GetComponent<PanelTile>());
+			}
 		} catch (Exception e) {
 			Debug.Log("Exception: " + e);
 		}
@@ -34,18 +39,22 @@ public class PanelInteraction : MonoBehaviour {
 
 
 	private void UpdateImage() {
-		GetComponent<Image>().enabled = false;
+		GetComponent<Image>().enabled = true;
 		Text text = GetComponentInChildren<Text>();
-		text.enabled = false;
+		text.enabled = true;
+		text.text = "rzecz";
 
-		if ( Mode != PanelInteractionMode.Idle) {
-			GetComponent<Image>().enabled = true;
-			text.enabled = true;
-			switch (Mode) {
-				case PanelInteractionMode.Casting: text.text = "Cast " + CastersCard.Name + " here"; break;
-				case PanelInteractionMode.Moving: text.text = "Move " + WhatMoveOrAttack.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name + " here"; break;
-				case PanelInteractionMode.Attacking: text.text = "Attack with " + WhatMoveOrAttack.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name; break;
-			}
+		switch (Mode) {
+			case PanelInteractionMode.Casting: text.text = "Cast " + CastersCard.Name + " here"; break;
+			case PanelInteractionMode.Moving: text.text = "Move " + WhatMoveOrAttack.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name + " here"; break;
+			case PanelInteractionMode.Attacking: text.text = "Attack with " + WhatMoveOrAttack.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name; break;
+			case PanelInteractionMode.ReceivingDamage: text.text = "Health -= " + ReceivingDamage; break;
+			case PanelInteractionMode.AnimationAttack: text.text = "Attackin!"; break;
+			case PanelInteractionMode.AnimationDefend: text.text = "Defending!"; break;
+			default:
+				GetComponent<Image>().enabled = false;
+				text.enabled = false;
+				break;
 		}
 	}
 
@@ -68,12 +77,28 @@ public class PanelInteraction : MonoBehaviour {
 		WhatMoveOrAttack = panelTile;
 		Mode = PanelInteractionMode.Attacking;
 	}
+
+	internal void TakeDamage(int p) {
+		ReceivingDamage = p;
+		Mode = PanelInteractionMode.ReceivingDamage;
+	}
+
+	internal void IsAttacking() {
+		Mode = PanelInteractionMode.AnimationAttack;
+	}
+
+	internal void IsDefending() {
+		Mode = PanelInteractionMode.AnimationDefend;
+	}
 }
 
 public enum PanelInteractionMode {
 	Idle,
 	Casting,
 	Moving,
-	Attacking
+	Attacking,
+	ReceivingDamage,
+	AnimationAttack,
+	AnimationDefend
 
 }
