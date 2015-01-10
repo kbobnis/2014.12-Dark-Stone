@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public enum WhereAmI{
-	Hand, Board, TopInfo
+public enum WhereAmI {
+	Hand, Board, TopInfo,
+	SpecialPower
 }
 
 public class ScrollableList : MonoBehaviour

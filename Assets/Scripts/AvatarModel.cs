@@ -34,6 +34,7 @@ public class AvatarModel {
 	private int Draught;
 	private bool OnBoard;
 	public int Armor;
+	public bool AlreadyUsedPower;
 
 	public List<Card> Hand {
 		get { return _Hand; }
@@ -257,6 +258,7 @@ public class AvatarModel {
 		RefillCrystals();
 		RefillMovements();
 		PullCardFromDeck();
+		AlreadyUsedPower = false;
 	}
 
 	internal void EndOfATurn() {

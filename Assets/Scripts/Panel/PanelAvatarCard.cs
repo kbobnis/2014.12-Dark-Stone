@@ -39,6 +39,21 @@ public class PanelAvatarCard : MonoBehaviour {
 				case global::WhereAmI.Hand:
 					PanelMinigame.Me.GetComponent<PanelMinigame>().CardInHandSelected(Card);
 					break;
+				case global::WhereAmI.SpecialPower:
+					PanelMinigame.Me.PanelCardPreview.GetComponent<PanelCardPreview>().PreviewCard(PanelMinigame.Me.ActualTurnModel, Card, global::WhereAmI.TopInfo);
+					if (HeroModel == PanelMinigame.Me.ActualTurnModel && HeroModel.ActualMana >= Card.Cost && !HeroModel.AlreadyUsedPower) {
+						HeroModel.AlreadyUsedPower = true;
+						PanelMinigame.Me.CardInHandSelected(Card);
+						if (Card.CardTarget == CardTarget.JustThrow || Card.CardTarget == CardTarget.Self) {
+							PanelTile actualTurnHerosTile = PanelMinigame.Me.PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(PanelMinigame.Me.ActualTurnModel);
+							PanelMinigame.Me.PointerDownOn(actualTurnHerosTile);
+						}
+						if (Card.CardTarget == CardTarget.EnemyHero) {
+							PanelTile actualTurnHerosTile = PanelMinigame.Me.PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(PanelMinigame.Me.ActualTurnModel==PanelMinigame.Me.MyModel?PanelMinigame.Me.EnemysModel:PanelMinigame.Me.MyModel);
+							PanelMinigame.Me.PointerDownOn(actualTurnHerosTile);
+						}
+					}
+					break;
 				case global::WhereAmI.TopInfo:
 					//nothing to do here;
 					Debug.Log("Touched in top info");
@@ -51,14 +66,17 @@ public class PanelAvatarCard : MonoBehaviour {
 		}
 	}
 
-	public void PreviewCardHand(AvatarModel heroModel, Card card) {
+	public void PreviewCardHand(AvatarModel heroModel, Card card, WhereAmI whereAmI) {
 		Prepare(heroModel, card);
 		
 		PanelCrystal.GetComponent<PanelValue>().Prepare(Card!=null? Card.Cost:0);
 		PanelAttack.GetComponent<PanelValue>().Prepare(Card!=null && Card.Params.ContainsKey(ParamType.Attack) ? Card.Params[ParamType.Attack] : 0);
 		PanelHealth.GetComponent<PanelValue>().Prepare(Card != null && Card.Params.ContainsKey(ParamType.Health) ? Card.Params[ParamType.Health] : 0);
 
-		CardImage.GetComponent<Image>().color = card != null && heroModel != null && card.Cost > heroModel.ActualMana ? Color.black : Color.white;
+		CardImage.GetComponent<Image>().color = card != null && heroModel != null && card.Cost > heroModel.ActualMana ? Color.black : (whereAmI == global::WhereAmI.SpecialPower && heroModel.AlreadyUsedPower ? Color.black : Color.white );
+		if (whereAmI == global::WhereAmI.TopInfo) {
+			CardImage.GetComponent<Image>().color = Color.white;
+		}
 		//PanelCrystal.GetComponent<Image>().color = card != null && card.Cost > heroModel.ActualMana ? Color.black : Color.white;
 		//PanelCrystal.GetComponent<PanelValue>().Text.GetComponent<Text>().color = card != null && heroModel != null && card.Cost > heroModel.ActualMana ? Color.black : Color.white;
 	}

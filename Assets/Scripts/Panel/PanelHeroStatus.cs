@@ -5,12 +5,29 @@ using UnityEngine.UI;
 
 public class PanelHeroStatus : MonoBehaviour {
 
-	public GameObject PanelManaCrystal, PanelHand, Deck;
+	public GameObject PanelManaCrystal, PanelHand, Deck, PanelSpecialPower, AvatarCardPrefab;
 
 	private AvatarModel _HeroModel;
 
 	public AvatarModel HeroModel {
 		set { _HeroModel = value; UpdateFromModel(); }
+	}
+
+	void Awake() {
+
+
+		GameObject newItem = Instantiate(AvatarCardPrefab) as GameObject;
+
+		newItem.name = "Special power";
+		newItem.GetComponent<PanelAvatarCard>().WhereAmI = WhereAmI.SpecialPower;
+		newItem.transform.parent = PanelSpecialPower.transform;
+
+		//move and size the new item
+		RectTransform rectTransform = newItem.GetComponent<RectTransform>();
+
+		rectTransform.offsetMin = new Vector2(0, 0);
+		rectTransform.offsetMax = new Vector2(0, 0);
+		rectTransform.rotation = PanelSpecialPower.GetComponent<RectTransform>().rotation;
 	}
 
 	// Use this for initialization
@@ -39,7 +56,7 @@ public class PanelHeroStatus : MonoBehaviour {
 			for (int i = 0; i < gos.Count; i++) {
 				gos[i].SetActive(_HeroModel.Hand.Count > i);
 				if (_HeroModel.Hand.Count > i && gos[i].GetComponent<PanelTile>() != null) {
-					gos[i].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().PanelAvatarCard.GetComponent<PanelAvatarCard>().PreviewCardHand(_HeroModel, _HeroModel.Hand[i]);
+					gos[i].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().PanelAvatarCard.GetComponent<PanelAvatarCard>().PreviewCardHand(_HeroModel, _HeroModel.Hand[i], WhereAmI.Hand);
 				}
 
 			}
@@ -48,6 +65,12 @@ public class PanelHeroStatus : MonoBehaviour {
 		}
 
 		Deck.GetComponentInChildren<Text>().text = "" + _HeroModel.Deck.Count;
+
+		PanelSpecialPower.SetActive(false);
+		if (_HeroModel.Card.Effects.ContainsKey(Effect.HerosSpecialPower)) {
+			PanelSpecialPower.SetActive(true);
+			PanelSpecialPower.GetComponentInChildren<PanelAvatarCard>().PreviewCardHand(_HeroModel, _HeroModel.Card.Effects[Effect.HerosSpecialPower], WhereAmI.SpecialPower);
+		} 
 	}
 
 }

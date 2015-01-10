@@ -40,9 +40,10 @@ public static class CardPersistencyMethods {
 	}
 }
 public enum Effect {
-	Battlecry, 
+	Battlecry,
 	WhileAlive,
-	AfterTakingDamage
+	AfterTakingDamage,
+	HerosSpecialPower
 }
 
 public class Card  {
@@ -173,9 +174,14 @@ public class Card  {
 	public static readonly Card MindControl = new Card("Mind Control", 10, CardPersistency.Instant, CardTarget.EnemyMinion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.TakeControl, 1 } });
 
 	//heroes
-	public static readonly Card Dementor = new Card("Dementor", 5, CardPersistency.Hero, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 30 }, {ParamType.Speed, 1} });
-	public static readonly Card Lasia = new Card("Lasia", 5, CardPersistency.Hero, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 30 }, {ParamType.Speed, 1}});
+	public static readonly Card ShapeshiftsFur = new Card("ShapeshiftsFur", 1, CardPersistency.WhileHolderAlive, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.ArmorAdd, 1 } });
+	public static readonly Card Shapeshift = new Card("Shapeshift", 2, CardPersistency.UntilEndTurn, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 1 } },
+		new Dictionary<Effect, Card>() { {  Effect.Battlecry, ShapeshiftsFur }  } );
+	public static readonly Card Druid = new Card("Lasia", 5, CardPersistency.Hero, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 30 }, {ParamType.Speed, 1}}, 
+		new Dictionary<Effect,Card>() { { Effect.HerosSpecialPower, Shapeshift} } );
+	
 
+	public static readonly Card Priest = new Card("Dementor", 5, CardPersistency.Hero, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 30 }, {ParamType.Speed, 1} });
 
 	public string Describe(AvatarModel heroOwner, bool shortV = false) {
 		string text = "";

@@ -40,7 +40,7 @@ public class PanelHand : MonoBehaviour {
 			Card c = hand.Count>i? hand[i]:null;
 			go.SetActive(c != null);
 			if (c != null) {
-				go.GetComponentInChildren<PanelAvatarCard>().PreviewCardHand(heroModel, c);
+				go.GetComponentInChildren<PanelAvatarCard>().PreviewCardHand(heroModel, c, WhereAmI.Hand);
 			}
 		}
 	}

@@ -8,15 +8,15 @@ public class PanelCardPreview : MonoBehaviour {
 	public GameObject PanelAvatar, TextDescription, TextName;
 
 
-	public void PreviewCard(AvatarModel hero, Card card, bool withEffects=false) {
-		PanelAvatar.GetComponent<PanelAvatarCard>().PreviewCardHand(hero, card);
+	public void PreviewCard(AvatarModel hero, Card card, WhereAmI whereAmI) {
+		PanelAvatar.GetComponent<PanelAvatarCard>().PreviewCardHand(hero, card, whereAmI);
 		TextName.GetComponent<Text>().text = card!=null?card.Name:"";
 		TextDescription.GetComponent<Text>().text = card!=null?card.Describe(hero):"";
 	}
 
-	internal void Preview(AvatarModel hero, AvatarModel targetModel) {
+	internal void Preview(AvatarModel hero, AvatarModel targetModel, WhereAmI whereAmI) {
 		Card tmp = targetModel != null ? targetModel.Card : null;
-		PreviewCard(hero, tmp);
+		PreviewCard(hero, tmp, whereAmI);
 		
 		string effectsText = "";
 		if (targetModel != null) {

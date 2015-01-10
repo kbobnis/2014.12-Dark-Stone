@@ -42,7 +42,9 @@ public class PanelMinigame : MonoBehaviour {
 
 	public GameObject PanelBoardFront, PanelBoardBack, PanelInformation, PanelCardPreview, PanelMyHeroStatus, ButtonEndTurn, PanelEnemyStatus;
 
-	private AvatarModel MyModel, EnemysModel;
+	public GameObject AvatarCardPrefab;
+
+	public AvatarModel MyModel, EnemysModel;
 	public AvatarModel ActualTurnModel;
 	//to be visible in inspector
 	public Mode Mode = Mode.Ready;
@@ -54,7 +56,7 @@ public class PanelMinigame : MonoBehaviour {
 
 	internal void Prepare() {
 
-		AvatarModel am = new AvatarModel(Card.Lasia, false, null);
+		AvatarModel am = new AvatarModel(Card.Druid, false, null);
 
 		Me = this;
 		PanelInformation.SetActive(true);
@@ -71,8 +73,8 @@ public class PanelMinigame : MonoBehaviour {
 
 		PanelBoardBack.GetComponent<ScrollableList>().Build(templates);
 
-		templates[3][2].AddTemplate(Card.Lasia);
-		templates[0][2].AddTemplate(Card.Dementor);
+		templates[3][2].AddTemplate(Card.Druid);
+		templates[0][2].AddTemplate(Card.Priest);
 
 		PanelBoardFront.GetComponent<ScrollableList>().Build(templates);
 		
@@ -161,8 +163,6 @@ public class PanelMinigame : MonoBehaviour {
 		EndTurn();
 		RevalidateEffects();
 
-		PanelCardPreview.GetComponent<PanelCardPreview>().PreviewCard(lasiaModel, Card.GnomishInventor);
-		
 	}
 
 	void Update() {
@@ -197,25 +197,20 @@ public class PanelMinigame : MonoBehaviour {
 	internal void CardInHandSelected(Card card) {
 		//Debug.Log("Card in hand selected: " + (card!=null?card.Name:"empty"));
 		AnimationRequests.Add(new AnimationRequestStruct(ActualTurnModel, AnimationRequest.CardInHandSelected, card));
-		PanelCardPreview.GetComponent<PanelCardPreview>().PreviewCard(ActualTurnModel, card);
+		PanelCardPreview.GetComponent<PanelCardPreview>().PreviewCard(ActualTurnModel, card, WhereAmI.TopInfo);
 
 		if (Mode != global::Mode.Ready) {
 			DisableAllPanelsInteraction();
 			Mode = global::Mode.Ready;
 		}
-			//PanelInformation.GetComponent<PanelInformation>().SetText("Finish actual action before casting spells");
 
-		if (card.Cost > ActualTurnModel.ActualMana) {
-			//PanelInformation.GetComponent<PanelInformation>().SetText("Not enough mana crystals.\nYou have " + ActualTurnModel.ActualMana + " mana crystals. And spell " + card.Name + " costs " + card.Cost + " mana crystals");
-		} else {
+		if (card.Cost <= ActualTurnModel.ActualMana) {
 			//getting your main character
 			PanelTile panelTile = PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(ActualTurnModel);
-			Debug.Log("Card in hand selected, actual hero tile: " + panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name);
+			//Debug.Log("Card in hand selected, actual hero tile: " + panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name);
 			CastSpell(panelTile, card, panelTile, panelTile, false, card.Cost);
 		}
 	}
-
-
 
 	internal void PointerDownOn(PanelTile panelTile) {
 		//Debug.Log("pointer down on: " + panelTile.gameObject.name);
@@ -223,7 +218,7 @@ public class PanelMinigame : MonoBehaviour {
 		AvatarModel heroModel = panelTile.PanelAvatar.GetComponent<PanelAvatar>().PanelAvatarCard.GetComponent<PanelAvatarCard>().HeroModel;
 		AvatarModel targetModel = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
 		
-		PanelCardPreview.GetComponent<PanelCardPreview>().Preview(heroModel, targetModel);
+		PanelCardPreview.GetComponent<PanelCardPreview>().Preview(heroModel, targetModel, WhereAmI.TopInfo);
 
 		bool isYourCharacter = ActualTurnModel.IsItYourMinion(targetModel) || ActualTurnModel == heroModel;
 		if (heroModel != null) {
@@ -303,29 +298,29 @@ public class PanelMinigame : MonoBehaviour {
 			}
 			case global::Mode.CastingSpell: {
 
-				PanelInteractionMode whatMode = pi.Mode;
-				Card whatCard = pi.CastersCard;
+					PanelInteractionMode whatMode = pi.Mode;
+					Card whatCard = pi.CastersCard;
 
-				if (pi.Mode == PanelInteractionMode.Casting) {
-					Debug.Log("Casting spell " + whatCard.Name + " by: " + pi.Caster.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name);
-					CastSpell(panelTile, pi.CastersCard, pi.Caster, pi.Caster, true, pi.CastersCard.Cost);
-				}
-				DisableAllPanelsInteraction();
-				Mode = global::Mode.Ready;
+					if (pi.Mode == PanelInteractionMode.Casting) {
+						Debug.Log("Casting spell " + whatCard.Name + " by: " + pi.Caster.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name);
+						CastSpell(panelTile, pi.CastersCard, pi.Caster, pi.Caster, true, pi.CastersCard.Cost);
+					}
+					DisableAllPanelsInteraction();
+					Mode = global::Mode.Ready;
 
-				if (whatMode == PanelInteractionMode.Casting && panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model != null) {
-					if (whatCard.Effects.ContainsKey(Effect.Battlecry)) {
-						Debug.Log("There is battlecry for " + whatCard.Name);
-						Card battlecryCard = whatCard.Effects[Effect.Battlecry];
-						bool explicitly = battlecryCard.CardTarget == CardTarget.JustThrow || battlecryCard.CardTarget == CardTarget.Self || battlecryCard.CardTarget == CardTarget.EnemyHero;
-						CastSpell(panelTile, battlecryCard, panelTile, pi.Caster, explicitly, 0);
+					if (whatMode == PanelInteractionMode.Casting && panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model != null) {
+						if (whatCard.Effects.ContainsKey(Effect.Battlecry)) {
+							Debug.Log("There is battlecry for " + whatCard.Name);
+							Card battlecryCard = whatCard.Effects[Effect.Battlecry];
+							bool explicitly = battlecryCard.CardTarget == CardTarget.JustThrow || battlecryCard.CardTarget == CardTarget.Self || battlecryCard.CardTarget == CardTarget.EnemyHero;
+							CastSpell(panelTile, battlecryCard, panelTile, pi.Caster, explicitly, 0);
+						}
+						if (whatCard.Effects.ContainsKey(Effect.WhileAlive) && whatCard.Effects[Effect.WhileAlive].CardPersistency == CardPersistency.WhileHolderAlive) {
+							Debug.Log("There is while alive for " + whatCard.Name);
+							Card whileAliveEffect = whatCard.Effects[Effect.WhileAlive];
+							CastSpell(panelTile, whileAliveEffect, pi.Caster, pi.Caster, true, 0);
+						}
 					}
-					if (whatCard.Effects.ContainsKey(Effect.WhileAlive) && whatCard.Effects[Effect.WhileAlive].CardPersistency == CardPersistency.WhileHolderAlive) {
-						Debug.Log("There is while alive for " + whatCard.Name);
-						Card whileAliveEffect = whatCard.Effects[Effect.WhileAlive];
-						CastSpell(panelTile, whileAliveEffect, pi.Caster, pi.Caster, true, 0);
-					}
-				}
 				break;
 			}
 			default: throw new NotImplementedException("Implement working with mode: " + Mode);
@@ -335,7 +330,7 @@ public class PanelMinigame : MonoBehaviour {
 		RevalidateEffects();
 	}
 
-	private void CastSpell(PanelTile target, Card card, PanelTile caster, PanelTile castingHero, bool explicitlySelectedTile, int cost) {
+	public void CastSpell(PanelTile target, Card card, PanelTile caster, PanelTile castingHero, bool explicitlySelectedTile, int cost) {
 
 		if (explicitlySelectedTile) {
 			foreach (PanelTile pt in PanelBoardFront.GetComponent<PanelTiles>().GetAllPanelTiles()) {
@@ -405,15 +400,12 @@ public class PanelMinigame : MonoBehaviour {
 			//Debug.Log("Distance between " + castersModel.Card.Name + " and " + castedOn.Row + ", " + castedOn.Column + " is " + distance);
 			canCast =  distance <= card.CastDistance;
 		}
-		if (castedOnModel != null) {
-			//Debug.Log("Can be casted on: " + castedOnModel.Card.Name + "? " + (canCast ? "yes" : "no"));
-		}
 
 		return canCast;
 	}
 
 
-	private void RevalidateEffects() {
+	public void RevalidateEffects() {
 		PanelBoardFront.GetComponent<PanelTiles>().UpdateAdjacentModels();
 
 		//mark to remove all every action revalidate effects
