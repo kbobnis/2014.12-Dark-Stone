@@ -81,11 +81,12 @@ public class PanelMinigame : MonoBehaviour {
 		PanelAvatar lasiaAvatar = PanelBoardFront.GetComponent<ScrollableList>().ElementsToPut[3 * 5 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel lasiaModel = lasiaAvatar.Model;
 		lasiaModel.Deck.Add(Card.AncestralHealing);
+		lasiaModel.Deck.Add(Card.HealingTotem);
 		lasiaModel.Deck.Add(Card.StonetuskBoar);
 		lasiaModel.Deck.Add(Card.RiverCrocolisk);
 		lasiaModel.Deck.Add(Card.Wolfrider);
 		lasiaModel.Deck.Add(Card.StormwindKnight);
-		lasiaModel.Deck.Add(Card.StormpikeCommando);
+		/*lasiaModel.Deck.Add(Card.StormpikeCommando);
 		lasiaModel.Deck.Add(Card.RecklessRocketeer);
 		lasiaModel.Deck.Add(Card.WarGolem);
 		lasiaModel.Deck.Add(Card.Nightblade);
@@ -126,7 +127,6 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.MindControl);
 		lasiaModel.Deck.Add(Card.Starfire);
 		lasiaModel.Deck.Add(Card.FlametongueTotem);
-		lasiaModel.Deck.Add(Card.StormwindChampion);
 		lasiaModel.Deck.Add(Card.RazorfenHunter);
 		lasiaModel.Deck.Add(Card.SenjinShieldmasta);
 		lasiaModel.Deck.Add(Card.Bloodlust);
@@ -134,11 +134,14 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.FireElemental);
 		lasiaModel.Deck.Add(Card.FrostwolfWarlord);
 		lasiaModel.Deck.Add(Card.Hex);
+		* */
+		lasiaModel.Deck.Add(Card.StormwindChampion);
 		lasiaModel.Deck.Add(Card.ShatteredSunCleric);
 		lasiaModel.Deck.Add(Card.BloodfenRaptor);
 		lasiaModel.Deck.Add(Card.Thrallmar);
 		lasiaModel.Deck.Add(Card.Wisp);
 		lasiaModel.Deck.Add(Card.IronbarkProtector);
+		 
 		lasiaModel.Deck.Shuffle();
 		lasiaModel.PullCardFromDeck();
 		lasiaModel.PullCardFromDeck();

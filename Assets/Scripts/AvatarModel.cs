@@ -59,7 +59,7 @@ public class AvatarModel {
 				}
 			}
 
-			return actual; 
+			return actual;
 		}
 	}
 
@@ -74,7 +74,7 @@ public class AvatarModel {
 					actual += c.Params[CastedCardParamType.ManaCrystalEmptyAdd];
 				}
 			}
-			return actual; 
+			return actual;
 		}
 	}
 
@@ -106,7 +106,7 @@ public class AvatarModel {
 			int delta = _ActualHealth - value;
 			int deltaHealth = RemoveArmorBy(delta);
 
-			if (deltaHealth > 0 ) {
+			if (deltaHealth > 0) {
 				PanelMinigame.Me.AnimationRequests.Add(new AnimationRequestStruct(this, global::AnimationRequest.ReceiveDamage, deltaHealth));
 				if (Card.Effects.ContainsKey(Effect.AfterTakingDamage)) {
 					Cast(this, Card.Effects[Effect.AfterTakingDamage], 0);
@@ -121,7 +121,7 @@ public class AvatarModel {
 
 	private int RemoveArmorBy(int delta) {
 		int res = delta;
-		
+
 		if (delta > 0 && Armor > 0) {
 			PanelMinigame.Me.AnimationRequests.Add(new AnimationRequestStruct(this, AnimationRequest.RemoveArmor, delta));
 			Armor -= delta;
@@ -129,9 +129,9 @@ public class AvatarModel {
 			if (Armor < 0) {
 				res = -Armor;
 				Armor = 0;
-			} 
+			}
 		}
-		
+
 		return res;
 	}
 
@@ -161,7 +161,7 @@ public class AvatarModel {
 	}
 
 	public void RefillMovements() {
-		int speed = Card.Params[ParamType.Speed];
+		int speed = Card.Params.ContainsKey(ParamType.Speed)?Card.Params[ParamType.Speed]:0;
 
 		_MovesLeft = speed;
 		foreach (AvatarModel am in Minions) {
@@ -176,7 +176,7 @@ public class AvatarModel {
 			PanelMinigame.Me.AnimationRequests.Add(new AnimationRequestStruct(this, global::AnimationRequest.BurnCard));
 			Draught++;
 			ActualHealth -= Draught;
-			
+
 		} else {
 			Deck.Remove(c);
 			if (_Hand.Count < AvatarModel.HandSize) {
@@ -228,12 +228,12 @@ public class AvatarModel {
 			castingOn = new AvatarModel(c, true, owner);
 			//minions will be a flat structure. there is no need for deep one. 
 			owner.Minions.Add(castingOn);
-		} 
-		
+		}
+
 		//check if there is already an effect like this and marked to remove. we will unmark it
 		bool foundTheSame = false;
 		foreach (CastedCard cc in castingOn.Effects) {
-			if (cc.Card == c && cc.MarkedToRemove){
+			if (cc.Card == c && cc.MarkedToRemove) {
 				cc.MarkedToRemove = false;
 				foundTheSame = true;
 				break;
@@ -268,6 +268,19 @@ public class AvatarModel {
 				Effects.Remove(c);
 			}
 		}
+		foreach (KeyValuePair<Effect, Card> e in Card.Effects) {
+			if (e.Key == Effect.AtEndTurn) {
+
+				if (e.Value.CardTarget == CardTarget.Self){
+					PanelTile pt = PanelMinigame.Me.PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(this);
+					PanelTile heroTile = PanelMinigame.Me.PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(GetMyHero());
+					PanelMinigame.Me.CastSpell(pt, e.Value, pt, heroTile, true, 0);
+				} else {
+					throw new NotImplementedException("Implement at end turn card target: " + e.Value.CardTarget);
+				}
+			}
+		}
+
 		foreach (AvatarModel am in Minions) {
 			am.EndOfATurn();
 		}

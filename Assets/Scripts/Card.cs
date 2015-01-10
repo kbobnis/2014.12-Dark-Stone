@@ -43,7 +43,8 @@ public enum Effect {
 	Battlecry,
 	WhileAlive,
 	AfterTakingDamage,
-	HerosSpecialPower
+	HerosSpecialPower,
+	AtEndTurn
 }
 
 public class Card  {
@@ -89,6 +90,9 @@ public class Card  {
 	public static readonly Card VoodooDoctorMedicine = new Card("Voodoo Doctor Medicine", 1, CardPersistency.Instant, CardTarget.Character, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Heal, 2 } });
 	public static readonly Card VoodooDoctor = new Card("Voodoo Doctor", 1, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 2 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, VoodooDoctorMedicine } });
+	public static readonly Card HealingAura = new Card("Healing Aura", 1, CardPersistency.Instant, CardTarget.Self, 1, IsCastOn.AllFriendlyMinions, new Dictionary<ParamType, int>() { { ParamType.Heal, 1 } });
+	public static readonly Card HealingTotem = new Card("Healing Totem", 1, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 2 }, {ParamType.Speed, 1} },
+		new Dictionary<Effect,Card>() { { Effect.AtEndTurn, HealingAura } });
 	public static readonly Card WildGrowth = new Card("Wild Growth", 2, CardPersistency.WhileHolderAlive, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.ManaCrystalEmptyAdd, 1 } });
 	public static readonly Card MarkOfTheWild = new Card("Mark of the Wild", 2, CardPersistency.WhileHolderAlive, CardTarget.Minion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 2 }, { ParamType.HealthAdd, 2 }, { ParamType.Taunt, 1 } });
 	public static readonly Card FlametongueTotem= new Card("Flametongue Totem", 2, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.Health, 3}, {ParamType.Speed, 1} },
