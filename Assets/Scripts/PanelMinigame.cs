@@ -83,12 +83,13 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.AncestralHealing);
 		lasiaModel.Deck.Add(Card.SearingTotem);
 		lasiaModel.Deck.Add(Card.StoneclawTotem);
+		lasiaModel.Deck.Add(Card.WrathOfAirTotem);
 		lasiaModel.Deck.Add(Card.HealingTotem);
-		lasiaModel.Deck.Add(Card.StonetuskBoar);
+		/*lasiaModel.Deck.Add(Card.StonetuskBoar);
 		lasiaModel.Deck.Add(Card.RiverCrocolisk);
 		lasiaModel.Deck.Add(Card.Wolfrider);
 		lasiaModel.Deck.Add(Card.StormwindKnight);
-		/*lasiaModel.Deck.Add(Card.StormpikeCommando);
+		lasiaModel.Deck.Add(Card.StormpikeCommando);
 		lasiaModel.Deck.Add(Card.RecklessRocketeer);
 		lasiaModel.Deck.Add(Card.WarGolem);
 		lasiaModel.Deck.Add(Card.Nightblade);
