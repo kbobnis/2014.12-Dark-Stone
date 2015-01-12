@@ -91,6 +91,7 @@ public class Card  {
 	public static readonly Card VoodooDoctor = new Card("Voodoo Doctor", 1, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 2 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card>() { { Effect.Battlecry, VoodooDoctorMedicine } });
 	public static readonly Card SearingTotem = new Card("Searing Totem", 1, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 1 }, { ParamType.Speed, 1 }, { ParamType.Health, 1 } });
+	public static readonly Card StoneclawTotem= new Card("Stoneclaw Totem", 1, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Taunt, 1 }, { ParamType.Speed, 1 }, { ParamType.Health, 2 } });
 	public static readonly Card HealingAura = new Card("Healing Aura", 1, CardPersistency.Instant, CardTarget.Self, 1, IsCastOn.AllFriendlyMinions, new Dictionary<ParamType, int>() { { ParamType.Heal, 1 } });
 	public static readonly Card HealingTotem = new Card("Healing Totem", 1, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 2 }, {ParamType.Speed, 1} },
 		new Dictionary<Effect,Card>() { { Effect.AtEndTurn, HealingAura } });

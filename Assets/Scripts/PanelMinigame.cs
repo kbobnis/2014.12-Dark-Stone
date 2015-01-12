@@ -82,6 +82,7 @@ public class PanelMinigame : MonoBehaviour {
 		AvatarModel lasiaModel = lasiaAvatar.Model;
 		lasiaModel.Deck.Add(Card.AncestralHealing);
 		lasiaModel.Deck.Add(Card.SearingTotem);
+		lasiaModel.Deck.Add(Card.StoneclawTotem);
 		lasiaModel.Deck.Add(Card.HealingTotem);
 		lasiaModel.Deck.Add(Card.StonetuskBoar);
 		lasiaModel.Deck.Add(Card.RiverCrocolisk);
