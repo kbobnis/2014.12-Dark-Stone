@@ -58,8 +58,10 @@ public class AvatarModel {
 					actual += c.Params[CastedCardParamType.ManaCrystalAdd];
 				}
 			}
-
 			return actual;
+		}
+		set {
+			_ActualMana = value;
 		}
 	}
 
@@ -109,7 +111,9 @@ public class AvatarModel {
 			if (deltaHealth > 0) {
 				PanelMinigame.Me.AnimationRequests.Add(new AnimationRequestStruct(this, global::AnimationRequest.ReceiveDamage, deltaHealth));
 				if (Card.Effects.ContainsKey(Effect.AfterTakingDamage)) {
-					Cast(this, Card.Effects[Effect.AfterTakingDamage], 0);
+					foreach (Card afterTakingDamage in Card.Effects[Effect.AfterTakingDamage]) {
+						Cast(this, afterTakingDamage, 0);
+					}
 				}
 			}
 			_ActualHealth -= deltaHealth;
@@ -230,25 +234,28 @@ public class AvatarModel {
 			owner.Minions.Add(castingOn);
 		}
 
-		//check if there is already an effect like this and marked to remove. we will unmark it
-		bool foundTheSame = false;
-		foreach (CastedCard cc in castingOn.Effects) {
-			if (cc.Card == c && cc.MarkedToRemove) {
-				cc.MarkedToRemove = false;
-				foundTheSame = true;
-				break;
+		//is null for totemic might. where the actual spell does nothing, the battlecry throws totem
+		if (castingOn != null) {
+			//check if there is already an effect like this and marked to remove. we will unmark it
+			bool foundTheSame = false;
+			foreach (CastedCard cc in castingOn.Effects) {
+				if (cc.Card == c && cc.MarkedToRemove) {
+					cc.MarkedToRemove = false;
+					foundTheSame = true;
+					break;
+				}
 			}
-		}
 
-		if (!foundTheSame) {
-			CastedCard castedCard = new CastedCard(this, castingOn, c);
+			if (!foundTheSame) {
+				CastedCard castedCard = new CastedCard(this, castingOn, c);
 
-			if (c.CardPersistency != CardPersistency.Instant && castedCard.Params.Count > 0) {
-				Debug.Log("Casting " + c.Name + " on " + castingOn.Card.Name);
-				castingOn.Effects.Add(castedCard);
+				if (c.CardPersistency != CardPersistency.Instant && castedCard.Params.Count > 0) {
+					Debug.Log("Casting " + c.Name + " on " + castingOn.Card.Name);
+					castingOn.Effects.Add(castedCard);
+				}
+				//because of healing this has to be after adding castedCard to effect. (max health update then healing)
+				castedCard.DealInstants(this, castingOn);
 			}
-			//because of healing this has to be after adding castedCard to effect. (max health update then healing)
-			castedCard.DealInstants(this, castingOn);
 		}
 		return castingOn;
 	}
@@ -268,15 +275,14 @@ public class AvatarModel {
 				Effects.Remove(c);
 			}
 		}
-		foreach (KeyValuePair<Effect, Card> e in Card.Effects) {
-			if (e.Key == Effect.AtEndTurn) {
-
-				if (e.Value.CardTarget == CardTarget.Self){
+		if (Card.Effects.ContainsKey(Effect.AtEndTurn)) {
+			foreach (Card atEndTurn in Card.Effects[Effect.AtEndTurn]) {
+				if (atEndTurn.CardTarget == CardTarget.Self){
 					PanelTile pt = PanelMinigame.Me.PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(this);
 					PanelTile heroTile = PanelMinigame.Me.PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(GetMyHero());
-					PanelMinigame.Me.CastSpell(pt, e.Value, pt, heroTile, true, 0);
+					PanelMinigame.Me.CastSpell(pt, atEndTurn, pt, heroTile, true, 0, true);
 				} else {
-					throw new NotImplementedException("Implement at end turn card target: " + e.Value.CardTarget);
+					throw new NotImplementedException("Implement at end turn card target: " + atEndTurn.CardTarget);
 				}
 			}
 		}

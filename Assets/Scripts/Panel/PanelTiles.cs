@@ -15,6 +15,17 @@ public class PanelTiles : MonoBehaviour {
 		return null;
 	}
 
+	internal bool IsModelOfCard(Card c) {
+		foreach (GameObject go in GetComponent<ScrollableList>().ElementsToPut) {
+			if (go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().Model != null) {
+				if (go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().Model.Card == c) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	internal void UpdateAdjacentModels() {
 		foreach (GameObject go in GetComponent<ScrollableList>().ElementsToPut) {
 			

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b6870cca6da00c847bb3d0331d167ce5
+guid: e61f39a30a332de4a934d4c51f214371
 TextureImporter:
   fileIDToRecycleName:
-    21300000: zlydementor
-    21300002: zlyDementor
-    21300004: Dementor
+    21300000: lasia
+    21300002: Lasia
+    21300004: Druid
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0

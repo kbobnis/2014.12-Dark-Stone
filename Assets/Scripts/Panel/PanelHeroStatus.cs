@@ -69,7 +69,7 @@ public class PanelHeroStatus : MonoBehaviour {
 		PanelSpecialPower.SetActive(false);
 		if (_HeroModel.Card.Effects.ContainsKey(Effect.HerosSpecialPower)) {
 			PanelSpecialPower.SetActive(true);
-			PanelSpecialPower.GetComponentInChildren<PanelAvatarCard>().PreviewCardHand(_HeroModel, _HeroModel.Card.Effects[Effect.HerosSpecialPower], WhereAmI.SpecialPower);
+			PanelSpecialPower.GetComponentInChildren<PanelAvatarCard>().PreviewCardHand(_HeroModel, _HeroModel.Card.Effects[Effect.HerosSpecialPower][0], WhereAmI.SpecialPower);
 		} 
 	}
 

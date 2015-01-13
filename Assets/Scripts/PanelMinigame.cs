@@ -74,18 +74,14 @@ public class PanelMinigame : MonoBehaviour {
 		PanelBoardBack.GetComponent<ScrollableList>().Build(templates);
 
 		templates[3][2].AddTemplate(Card.Druid);
-		templates[0][2].AddTemplate(Card.Priest);
+		templates[0][2].AddTemplate(Card.Shaman);
 
 		PanelBoardFront.GetComponent<ScrollableList>().Build(templates);
 		
 		PanelAvatar lasiaAvatar = PanelBoardFront.GetComponent<ScrollableList>().ElementsToPut[3 * 5 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel lasiaModel = lasiaAvatar.Model;
 		lasiaModel.Deck.Add(Card.AncestralHealing);
-		lasiaModel.Deck.Add(Card.SearingTotem);
-		lasiaModel.Deck.Add(Card.StoneclawTotem);
-		lasiaModel.Deck.Add(Card.WrathOfAirTotem);
-		lasiaModel.Deck.Add(Card.HealingTotem);
-		/*lasiaModel.Deck.Add(Card.StonetuskBoar);
+		lasiaModel.Deck.Add(Card.StonetuskBoar);
 		lasiaModel.Deck.Add(Card.RiverCrocolisk);
 		lasiaModel.Deck.Add(Card.Wolfrider);
 		lasiaModel.Deck.Add(Card.StormwindKnight);
@@ -137,7 +133,6 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.Deck.Add(Card.FireElemental);
 		lasiaModel.Deck.Add(Card.FrostwolfWarlord);
 		lasiaModel.Deck.Add(Card.Hex);
-		* */
 		lasiaModel.Deck.Add(Card.StormwindChampion);
 		lasiaModel.Deck.Add(Card.ShatteredSunCleric);
 		lasiaModel.Deck.Add(Card.BloodfenRaptor);
@@ -200,31 +195,34 @@ public class PanelMinigame : MonoBehaviour {
 	}
 
 
-	internal void CardInHandSelected(Card card) {
+	internal void CardInHandSelected(Card card, bool alreadyPaidFor) {
 		//Debug.Log("Card in hand selected: " + (card!=null?card.Name:"empty"));
-		AnimationRequests.Add(new AnimationRequestStruct(ActualTurnModel, AnimationRequest.CardInHandSelected, card));
-		PanelCardPreview.GetComponent<PanelCardPreview>().PreviewCard(ActualTurnModel, card, WhereAmI.TopInfo);
 
-		if (Mode != global::Mode.Ready) {
+		if (Mode != global::Mode.CastingSpellNoCancel) {
+			AnimationRequests.Add(new AnimationRequestStruct(ActualTurnModel, AnimationRequest.CardInHandSelected, card));
+			PanelCardPreview.GetComponent<PanelCardPreview>().PreviewCard(ActualTurnModel, card, WhereAmI.TopInfo);
+
 			DisableAllPanelsInteraction();
 			Mode = global::Mode.Ready;
-		}
 
-		if (card.Cost <= ActualTurnModel.ActualMana) {
-			//getting your main character
-			PanelTile panelTile = PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(ActualTurnModel);
-			//Debug.Log("Card in hand selected, actual hero tile: " + panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name);
-			CastSpell(panelTile, card, panelTile, panelTile, false, card.Cost);
+			if (card.Cost <= ActualTurnModel.ActualMana) {
+				//getting your main character
+				PanelTile panelTile = PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(ActualTurnModel);
+				//Debug.Log("Card in hand selected, actual hero tile: " + panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name);
+				CastSpell(panelTile, card, panelTile, panelTile, false, card.Cost, alreadyPaidFor);
+			}
 		}
 	}
 
 	internal void PointerDownOn(PanelTile panelTile) {
-		//Debug.Log("pointer down on: " + panelTile.gameObject.name);
+		Debug.Log("pointer down on: " + panelTile.gameObject.name + ", mode: " + Mode);
 		PanelInteraction pi = panelTile.PanelInteraction.GetComponent<PanelInteraction>();
 		AvatarModel heroModel = panelTile.PanelAvatar.GetComponent<PanelAvatar>().PanelAvatarCard.GetComponent<PanelAvatarCard>().HeroModel;
 		AvatarModel targetModel = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
-		
-		PanelCardPreview.GetComponent<PanelCardPreview>().Preview(heroModel, targetModel, WhereAmI.TopInfo);
+
+		if (Mode != global::Mode.CastingSpellNoCancel) {
+			PanelCardPreview.GetComponent<PanelCardPreview>().Preview(heroModel, targetModel, WhereAmI.TopInfo);
+		}
 
 		bool isYourCharacter = ActualTurnModel.IsItYourMinion(targetModel) || ActualTurnModel == heroModel;
 		if (heroModel != null) {
@@ -302,31 +300,25 @@ public class PanelMinigame : MonoBehaviour {
 
 				break;
 			}
+			case global::Mode.CastingSpellNoCancel: {
+					if (pi.Mode == PanelInteractionMode.Casting) {
+						CastSpell(panelTile, pi.CastersCard, pi.Caster, pi.Caster, true, 0, true); //if no cancel, then it is already paid (hero power or battlecry)
+						DisableAllPanelsInteraction();
+						Mode = global::Mode.Ready;
+						CastEffects(panelTile);
+					}
+				break;
+			}
 			case global::Mode.CastingSpell: {
 
-					PanelInteractionMode whatMode = pi.Mode;
-					Card whatCard = pi.CastersCard;
-
-					if (pi.Mode == PanelInteractionMode.Casting) {
-						Debug.Log("Casting spell " + whatCard.Name + " by: " + pi.Caster.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name);
-						CastSpell(panelTile, pi.CastersCard, pi.Caster, pi.Caster, true, pi.CastersCard.Cost);
-					}
-					DisableAllPanelsInteraction();
-					Mode = global::Mode.Ready;
-
-					if (whatMode == PanelInteractionMode.Casting && panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model != null) {
-						if (whatCard.Effects.ContainsKey(Effect.Battlecry)) {
-							Debug.Log("There is battlecry for " + whatCard.Name);
-							Card battlecryCard = whatCard.Effects[Effect.Battlecry];
-							bool explicitly = battlecryCard.CardTarget == CardTarget.JustThrow || battlecryCard.CardTarget == CardTarget.Self || battlecryCard.CardTarget == CardTarget.EnemyHero;
-							CastSpell(panelTile, battlecryCard, panelTile, pi.Caster, explicitly, 0);
-						}
-						if (whatCard.Effects.ContainsKey(Effect.WhileAlive) && whatCard.Effects[Effect.WhileAlive].CardPersistency == CardPersistency.WhileHolderAlive) {
-							Debug.Log("There is while alive for " + whatCard.Name);
-							Card whileAliveEffect = whatCard.Effects[Effect.WhileAlive];
-							CastSpell(panelTile, whileAliveEffect, pi.Caster, pi.Caster, true, 0);
-						}
-					}
+				if (pi.Mode == PanelInteractionMode.Casting) {
+					CastSpell(panelTile, pi.CastersCard, pi.Caster, pi.Caster, true, pi.CastersCard.Cost, false);
+				}
+				DisableAllPanelsInteraction();
+				Mode = global::Mode.Ready;
+				if (pi.CastersCard != null) {
+					CastEffects(panelTile);
+				}
 				break;
 			}
 			default: throw new NotImplementedException("Implement working with mode: " + Mode);
@@ -336,7 +328,61 @@ public class PanelMinigame : MonoBehaviour {
 		RevalidateEffects();
 	}
 
-	public void CastSpell(PanelTile target, Card card, PanelTile caster, PanelTile castingHero, bool explicitlySelectedTile, int cost) {
+	private void CastEffects(PanelTile panelTile) {
+
+		PanelInteraction pi = panelTile.PanelInteraction.GetComponent<PanelInteraction>();
+		AvatarModel heroModel = panelTile.PanelAvatar.GetComponent<PanelAvatar>().PanelAvatarCard.GetComponent<PanelAvatarCard>().HeroModel;
+		AvatarModel targetModel = panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model;
+		PanelInteractionMode whatMode = pi.Mode;
+		Card whatCard = pi.CastersCard;
+
+		List<Card> cardsToCast = new List<Card>();
+
+		if (whatCard.Effects.ContainsKey(Effect.BattlecryNonExistantRandom)) {
+			Debug.Log("There is battlecry non existant random");
+			Card c = null;
+			int random = new System.Random().Next(whatCard.Effects[Effect.BattlecryNonExistantRandom].Length);
+			int count = 0;
+			do {
+				random++;
+				count++;
+				if (count > whatCard.Effects[Effect.BattlecryNonExistantRandom].Length) {
+					break;
+				}
+				if (random >= whatCard.Effects[Effect.BattlecryNonExistantRandom].Length) {
+					random = 0;
+				}
+				c = whatCard.Effects[Effect.BattlecryNonExistantRandom][random];
+				Debug.Log("Random totem found: " + c.Name);
+				//check if exists on board
+			} while (PanelBoardFront.GetComponent<PanelTiles>().IsModelOfCard(c));
+			if (c != null) {
+				Debug.Log("Adding totem to cards to cast: " + c);
+				cardsToCast.Add(c);
+			}
+		}
+		if (whatCard.Effects.ContainsKey(Effect.Battlecry)) {
+			Debug.Log("There is battlecry for " + whatCard.Name);
+			cardsToCast.AddRange(whatCard.Effects[Effect.Battlecry]);
+			Card[] battlecryCards = whatCard.Effects[Effect.Battlecry];
+
+		}
+		if (whatCard.Effects.ContainsKey(Effect.WhileAlive) && whatCard.Effects[Effect.WhileAlive][0].CardPersistency == CardPersistency.WhileHolderAlive) {
+			Debug.Log("There is while alive for " + whatCard.Name);
+			cardsToCast.AddRange(whatCard.Effects[Effect.WhileAlive]);
+		}
+
+		foreach (Card battlecryCard in cardsToCast) {
+			bool explicitly = battlecryCard.CardTarget == CardTarget.Self || battlecryCard.CardTarget == CardTarget.EnemyHero;
+			if (explicitly == false) {
+				PanelCardPreview.GetComponent<PanelCardPreview>().PreviewCard(heroModel, battlecryCard, WhereAmI.TopInfo);
+			}
+			CastSpell(panelTile, battlecryCard, panelTile, pi.Caster, explicitly, 0, true);
+		}
+	}
+
+	public void CastSpell(PanelTile target, Card card, PanelTile caster, PanelTile castingHero, bool explicitlySelectedTile, int cost, bool alreadyPaidFor) {
+		//Debug.Log("Casting spell " + card.Name + " by: " + caster.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name + ", already paid? " + (alreadyPaidFor?"yes":"no"));
 
 		if (explicitlySelectedTile) {
 			foreach (PanelTile pt in PanelBoardFront.GetComponent<PanelTiles>().GetAllPanelTiles()) {
@@ -347,13 +393,10 @@ public class PanelMinigame : MonoBehaviour {
 			}
 		} else {
 			List<PanelTile> pts = PanelBoardFront.GetComponent<PanelTiles>().GetAllPanelTiles();
-			foreach (PanelTile pa in pts) {
-				if (CanBeCastedOn(caster, pa, card)) {
-					pa.PanelInteraction.GetComponent<PanelInteraction>().CanCastHere(caster, card);
-					Mode = global::Mode.CastingSpell;
-					if (pa.PanelAvatar.GetComponent<PanelAvatar>().Model != null){
-						//Debug.Log("Spell: " + card.Name + ", Can be casted on: " + pa.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name);
-					}
+			foreach (PanelTile pt in pts) {
+				if (CanBeCastedOn(caster, pt, card)) {
+					pt.PanelInteraction.GetComponent<PanelInteraction>().CanCastHere(caster, card);
+					Mode = alreadyPaidFor?global::Mode.CastingSpellNoCancel:global::Mode.CastingSpell;
 				}
 			}
 		}
@@ -361,8 +404,8 @@ public class PanelMinigame : MonoBehaviour {
 
 	private bool CanBeCastedOn(PanelTile caster, PanelTile castedOn, Card card) {
 
-		AvatarModel castedOnModel = castedOn.PanelAvatar.GetComponent<PanelAvatar>().Model;
 		AvatarModel castersModel = caster.PanelAvatar.GetComponent<PanelAvatar>().Model;
+		AvatarModel castedOnModel = castedOn.PanelAvatar.GetComponent<PanelAvatar>().Model;
 
 		bool canCast = false;
 		switch (card.CardTarget) {
@@ -381,14 +424,14 @@ public class PanelMinigame : MonoBehaviour {
 			case CardTarget.Self: 
 				canCast = castersModel == castedOnModel; 
 				break;
-			case CardTarget.JustThrow: 
-				canCast = true;
-				break;
 			case CardTarget.Character:
 				canCast = castedOnModel != null;
 				break;
 			case CardTarget.OtherFriendlyMinion: 
 				canCast = castersModel != castedOnModel && castedOnModel != null && castedOnModel.Card.CardPersistency != CardPersistency.Hero && castersModel.GetMyHero().IsItYourMinion(castedOnModel); 
+				break;
+			case CardTarget.OtherCharacter:
+				canCast = castersModel != castedOnModel && castedOnModel != null;
 				break;
 			case CardTarget.EnemyCharacter:
 				canCast = castedOnModel != null && !castersModel.GetMyHero().IsItYourMinion(castedOnModel) && castersModel.GetMyHero() != castedOnModel.GetMyHero();
@@ -433,9 +476,11 @@ public class PanelMinigame : MonoBehaviour {
 			if (am != null) {
 				AvatarModel myHero = am.GetMyHero();
 
-				foreach (KeyValuePair<Effect, Card> e in am.Card.Effects) {
-					if (e.Key == Effect.WhileAlive && e.Value.CardPersistency == CardPersistency.EveryActionRevalidate ) {
-						CastSpell(pt, e.Value, pt, pt, true, 0);
+				foreach (KeyValuePair<Effect, Card[]> e in am.Card.Effects) {
+					foreach (Card card in e.Value) {
+						if (e.Key == Effect.WhileAlive && card.CardPersistency == CardPersistency.EveryActionRevalidate) {
+							CastSpell(pt, card, pt, pt, true, 0, true);
+						}
 					}
 				}
 			}
@@ -475,5 +520,6 @@ public class PanelMinigame : MonoBehaviour {
 
 public enum Mode {
 	Ready, MovingOrAttacking,
-	CastingSpell
+	CastingSpell,
+	CastingSpellNoCancel
 }

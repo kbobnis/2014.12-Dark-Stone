@@ -37,20 +37,28 @@ public class PanelAvatarCard : MonoBehaviour {
 					PanelMinigame.Me.GetComponent<PanelMinigame>().PointerDownOn(gameObject.transform.parent.gameObject.transform.parent.gameObject.GetComponent<PanelTile>());
 					break;
 				case global::WhereAmI.Hand:
-					PanelMinigame.Me.GetComponent<PanelMinigame>().CardInHandSelected(Card);
+					PanelMinigame.Me.GetComponent<PanelMinigame>().CardInHandSelected(Card, false);
 					break;
 				case global::WhereAmI.SpecialPower:
-					PanelMinigame.Me.PanelCardPreview.GetComponent<PanelCardPreview>().PreviewCard(PanelMinigame.Me.ActualTurnModel, Card, global::WhereAmI.TopInfo);
-					if (HeroModel == PanelMinigame.Me.ActualTurnModel && HeroModel.ActualMana >= Card.Cost && !HeroModel.AlreadyUsedPower) {
-						HeroModel.AlreadyUsedPower = true;
-						PanelMinigame.Me.CardInHandSelected(Card);
-						if (Card.CardTarget == CardTarget.JustThrow || Card.CardTarget == CardTarget.Self) {
-							PanelTile actualTurnHerosTile = PanelMinigame.Me.PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(PanelMinigame.Me.ActualTurnModel);
-							PanelMinigame.Me.PointerDownOn(actualTurnHerosTile);
-						}
-						if (Card.CardTarget == CardTarget.EnemyHero) {
-							PanelTile actualTurnHerosTile = PanelMinigame.Me.PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(PanelMinigame.Me.ActualTurnModel==PanelMinigame.Me.MyModel?PanelMinigame.Me.EnemysModel:PanelMinigame.Me.MyModel);
-							PanelMinigame.Me.PointerDownOn(actualTurnHerosTile);
+
+					if (PanelMinigame.Me.Mode != Mode.CastingSpellNoCancel) {
+						PanelMinigame.Me.PanelCardPreview.GetComponent<PanelCardPreview>().PreviewCard(PanelMinigame.Me.ActualTurnModel, Card, global::WhereAmI.TopInfo);
+
+						if (HeroModel == PanelMinigame.Me.ActualTurnModel && HeroModel.ActualMana >= Card.Cost && !HeroModel.AlreadyUsedPower) {
+							HeroModel.AlreadyUsedPower = true;
+							
+							PanelMinigame.Me.CardInHandSelected(Card, true);
+							if (Card.CardTarget == CardTarget.Self) {
+								PanelTile actualTurnHerosTile = PanelMinigame.Me.PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(PanelMinigame.Me.ActualTurnModel);
+								PanelMinigame.Me.PointerDownOn(actualTurnHerosTile);
+							}
+							if (Card.CardTarget == CardTarget.EnemyHero) {
+								PanelTile actualTurnHerosTile = PanelMinigame.Me.PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(PanelMinigame.Me.ActualTurnModel == PanelMinigame.Me.MyModel ? PanelMinigame.Me.EnemysModel : PanelMinigame.Me.MyModel);
+								PanelMinigame.Me.PointerDownOn(actualTurnHerosTile);
+							}
+							//mana deduction has to be after pointer down on, because the spell will no select
+							HeroModel.ActualMana -= Card.Cost;
+							PanelMinigame.Me.RevalidateEffects();
 						}
 					}
 					break;
