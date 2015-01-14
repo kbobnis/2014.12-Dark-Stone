@@ -41,24 +41,30 @@ public class PanelAvatarCard : MonoBehaviour {
 					break;
 				case global::WhereAmI.SpecialPower:
 
-					if (PanelMinigame.Me.Mode != Mode.CastingSpellNoCancel) {
+					if (PanelMinigame.Me.Mode != Mode.CastingSpellNoCancel ) {
 						PanelMinigame.Me.PanelCardPreview.GetComponent<PanelCardPreview>().PreviewCard(PanelMinigame.Me.ActualTurnModel, Card, global::WhereAmI.TopInfo);
 
 						if (HeroModel == PanelMinigame.Me.ActualTurnModel && HeroModel.ActualMana >= Card.Cost && !HeroModel.AlreadyUsedPower) {
-							HeroModel.AlreadyUsedPower = true;
-							
+
+							bool anyActionDone = false;
+
 							PanelMinigame.Me.CardInHandSelected(Card, true);
 							if (Card.CardTarget == CardTarget.Self) {
 								PanelTile actualTurnHerosTile = PanelMinigame.Me.PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(PanelMinigame.Me.ActualTurnModel);
-								PanelMinigame.Me.PointerDownOn(actualTurnHerosTile);
+								anyActionDone = PanelMinigame.Me.PointerDownOn(actualTurnHerosTile);
 							}
 							if (Card.CardTarget == CardTarget.EnemyHero) {
 								PanelTile actualTurnHerosTile = PanelMinigame.Me.PanelBoardFront.GetComponent<PanelTiles>().FindTileForModel(PanelMinigame.Me.ActualTurnModel == PanelMinigame.Me.MyModel ? PanelMinigame.Me.EnemysModel : PanelMinigame.Me.MyModel);
-								PanelMinigame.Me.PointerDownOn(actualTurnHerosTile);
+								anyActionDone = PanelMinigame.Me.PointerDownOn(actualTurnHerosTile);
 							}
 							//mana deduction has to be after pointer down on, because the spell will no select
-							HeroModel.ActualMana -= Card.Cost;
-							PanelMinigame.Me.RevalidateEffects();
+							if (anyActionDone) {
+								HeroModel.AlreadyUsedPower = true;
+								HeroModel.ActualMana -= Card.Cost;
+								PanelMinigame.Me.RevalidateEffects();
+							} else {
+								PanelMinigame.Me.PanelInformation.GetComponent<PanelInformation>().SetText("There is no place or target for special power");
+							}
 						}
 					}
 					break;

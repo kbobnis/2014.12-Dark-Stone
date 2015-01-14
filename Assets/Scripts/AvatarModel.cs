@@ -26,7 +26,7 @@ public class AvatarModel {
 	private int _ActualMana, _MovesLeft, _ActualHealth, _MaxMana;
 
 	public List<Card> Deck = new List<Card>();
-	private List<Card> _Hand = new List<Card>();
+	public List<Card> _Hand = new List<Card>();
 	public List<CastedCard> Effects = new List<CastedCard>();
 	public List<AvatarModel> Minions = new List<AvatarModel>();
 	private AvatarModel _Creator;
