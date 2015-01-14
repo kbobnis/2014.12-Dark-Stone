@@ -144,7 +144,6 @@ public class PanelMinigame : MonoBehaviour {
 		lasiaModel.PullCardFromDeck();
 		lasiaModel.PullCardFromDeck();
 		lasiaModel.PullCardFromDeck();
-		lasiaModel.PullCardFromDeck();
 
 		PanelAvatar dementorAvatar = PanelBoardFront.GetComponent<ScrollableList>().ElementsToPut[2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel dementorModel = dementorAvatar.Model;
@@ -311,12 +310,13 @@ public class PanelMinigame : MonoBehaviour {
 			}
 			case global::Mode.CastingSpell: {
 
-				if (pi.Mode == PanelInteractionMode.Casting) {
+				PanelInteractionMode pim = pi.Mode;
+				if (pim == PanelInteractionMode.Casting) {
 					CastSpell(panelTile, pi.CastersCard, pi.Caster, pi.Caster, true, pi.CastersCard.Cost, false);
 				}
 				DisableAllPanelsInteraction();
 				Mode = global::Mode.Ready;
-				if (pi.CastersCard != null) {
+				if (pim == PanelInteractionMode.Casting && pi.CastersCard != null) {
 					CastEffects(panelTile);
 				}
 				break;
