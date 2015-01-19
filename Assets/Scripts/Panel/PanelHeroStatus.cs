@@ -35,7 +35,7 @@ public class PanelHeroStatus : MonoBehaviour {
 		List<List<TileTemplate>> templates = new List<List<TileTemplate>>();
 		for (int i = 0; i < 1; i++) {
 			List<TileTemplate> col = new List<TileTemplate>();
-			for (int j = 0; j < 10; j++) {
+			for (int j = 0; j < AvatarModel.HandSize ; j++) {
 				TileTemplate tt = new TileTemplate();
 				col.Add(tt);
 			}

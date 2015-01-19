@@ -62,9 +62,9 @@ public class PanelMinigame : MonoBehaviour {
 		PanelInformation.SetActive(true);
 
 		List<List<TileTemplate>> templates = new List<List<TileTemplate>>();
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 3; i++) {
 			List<TileTemplate> col = new List<TileTemplate>();
-			for (int j = 0; j < 5; j++) {
+			for (int j = 0; j < 4; j++) {
 				TileTemplate tt = new TileTemplate();
 				col.Add(tt);
 			}
@@ -73,12 +73,12 @@ public class PanelMinigame : MonoBehaviour {
 
 		PanelBoardBack.GetComponent<ScrollableList>().Build(templates);
 
-		templates[3][2].AddTemplate(Card.Druid);
-		templates[0][2].AddTemplate(Card.Shaman);
+		templates[2][2].AddTemplate(Card.Druid);
+		templates[0][1].AddTemplate(Card.Shaman);
 
 		PanelBoardFront.GetComponent<ScrollableList>().Build(templates);
 		
-		PanelAvatar lasiaAvatar = PanelBoardFront.GetComponent<ScrollableList>().ElementsToPut[3 * 5 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
+		PanelAvatar lasiaAvatar = PanelBoardFront.GetComponent<ScrollableList>().ElementsToPut[2 * 4 + 2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel lasiaModel = lasiaAvatar.Model;
 
 		List<Card> all = new List<Card>();
@@ -141,22 +141,22 @@ public class PanelMinigame : MonoBehaviour {
 		all.Add(Card.Thrallmar);
 		all.Add(Card.Wisp);
 		all.Add(Card.IronbarkProtector);
+
+		all.RemoveAll(x => x.Cost > 5);
 		 
 		all.Shuffle();
 
+		lasiaModel.Deck = all.GetRange(0, 15);
+		lasiaModel.Hand.Add(Card.Wisp);
+		lasiaModel.PullCardFromDeck();
+		lasiaModel.PullCardFromDeck();
 
-		lasiaModel.Deck = all.GetRange(0, 30);
-		lasiaModel.PullCardFromDeck();
-		lasiaModel.PullCardFromDeck();
-		lasiaModel.PullCardFromDeck();
-
-		PanelAvatar dementorAvatar = PanelBoardFront.GetComponent<ScrollableList>().ElementsToPut[2].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
+		PanelAvatar dementorAvatar = PanelBoardFront.GetComponent<ScrollableList>().ElementsToPut[1].GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>();
 		AvatarModel dementorModel = dementorAvatar.Model;
 
-		dementorModel.Deck = all.GetRange(0, 30);
+		all.Shuffle();
+		dementorModel.Deck = all.GetRange(0, 15);
 
-		dementorModel.Deck.Shuffle();
-		dementorModel.PullCardFromDeck();
 		dementorModel.PullCardFromDeck();
 		dementorModel.PullCardFromDeck();
 		dementorModel.PullCardFromDeck();
@@ -233,7 +233,7 @@ public class PanelMinigame : MonoBehaviour {
 		switch (Mode) {
 			case global::Mode.Ready: {
 
-					if (isYourCharacter && targetModel.MovesLeft > 0 && panelTile.SetInteractionToMoveAround()) {
+					if (isYourCharacter && targetModel != null && targetModel.MovesLeft > 0 && panelTile.SetInteractionToMoveAround()) {
 						Mode = global::Mode.MovingOrAttacking;
 						actionWithBattlecryDone = true;
 					}
@@ -244,6 +244,7 @@ public class PanelMinigame : MonoBehaviour {
 				int movesLeft = 0;
 				PanelTile whatWantsToMoveOrAttackHere = pi.WhatMoveOrAttack;
 				PanelInteractionMode mode = pi.Mode;
+				bool hasMoved = false;
 				if (pi.Mode == PanelInteractionMode.Moving || pi.Mode == PanelInteractionMode.Attacking) {
 					whatWantsToMoveOrAttackHere = pi.WhatMoveOrAttack;
 					if (!isYourCharacter) {
@@ -259,11 +260,13 @@ public class PanelMinigame : MonoBehaviour {
 							//move if killed
 							panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model = whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model;
 							whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model = null;
+							hasMoved = true;
 						}
 					} else {
 						//move
 						panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model = whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model;
 						whatWantsToMoveOrAttackHere.PanelAvatar.GetComponent<PanelAvatar>().Model = null;
+						hasMoved = true;
 					}
 					
 				}
@@ -272,7 +275,11 @@ public class PanelMinigame : MonoBehaviour {
 				//automatically enter next move interaction if moves are left
 				if (movesLeft > 0) {
 					Debug.Log("Moves left: " + movesLeft);
-					PointerDownOn(panelTile);
+					if (panelTile.PanelAvatar.GetComponent<PanelAvatar>().Model != null && hasMoved) {
+						PointerDownOn(panelTile);
+					} else {
+						PointerDownOn(whatWantsToMoveOrAttackHere);
+					}
 				}			
 
 				break;
@@ -309,7 +316,7 @@ public class PanelMinigame : MonoBehaviour {
 	}
 
 	private bool CastEffects(PanelTile panelTile) {
-		bool allEffectDone = true;
+		bool allEffectDone = false;
 		bool allEffectsOnceSetTrue = false;
 
 		PanelInteraction pi = panelTile.PanelInteraction.GetComponent<PanelInteraction>();
@@ -328,6 +335,7 @@ public class PanelMinigame : MonoBehaviour {
 				random++;
 				count++;
 				if (count > whatCard.Effects[Effect.BattlecryNonExistantRandom].Length) {
+					c = null;
 					break;
 				}
 				if (random >= whatCard.Effects[Effect.BattlecryNonExistantRandom].Length) {
@@ -367,7 +375,7 @@ public class PanelMinigame : MonoBehaviour {
 		return allEffectDone;
 	}
 
-	public bool CastSpell(PanelTile target, Card card, PanelTile caster, PanelTile castingHero, bool explicitlySelectedTile, int cost, bool alreadyPaidFor) {
+	public bool CastSpell(PanelTile target, Card card, PanelTile caster, PanelTile castingHero, bool explicitlySelectedTile, int cost, bool noCancel) {
 		bool anyActionDone = false;
 		//Debug.Log("Casting spell " + card.Name + " by: " + caster.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name + ", already paid? " + (alreadyPaidFor?"yes":"no"));
 
@@ -375,9 +383,12 @@ public class PanelMinigame : MonoBehaviour {
 			foreach (PanelTile pt in PanelBoardFront.GetComponent<PanelTiles>().GetAllPanelTiles()) {
 				if (castingHero.CanHeHaveThisSpell(target, pt, card)) {
 					//Debug.Log(caster.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name + " is casting on " + pt.gameObject.name + " card: " + card.Name);
-					castingHero.PanelAvatar.GetComponent<PanelAvatar>().CastOn(pt.PanelAvatar.GetComponent<PanelAvatar>(), card, cost);
+					castingHero.PanelAvatar.GetComponent<PanelAvatar>().CastOn(pt.PanelAvatar.GetComponent<PanelAvatar>(), card);
 					anyActionDone = true;
 				}
+			}
+			if (anyActionDone) {
+				castingHero.PanelAvatar.GetComponent<PanelAvatar>().Model._ActualMana -= cost;
 			}
 		} else {
 			List<PanelTile> pts = PanelBoardFront.GetComponent<PanelTiles>().GetAllPanelTiles();
@@ -385,7 +396,7 @@ public class PanelMinigame : MonoBehaviour {
 				if (CanBeCastedOn(caster, pt, card)) {
 					anyActionDone = true;
 					pt.PanelInteraction.GetComponent<PanelInteraction>().CanCastHere(caster, card);
-					Mode = alreadyPaidFor?global::Mode.CastingSpellNoCancel:global::Mode.CastingSpell;
+					Mode = noCancel?global::Mode.CastingSpellNoCancel:global::Mode.CastingSpell;
 				}
 			}
 		}

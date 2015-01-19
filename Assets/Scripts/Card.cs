@@ -92,10 +92,9 @@ public class Card  {
 		IsCastOn = cardIsCastOn;
 	}
 
-
 	public static readonly Card Moonfire = new Card("Moonfire", 0, CardPersistency.Instant, CardTarget.Character, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 1 } });
 	public static readonly Card Innervate = new Card("Innervate", 0, CardPersistency.UntilEndTurn, CardTarget.Self, 0, IsCastOn.FriendlyHero, new Dictionary<ParamType, int>() { {ParamType.ManaCrystalAdd, 2} });
-	public static readonly Card Wisp = new Card("Wisp", 0, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, {ParamType.Speed, 1}});
+	public static readonly Card Wisp = new Card("Wisp", 0, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, {ParamType.Speed, 1}, {ParamType.Sticky, 1} });
 	public static readonly Card ElvenShot = new Card("Elven Shot", 0, CardPersistency.Instant, CardTarget.OtherCharacter, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamage, 1 } });	
 	public static readonly Card ElvenArcher = new Card("Elven Archer", 1, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card[]>() { {Effect.Battlecry, new Card[]{ElvenShot}}});
@@ -138,7 +137,7 @@ public class Card  {
 		new Dictionary<Effect, Card[]>() { { Effect.Battlecry, new Card[]{ShatteredSunClericBlessing} } });
 	public static readonly Card HealingTouch= new Card("Healing Touch", 3, CardPersistency.Instant, CardTarget.Character, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Heal, 8 } });
 	public static readonly Card SavageRoar= new Card("Savage Roar", 3, CardPersistency.UntilEndTurn, CardTarget.Self, 0, IsCastOn.AllFriendlyCharacters, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 2 } });	
-	public static readonly Card Hex = new Card("Hex", 3, CardPersistency.Minion, CardTarget.Minion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.ReplaceExisting, 1}, { ParamType.Health, 1 }, {ParamType.Speed, 1} });
+	public static readonly Card Hex = new Card("Hex", 3, CardPersistency.Minion, CardTarget.Minion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.ReplaceExisting, 1}, { ParamType.Health, 1 }, {ParamType.Speed, 1}, {ParamType.Taunt, 1} });
 	public static readonly Card IronfurGrizzly = new Card("Ironfur Grizzly", 3, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 3 }, { ParamType.Attack, 3 }, { ParamType.Speed, 1 }, {ParamType.Taunt, 1}});
 	public static readonly Card RazorfensBoar = new Card("Razorfens Boar", 1, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, { ParamType.Speed, 1 } });		
 	public static readonly Card RazorfenHunter = new Card("Razorfen Hunter", 3, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 3 }, {ParamType.Attack, 2}, { ParamType.Speed, 1 } },
@@ -200,16 +199,17 @@ public class Card  {
 	public static readonly Card IronbarkProtector = new Card("Ironbark Protector", 8, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Attack, 8 }, { ParamType.Health, 8 }, { ParamType.Speed, 1 }, { ParamType.Taunt, 1 } });
 	public static readonly Card MindControl = new Card("Mind Control", 10, CardPersistency.Instant, CardTarget.EnemyMinion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.TakeControl, 1 } });
 
+	
 	//heroes
 	public static readonly Card ShapeshiftsFur = new Card("ShapeshiftsFur", 1, CardPersistency.WhileHolderAlive, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.ArmorAdd, 1 } });
 	public static readonly Card Shapeshift = new Card("Shapeshift", 2, CardPersistency.UntilEndTurn, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.AttackAdd, 1 } },
 		new Dictionary<Effect, Card[]>() { {  Effect.Battlecry, new Card[]{ShapeshiftsFur }  } });
-	public static readonly Card Druid = new Card("Druid", 10, CardPersistency.Hero, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 30 }, {ParamType.Speed, 1}}, 
+	public static readonly Card Druid = new Card("Druid", 10, CardPersistency.Hero, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 15 }, {ParamType.Speed, 1}}, 
 		new Dictionary<Effect,Card[]>() { { Effect.HerosSpecialPower, new Card[]{Shapeshift} } });
 	
 	public static readonly Card TotemicMight = new Card("Totemic Might", 2, CardPersistency.Instant, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType,int>() { }, 
 		new Dictionary<Effect,Card[]>() { { Effect.BattlecryNonExistantRandom, new Card[]{SearingTotem, WrathOfAirTotem, HealingTotem, StoneclawTotem}} } );
-	public static readonly Card Shaman = new Card("Shaman", 10, CardPersistency.Hero, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 30 }, { ParamType.Speed, 1 } },
+	public static readonly Card Shaman = new Card("Shaman", 10, CardPersistency.Hero, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 15 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect, Card[]>() { { Effect.HerosSpecialPower, new Card[] { TotemicMight } } });
 
 	public string Describe(AvatarModel heroOwner, bool shortV = false) {
@@ -271,6 +271,7 @@ public enum CastedCardParamType {
 	ArmorAdd,
 	ManaCrystalEmptyAdd,
 	HealFull,
+	Sticky,
 }
 
 
@@ -315,6 +316,10 @@ public class CastedCard {
 			Params.Add(CastedCardParamType.Taunt, c.Params[ParamType.Taunt]);
 		}
 
+		if (c.Params.ContainsKey(ParamType.Sticky)) {
+			Params.Add(CastedCardParamType.Sticky, 1);
+		}
+
 		if (c.Params.ContainsKey(ParamType.SpellDamageAdd)) {
 			Params.Add(CastedCardParamType.SpellDamageAdd, c.Params[ParamType.SpellDamageAdd]);
 		}
@@ -342,7 +347,7 @@ public class CastedCard {
 			castingOn.GetMyHero().Minions.Remove(castingOn);
 			castingOn.Creator = castingBy.GetMyHero();
 			castingBy.Minions.Add(castingOn);
-			castingOn.MovesLeft = 0;
+			castingOn.MovesLeft = castingOn.Card.Params.ContainsKey(ParamType.Charge)?castingOn.Card.Params[ParamType.Speed]:0;
 		}
 		if (c.Params.ContainsKey(ParamType.Charge)) {
 			castingOn.RefillMovements();

@@ -19,11 +19,12 @@ public enum AnimationRequest {
 
 public class AvatarModel {
 
-	public static readonly int HandSize = 10;
-	public static readonly int MaxCrystals = 10;
+	public static readonly int HandSize = 5;
+	public static readonly int MaxCrystals = 5;
 
 	private Card _Card;
-	private int _ActualMana, _MovesLeft, _ActualHealth, _MaxMana;
+	public int _ActualMana;
+	private int _MovesLeft, _ActualHealth, _MaxMana;
 
 	public List<Card> Deck = new List<Card>();
 	public List<Card> _Hand = new List<Card>();
@@ -59,9 +60,6 @@ public class AvatarModel {
 				}
 			}
 			return actual;
-		}
-		set {
-			_ActualMana = value;
 		}
 	}
 
@@ -112,7 +110,7 @@ public class AvatarModel {
 				PanelMinigame.Me.AnimationRequests.Add(new AnimationRequestStruct(this, global::AnimationRequest.ReceiveDamage, deltaHealth));
 				if (Card.Effects.ContainsKey(Effect.AfterTakingDamage)) {
 					foreach (Card afterTakingDamage in Card.Effects[Effect.AfterTakingDamage]) {
-						Cast(this, afterTakingDamage, 0);
+						Cast(this, afterTakingDamage);
 					}
 				}
 			}
@@ -207,12 +205,7 @@ public class AvatarModel {
 		}
 	}
 
-	internal AvatarModel Cast(AvatarModel castingOn, Card c, int cost) {
-		_ActualMana -= cost;
-		if (_ActualMana < 0) {
-			//it can go under zero. if a minion is summoning it with battlecry
-			//throw new Exception("What is this situation. Mana can not go under zero. Casting: " + c.Name + " for " + c.Cost);
-		}
+	internal AvatarModel Cast(AvatarModel castingOn, Card c) {
 		Hand.Remove(c);
 
 		//minion

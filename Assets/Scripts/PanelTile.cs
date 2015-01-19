@@ -98,7 +98,9 @@ public class PanelTile : MonoBehaviour {
 		bool canMove = false;
 
 		//check for adjacent taunt
+		//check for adjacent sticky enemy characters
 		bool foundTaunt = false;
+		bool foundStickyEnemy = false;
 		List<Side> whereTaunts = new List<Side>();
 		foreach (Side s in SideMethods.AllSides()) {
 			if (Neighbours.ContainsKey(s)) {
@@ -106,9 +108,11 @@ public class PanelTile : MonoBehaviour {
 				if (m != null && !m.IsFriendlyCharacter(PanelAvatar.GetComponent<PanelAvatar>().Model)) {
 					foreach (CastedCard cc in m.Effects) {
 						if (cc.Params.ContainsKey(CastedCardParamType.Taunt)) {
-							Debug.Log("Found taunt on " + m.Card.Name);
 							foundTaunt = true;
 							whereTaunts.Add(s);
+						}
+						if (cc.Params.ContainsKey(CastedCardParamType.Sticky)) {
+							foundStickyEnemy = true;
 						}
 					}
 				}
@@ -121,8 +125,11 @@ public class PanelTile : MonoBehaviour {
 				PanelTile whereMove = Neighbours[s];
 				
 				if (whereMove.PanelAvatar.GetComponent<PanelAvatar>().Model == null) {
-					whereMove.PanelInteraction.GetComponent<PanelInteraction>().CanMoveHere(this);
-					canMove = true;
+
+					if (!foundStickyEnemy) {
+						whereMove.PanelInteraction.GetComponent<PanelInteraction>().CanMoveHere(this);
+						canMove = true;
+					}
 				} else if (!PanelAvatar.GetComponent<PanelAvatar>().Model.IsFriendlyCharacter(whereMove.PanelAvatar.GetComponent<PanelAvatar>().Model)
 						&& am.ActualAttack > 0 
 						&& (!foundTaunt || whereTaunts.Contains(s))) {

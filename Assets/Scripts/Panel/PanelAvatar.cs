@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class PanelAvatar : MonoBehaviour {
 
-	public GameObject PanelTile, ImageTaunt, PanelAvatarCard;
+	public GameObject PanelTile, PanelAvatarCard;
 
 	private AvatarModel _Model = null;
 
@@ -27,15 +27,6 @@ public class PanelAvatar : MonoBehaviour {
 			_Model = null;
 		}
 
-		bool hasTaunt = false;
-		if (Model != null) {
-			foreach (CastedCard cc in Model.Effects) {
-				if (cc.Params.ContainsKey(CastedCardParamType.Taunt)) {
-					hasTaunt = true;
-				}
-			}
-		}
-		ImageTaunt.SetActive(hasTaunt);
 		AvatarModel heroModel = Model != null ? Model.GetMyHero() : null;
 		PanelAvatarCard.GetComponent<PanelAvatarCard>().PreviewModel(heroModel, Model, PanelMinigame.Me.ActualTurnModel.IsItYourMinion(Model) || PanelMinigame.Me.ActualTurnModel == heroModel);
 	}
@@ -56,8 +47,8 @@ public class PanelAvatar : MonoBehaviour {
 		panelAvatar.UpdateFromModel();
 	}
 
-	public void CastOn(PanelAvatar onWhat, Card c, int cost) {
-		onWhat.Model = Model.Cast(onWhat.Model, c, cost);
+	public void CastOn(PanelAvatar onWhat, Card c) {
+		onWhat.Model = Model.Cast(onWhat.Model, c);
 	}
 
 }

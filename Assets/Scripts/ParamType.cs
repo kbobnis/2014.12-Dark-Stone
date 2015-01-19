@@ -22,6 +22,7 @@ public enum ParamType {
 	Taunt,
 	Charge,
 	HealFull,
+	Sticky,
 }
 
 public static class ParamTypeMethod {

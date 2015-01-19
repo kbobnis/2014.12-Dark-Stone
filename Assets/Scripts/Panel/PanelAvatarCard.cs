@@ -6,13 +6,13 @@ using UnityEngine.EventSystems;
 
 public class PanelAvatarCard : MonoBehaviour {
 
-	public GameObject PanelCrystal, PanelAttack, PanelHealth, PanelArmor, CardImage, ImageOval, ImageColor;
+	public GameObject PanelCrystal, PanelAttack, PanelHealth, PanelArmor, CardImage, ImageOval, ImageColor, ImageBorder, ImageTaunt, ImageSticky;
 
 	public AvatarModel HeroModel;
 	public Card Card;
 	public WhereAmI WhereAmI = WhereAmI.TopInfo;
 
-	public void Prepare(AvatarModel heroModel , Card card){
+	public void Prepare(AvatarModel heroModel , Card card, WhereAmI whereAmI){
 		HeroModel = heroModel;
 		Card = card;
 
@@ -22,12 +22,16 @@ public class PanelAvatarCard : MonoBehaviour {
 		PanelCrystal.SetActive(Card != null);
 		PanelAttack.SetActive(Card != null);
 		PanelHealth.SetActive(Card != null);
+		ImageTaunt.SetActive(false);
+		ImageSticky.SetActive(false);
 		//minion has green background
-		ImageColor.GetComponent<Image>().color = (card!=null&&card.CardPersistency.IsCharacter()) ? Color.green : Color.red;
+		ImageColor.GetComponent<Image>().color = (card!=null&&card.CardPersistency.IsCharacter()) ? Color.blue : Color.red;
 		//minion has oval
 		//ImageOval.SetActive(card!=null && Card.CardPersistency.IsCharacter());
 
 		CardImage.GetComponent<Image>().sprite = card != null?card.Animation:null;
+
+		ImageBorder.SetActive(whereAmI == global::WhereAmI.Hand || whereAmI == global::WhereAmI.SpecialPower || whereAmI == global::WhereAmI.Board);
 	}
 
 	public void Touched(BaseEventData bed) {
@@ -60,7 +64,7 @@ public class PanelAvatarCard : MonoBehaviour {
 							//mana deduction has to be after pointer down on, because the spell will no select
 							if (anyActionDone) {
 								HeroModel.AlreadyUsedPower = true;
-								HeroModel.ActualMana -= Card.Cost;
+								HeroModel._ActualMana -= Card.Cost;
 								PanelMinigame.Me.RevalidateEffects();
 							} else {
 								PanelMinigame.Me.PanelInformation.GetComponent<PanelInformation>().SetText("There is no place or target for special power");
@@ -81,15 +85,16 @@ public class PanelAvatarCard : MonoBehaviour {
 	}
 
 	public void PreviewCardHand(AvatarModel heroModel, Card card, WhereAmI whereAmI) {
-		Prepare(heroModel, card);
+
+		Prepare(heroModel, card, whereAmI);
 		
 		PanelCrystal.GetComponent<PanelValue>().Prepare(Card!=null? Card.Cost:0);
 		PanelAttack.GetComponent<PanelValue>().Prepare(Card!=null && Card.Params.ContainsKey(ParamType.Attack) ? Card.Params[ParamType.Attack] : 0);
 		PanelHealth.GetComponent<PanelValue>().Prepare(Card != null && Card.Params.ContainsKey(ParamType.Health) ? Card.Params[ParamType.Health] : 0);
 
-		CardImage.GetComponent<Image>().color = card != null && heroModel != null && card.Cost > heroModel.ActualMana ? Color.black : (whereAmI == global::WhereAmI.SpecialPower && heroModel.AlreadyUsedPower ? Color.black : Color.white );
+		ImageBorder.GetComponent<Image>().color = card != null && heroModel != null && card.Cost > heroModel.ActualMana ? Color.black : (whereAmI == global::WhereAmI.SpecialPower && heroModel.AlreadyUsedPower ? Color.black : Color.green );
 		if (whereAmI == global::WhereAmI.TopInfo) {
-			CardImage.GetComponent<Image>().color = Color.white;
+			ImageBorder.GetComponent<Image>().color = Color.white;
 		}
 		//PanelCrystal.GetComponent<Image>().color = card != null && card.Cost > heroModel.ActualMana ? Color.black : Color.white;
 		//PanelCrystal.GetComponent<PanelValue>().Text.GetComponent<Text>().color = card != null && heroModel != null && card.Cost > heroModel.ActualMana ? Color.black : Color.white;
@@ -97,7 +102,7 @@ public class PanelAvatarCard : MonoBehaviour {
 
 	internal void PreviewModel(AvatarModel heroModel, AvatarModel target, bool friendly) {
 		Card c = target != null ? target.Card : null;
-		Prepare(heroModel, c);
+		Prepare(heroModel, c, global::WhereAmI.Board);
 
 		//on board there is no color
 		ImageColor.SetActive(false);
@@ -105,14 +110,30 @@ public class PanelAvatarCard : MonoBehaviour {
 		PanelHealth.GetComponent<PanelValue>().Prepare(target!=null ? target.ActualHealth:0);
 		PanelArmor.GetComponent<PanelValue>().Prepare(target != null ? target.Armor : 0);
 
+		ImageBorder.SetActive(target != null);
 		if (target != null) {
-			CardImage.GetComponent<Image>().color = target.MovesLeft > 0 ? Color.white : Color.black;
-			CardImage.GetComponent<Image>().material = Image.defaultGraphicMaterial;
+			ImageBorder.GetComponent<Image>().color = target.MovesLeft > 0 ? Color.green : Color.black;
+			ImageBorder.GetComponent<Image>().material = Image.defaultGraphicMaterial;
 
 			if (!friendly) {
-				CardImage.GetComponent<Image>().color = Color.red;
-				CardImage.GetComponent<Image>().material = SpriteManager.Font.material;
+				ImageBorder.GetComponent<Image>().color = Color.red;
+				ImageBorder.GetComponent<Image>().material = SpriteManager.Font.material;
 			}
 		}
+		bool hasTaunt = false;
+		bool hasSticky = false;
+		if (target != null) {
+			foreach (CastedCard cc in target.Effects) {
+				if (cc.Params.ContainsKey(CastedCardParamType.Taunt)) {
+					hasTaunt = true;
+				}
+				if (cc.Params.ContainsKey(CastedCardParamType.Sticky)){
+					hasSticky = true;
+				}
+			}
+		}
+		ImageTaunt.SetActive(hasTaunt);
+		ImageSticky.SetActive(hasSticky);
+
 	}
 }
