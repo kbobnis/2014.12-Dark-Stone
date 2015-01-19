@@ -8,6 +8,9 @@ using System;
 public class PanelTile : MonoBehaviour {
 
 	public GameObject PanelAvatar, PanelInteraction, PanelAvatarCardPrefab;
+	public Dictionary<Side, PanelTile> Neighbours = new Dictionary<Side, PanelTile>();
+	public int Row;
+	public int Column;
 
 	public void Create(int row, int column) {
 		Row = row;
@@ -20,10 +23,6 @@ public class PanelTile : MonoBehaviour {
 		rt.offsetMin = new Vector2();
 		rt.offsetMax = new Vector2();
 	}
-
-	public Dictionary<Side, PanelTile> Neighbours = new Dictionary<Side, PanelTile>();
-	public int Row;
-	public int Column;
 
 	internal int GetDistanceTo(PanelTile to) {
 		int d = Mathf.Abs(to.Row - Row) + Mathf.Abs(to.Column - Column);
@@ -44,12 +43,55 @@ public class PanelTile : MonoBehaviour {
 			case IsCastOn.Target:
 				canIHave = onWhat == target;
 				break;
-			case IsCastOn.AllFriendlyMinions:
+			case IsCastOn.FriendlyMinions:
 				canIHave = onWhatModel != null && casterModel.GetMyHero().IsItYourMinion(onWhatModel);
 				break;
-			case IsCastOn.AdjacentFriendlyMinions:
+			case IsCastOn.AdjacentCharacters:
+				if (onWhatModel != null) {
+					foreach (Side s in SideMethods.AllSides()) {
+						//we have to compare panelTiles instead of AvatarModels, because we could compare null to null
+						if (target.Neighbours.ContainsKey(s) && target.Neighbours[s] == onWhat) {
+							canIHave = true;
+						}
+					}
+				}
+				break;
+			case IsCastOn.AllCharactersInLineFromThis:
+				//define the line
+				int dRow = target.Row - Row;
+				int dCol = target.Column - Column;
+				
+				Side s2 = SideMethods.GetSide(dRow, dCol);
+				PanelTile tmp = target;
+				bool thisIsOnLine = false;
+
+				while (tmp != null) {
+					thisIsOnLine = tmp == onWhat;
+					if (thisIsOnLine) {
+						break;
+					}
+					if (tmp.Neighbours.ContainsKey(s2)) {
+						tmp = tmp.Neighbours[s2];
+					} else {
+						break;
+					}
+				}
+				canIHave = thisIsOnLine;
+				break;
+			case IsCastOn.AdjacentMinions:
+
+				if (onWhatModel != null && onWhatModel.Card.CardPersistency == CardPersistency.Minion) {
+					foreach (Side s in SideMethods.AllSides()) {
+						//we have to compare panelTiles instead of AvatarModels, because we could compare null to null
+						if (target.Neighbours.ContainsKey(s) && target.Neighbours[s] == onWhat) {
+							canIHave = true;
+						}
+					}
+				}
+				break;
+			case IsCastOn.FriendlyAdjacentMinions:
 				if (onWhatModel != null && casterModel.GetMyHero().IsItYourMinion(onWhatModel)) {
-					foreach (Side s in SideMethods.AdjacentSides()) {
+					foreach (Side s in SideMethods.AllSides()) {
 						//we have to compare panelTiles instead of AvatarModels, because we could compare null to null
 						if (Neighbours.ContainsKey(s) && Neighbours[s] == onWhat) {
 							canIHave = true;
@@ -57,9 +99,9 @@ public class PanelTile : MonoBehaviour {
 					}
 				}
 				break;
-			case IsCastOn.AdjacentFriendlyCharacters:
+			case IsCastOn.FriendlyAdjacentCharacters:
 				if (onWhatModel != null && (casterModel.GetMyHero().IsItYourMinion(onWhatModel) || targetModel.GetMyHero() == casterModel)) {
-					foreach (Side s in SideMethods.AdjacentSides()) {
+					foreach (Side s in SideMethods.AllSides()) {
 						//we have to compare panelTiles instead of AvatarModels, because we could compare null to null
 						if (Neighbours.ContainsKey(s) && Neighbours[s] == onWhat) {
 							canIHave = true;
@@ -70,7 +112,7 @@ public class PanelTile : MonoBehaviour {
 			case IsCastOn.OtherFriendlyMinions:
 				canIHave = onWhatModel != null && casterModel.GetMyHero().IsItYourMinion(onWhatModel) && targetModel != onWhatModel;
 				break;
-			case IsCastOn.AllEnemyCharacters:
+			case IsCastOn.EnemyCharacters:
 				canIHave = onWhatModel != null && onWhatModel.GetMyHero() != casterModel.GetMyHero();
 				break;
 			case IsCastOn.OtherItsCharacters:
@@ -79,10 +121,10 @@ public class PanelTile : MonoBehaviour {
 			case IsCastOn.FriendlyHero:
 				canIHave = casterModel.GetMyHero() == onWhatModel;
 				break;
-			case IsCastOn.AllEnemyMinions:
+			case IsCastOn.EnemyMinions:
 				canIHave = onWhatModel != null && onWhatModel.GetMyHero() != casterModel.GetMyHero() && onWhatModel.GetMyHero().IsItYourMinion(onWhatModel);
 				break;
-			case IsCastOn.AllFriendlyCharacters:
+			case IsCastOn.FriendlyCharacters:
 				canIHave = onWhatModel != null && casterModel.IsFriendlyCharacter(onWhatModel);
 				break;
 			case IsCastOn.EnemyHero:

@@ -21,7 +21,17 @@ public class PanelAvatar : MonoBehaviour {
 
 	public void UpdateFromModel() {
 
-		if (Model != null && Model.IsOnBoard() &&  Model.ActualHealth <= 0) {
+		//to be destroyed?
+		bool toBeDestroyed = false;
+		if (Model != null) {
+			foreach (CastedCard cc in Model.Effects) {
+				if (cc.Params.ContainsKey(CastedCardParamType.Destroy)) {
+					toBeDestroyed = true;
+				}
+			}
+		}
+
+		if (Model != null && (Model.ActualHealth <= 0 || toBeDestroyed) ) {
 			//is dead
 			_Model.GetMyHero().Minions.Remove(_Model);
 			_Model = null;

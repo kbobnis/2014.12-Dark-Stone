@@ -33,7 +33,6 @@ public class AvatarModel {
 	private AvatarModel _Creator;
 	public Dictionary<Side, AvatarModel> AdjacentModels = new Dictionary<Side, AvatarModel>();
 	private int Draught;
-	private bool OnBoard;
 	public int Armor;
 	public bool AlreadyUsedPower;
 
@@ -88,11 +87,8 @@ public class AvatarModel {
 			throw new Exception("Card can not be null");
 		}
 		_Card = card;
-		OnBoard = onBoard;
 
 		ActualHealth = card.Params[ParamType.Health];
-
-		//adding taunt effect if needed to
 	}
 
 	public int ActualHealth {
@@ -186,10 +182,6 @@ public class AvatarModel {
 				_Hand.Add(c);
 			}
 		}
-	}
-
-	internal bool IsOnBoard() {
-		return OnBoard;
 	}
 
 	public int ActualAttack {

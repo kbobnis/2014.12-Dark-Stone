@@ -33,7 +33,7 @@ public class PanelTiles : MonoBehaviour {
 			AvatarModel am = go.GetComponent<PanelTile>().PanelAvatar.GetComponent<PanelAvatar>().Model;
 			if (am != null) {
 
-				foreach (Side s in SideMethods.AdjacentSides()) {
+				foreach (Side s in SideMethods.AllSides()) {
 					if (pt.Neighbours.ContainsKey(s)) {
 						am.AdjacentModels[s] = pt.Neighbours[s].PanelAvatar.GetComponent<PanelAvatar>().Model;
 					}

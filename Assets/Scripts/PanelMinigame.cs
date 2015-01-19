@@ -142,12 +142,16 @@ public class PanelMinigame : MonoBehaviour {
 		all.Add(Card.Wisp);
 		all.Add(Card.IronbarkProtector);
 
+		all.Add(Card.KillTheBullies);
+		all.Add(Card.BubblingVolcano);
+		all.Add(Card.MagicArrow);
+
 		all.RemoveAll(x => x.Cost > 5);
 		 
 		all.Shuffle();
 
 		lasiaModel.Deck = all.GetRange(0, 15);
-		lasiaModel.Hand.Add(Card.Wisp);
+		lasiaModel.Hand.Add(Card.MagicArrow);
 		lasiaModel.PullCardFromDeck();
 		lasiaModel.PullCardFromDeck();
 
@@ -156,7 +160,7 @@ public class PanelMinigame : MonoBehaviour {
 
 		all.Shuffle();
 		dementorModel.Deck = all.GetRange(0, 15);
-
+		dementorModel.Hand.Add(Card.BubblingVolcano);
 		dementorModel.PullCardFromDeck();
 		dementorModel.PullCardFromDeck();
 		dementorModel.PullCardFromDeck();
@@ -382,7 +386,7 @@ public class PanelMinigame : MonoBehaviour {
 		if (explicitlySelectedTile) {
 			foreach (PanelTile pt in PanelBoardFront.GetComponent<PanelTiles>().GetAllPanelTiles()) {
 				if (castingHero.CanHeHaveThisSpell(target, pt, card)) {
-					//Debug.Log(caster.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name + " is casting on " + pt.gameObject.name + " card: " + card.Name);
+					Debug.Log(castingHero.PanelAvatar.GetComponent<PanelAvatar>().Model.Card.Name + " is casting on " + pt.gameObject.name + " card: " + card.Name);
 					castingHero.PanelAvatar.GetComponent<PanelAvatar>().CastOn(pt.PanelAvatar.GetComponent<PanelAvatar>(), card);
 					anyActionDone = true;
 				}
@@ -433,6 +437,12 @@ public class PanelMinigame : MonoBehaviour {
 				break;
 			case CardTarget.OtherCharacter:
 				canCast = castersModel != castedOnModel && castedOnModel != null;
+				break;
+			case CardTarget.AnyOther:
+				canCast = castersModel != castedOnModel;
+				break;
+			case CardTarget.Any:
+				canCast = true;
 				break;
 			case CardTarget.EnemyCharacter:
 				canCast = castedOnModel != null && !castersModel.GetMyHero().IsItYourMinion(castedOnModel) && castersModel.GetMyHero() != castedOnModel.GetMyHero();

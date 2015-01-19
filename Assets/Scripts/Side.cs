@@ -10,14 +10,8 @@ public enum Side {
 public static class SideMethods {
 
 	public static List<Side> AllSides() {
-		List<Side> l = new List<Side>() { Side.UpLeft, Side.UpRight, Side.DownLeft, Side.DownRight };
-		l.AddRange(AdjacentSides());
-		return l;
+		return new List<Side>() {Side.Up, Side.Down, Side.Left, Side.Right , Side.UpLeft, Side.UpRight, Side.DownLeft, Side.DownRight };
 	}
-	public static List<Side> AdjacentSides() {
-		return new List<Side>() { Side.Up, Side.Down, Side.Left, Side.Right };
-	}
-
 	public static int DeltaX(this Side s) {
 		switch (s) {
 			case Side.Left: return -1;
@@ -34,6 +28,33 @@ public static class SideMethods {
 			default:
 				throw new Exception("Implement me");
 		}
+	}
+
+	public static Side GetSide(int x, int y){
+		switch (x) {
+			case 0:
+				switch (y) {
+					case 0: return Side.None;
+					case -1: return Side.Up;
+					case 1: return Side.Down;
+				}
+				break;
+			case 1:
+				switch (y) {
+					case 0: return Side.Right;
+					case -1: return Side.UpRight;
+					case 1: return Side.DownRight;
+				}
+				break;
+			case -1:
+				switch (y) {
+					case 0: return Side.Left;
+					case -1: return Side.UpLeft;
+					case 1: return Side.DownLeft;
+				}
+				break;
+		}
+		throw new Exception("There is no side for x: " + x + ", y: " + y);
 	}
 
 	public static Side Opposite(this Side s) {
