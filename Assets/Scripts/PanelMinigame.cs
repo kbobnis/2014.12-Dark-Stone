@@ -151,7 +151,6 @@ public class PanelMinigame : MonoBehaviour {
 		all.Shuffle();
 
 		lasiaModel.Deck = all.GetRange(0, 15);
-		lasiaModel.Hand.Add(Card.MagicArrow);
 		lasiaModel.PullCardFromDeck();
 		lasiaModel.PullCardFromDeck();
 
@@ -160,7 +159,7 @@ public class PanelMinigame : MonoBehaviour {
 
 		all.Shuffle();
 		dementorModel.Deck = all.GetRange(0, 15);
-		dementorModel.Hand.Add(Card.BubblingVolcano);
+		dementorModel.Hand.Add(Card.ManaCrystal);
 		dementorModel.PullCardFromDeck();
 		dementorModel.PullCardFromDeck();
 		dementorModel.PullCardFromDeck();

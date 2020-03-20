@@ -23,7 +23,10 @@ public class SpriteManager : MonoBehaviour{
 	public static Font Font;
 
 	void Awake(){
-
+		Debug.Log("Awake sprite manager");
+		if (Font != null) {
+			return;
+		}
 		Font = Resources.Load<Font>("MunroSmall");
 
 		ManaCrystallFull = Resources.Load<Sprite>("Images/manaCrystalFull");

@@ -3,6 +3,7 @@ using System.Collections;
 using System;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class PanelAvatarCard : MonoBehaviour {
 
@@ -127,8 +128,16 @@ public class PanelAvatarCard : MonoBehaviour {
 				if (cc.Params.ContainsKey(CastedCardParamType.Taunt)) {
 					hasTaunt = true;
 				}
-				if (cc.Params.ContainsKey(CastedCardParamType.Sticky)){
-					hasSticky = true;
+			}
+
+			foreach(KeyValuePair<Side, AvatarModel> kvp in target.AdjacentModels){
+				if (kvp.Value != null) {
+					foreach (CastedCard cc in kvp.Value.Effects) {
+						
+						if (cc.Params.ContainsKey(CastedCardParamType.Sticky)) {
+							hasSticky = true;
+						}
+					}
 				}
 			}
 		}

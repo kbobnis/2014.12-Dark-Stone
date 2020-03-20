@@ -97,6 +97,7 @@ public class Card  {
 		IsCastOn = cardIsCastOn;
 	}
 
+	public static readonly Card ManaCrystal = new Card("Mana Crystal", 0, CardPersistency.UntilEndTurn, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.ManaCrystalAdd, 1 } });
 	public static readonly Card Moonfire = new Card("Moonfire", 0, CardPersistency.Instant, CardTarget.Character, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 1 } });
 	public static readonly Card Innervate = new Card("Innervate", 0, CardPersistency.UntilEndTurn, CardTarget.Self, 0, IsCastOn.FriendlyHero, new Dictionary<ParamType, int>() { {ParamType.ManaCrystalAdd, 2} });
 	public static readonly Card Wisp = new Card("Wisp", 0, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 1 }, {ParamType.Speed, 1}, {ParamType.Sticky, 1} });
@@ -162,7 +163,7 @@ public class Card  {
 	public static readonly Card Swipe = new Card("Swipe", 4, CardPersistency.Instant, CardTarget.EnemyCharacter, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 4 } },
 		new Dictionary<Effect,Card[]>() { { Effect.Battlecry, new Card[]{SwipeRicochet } }});
 	public static readonly Card ChillwindYeti = new Card("Chillwind Yeti", 4, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 5 }, { ParamType.Attack, 4 }, { ParamType.Speed, 1 } });
-	public static readonly Card MechanicalDragonling = new Card("Mechanical Dragonling", 1, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 2 }, { ParamType.Speed, 1 } });
+	public static readonly Card MechanicalDragonling = new Card("Mechanical Dragonling", 1, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 1 }, { ParamType.Attack, 2 }, { ParamType.Speed, 1 }, { ParamType.Sticky, 1} });
 	public static readonly Card DragonlingMechanic = new Card("Dragonling Mechanic", 4, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 4 }, { ParamType.Attack, 2 }, { ParamType.Speed, 1 } },
 		new Dictionary<Effect,Card[]>() { { Effect.Battlecry, new Card[]{MechanicalDragonling } }});
 	public static readonly Card SenjinShieldmasta = new Card("Senjin Shieldmasta", 4, CardPersistency.Minion, CardTarget.Empty, 1, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.Health, 5 }, { ParamType.Attack, 3 }, { ParamType.Speed, 1 }, { ParamType.Taunt, 1 } });
@@ -205,11 +206,12 @@ public class Card  {
 	public static readonly Card MindControl = new Card("Mind Control", 10, CardPersistency.Instant, CardTarget.EnemyMinion, 5, IsCastOn.Target, new Dictionary<ParamType, int>() { {ParamType.TakeControl, 1 } });
 
 	//dark stone original cards
-	public static readonly Card KillTheBullies = new Card("Kill The Bullies", 5, CardPersistency.WhileHolderAlive, CardTarget.Self, 0, IsCastOn.AdjacentMinions, new Dictionary<ParamType, int>() { { ParamType.Destroy, 1} });
+	public static readonly Card KillTheBullies = new Card("Kill The Bullies", 4, CardPersistency.WhileHolderAlive, CardTarget.Self, 0, IsCastOn.AdjacentMinions, new Dictionary<ParamType, int>() { { ParamType.Destroy, 1} });
 	public static readonly Card VolcanoFragments = new Card("Volcano Fragments", 1, CardPersistency.Instant, CardTarget.Self, 2, IsCastOn.AdjacentCharacters, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 1 } });
 	public static readonly Card BubblingVolcano = new Card("Bubbling Volcano", 2, CardPersistency.Instant, CardTarget.Any, 2, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 2 } },
 		new Dictionary<Effect,Card[]>() { {Effect.Battlecry, new Card[]{ VolcanoFragments }}});
 	public static readonly Card MagicArrow = new Card("Magic Arrow", 3, CardPersistency.Instant, CardTarget.AnyOther, 1, IsCastOn.AllCharactersInLineFromThis, new Dictionary<ParamType, int>() { { ParamType.DealDamageSpell, 2 } });
+
 
 	//heroes
 	public static readonly Card ShapeshiftsFur = new Card("ShapeshiftsFur", 1, CardPersistency.WhileHolderAlive, CardTarget.Self, 0, IsCastOn.Target, new Dictionary<ParamType, int>() { { ParamType.ArmorAdd, 1 } });

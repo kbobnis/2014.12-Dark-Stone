@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 798194b59d963c24e8e1b4338226b5e6
+guid: 91930d2bfe08a094bb086e500d9a15a0
 TextureImporter:
   internalIDToNameTable:
   - first:
       213: 21300000
-    second: Starfire
+    second: Mana Crystal
   externalObjects: {}
   serializedVersion: 10
   mipmaps:
@@ -34,7 +34,7 @@ TextureImporter:
   maxTextureSize: 1024
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: -1
     aniso: -1
     mipBias: -100
     wrapU: -1
