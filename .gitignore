@@ -16,3 +16,4 @@ platforms
 /web/*.unity3d
 /web_Data
 *.exe
+/.vs
